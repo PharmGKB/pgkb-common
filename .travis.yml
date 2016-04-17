@@ -10,6 +10,8 @@ env:
     - OSSRH_USERNAME=travis
     - OSSRH_PASSWORD=dummy
 
+install: ./gradlew jar
+
 # gradle-specific cache configuration:
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
