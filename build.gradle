@@ -38,6 +38,9 @@ archivesBaseName = "pgkb-common"
 
 ext {
   description = 'PharmGKB common packages.'
+  // grab user/pwd from environment for Travis CI
+  sonatypeUser = hasProperty('ossrhUsername') ? ossrhUsername : System.getenv('OSSRH_USERNAME')
+  sonatypePwd = hasProperty('ossrhPassword') ? ossrhPassword : System.getenv('OSSRH_PASSWORD')
 }
 
 
@@ -103,11 +106,11 @@ uploadArchives {
       beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
       repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-        authentication(userName: ossrhUsername, password: ossrhPassword)
+        authentication(userName: sonatypeUser, password: sonatypePwd)
       }
 
       snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-        authentication(userName: ossrhUsername, password: ossrhPassword)
+        authentication(userName: sonatypeUser, password: sonatypePwd)
       }
 
       pom.project {
