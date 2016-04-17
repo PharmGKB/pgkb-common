@@ -1,0 +1,132 @@
+def getVersionName = {
+  try {
+    def stdout = new ByteArrayOutputStream()
+    exec {
+      commandLine 'git', 'describe', '--tags'
+      standardOutput = stdout
+    }
+    return stdout.toString().trim()
+  }
+  catch (ignored) {
+    return null
+  }
+}
+
+
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+project.group = 'org.pharmgkb'
+project.version = getVersionName()
+archivesBaseName = "pgkb-common"
+
+ext {
+  description = 'PharmGKB common packages.'
+}
+
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  compile group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
+  compile group: 'com.google.guava', name: 'guava', version: '19.0'
+  compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'
+  compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.21'
+
+  testCompile group: 'junit', name: 'junit', version: '4.11'
+}
+
+
+task printVersion {
+  doLast {
+    println project.version
+  }
+}
+
+
+jar {
+  manifest {
+    attributes 'Implementation-Title': project.name
+    attributes 'Implementation-Version': project.version
+  }
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+  classifier = 'javadoc'
+  from 'build/docs/javadoc'
+}
+
+task sourcesJar(type: Jar) {
+  classifier = 'sources'
+  from sourceSets.main.allSource
+}
+
+artifacts {
+  archives jar
+  archives javadocJar
+  archives sourcesJar
+}
+
+
+signing {
+  sign configurations.archives
+}
+
+
+// This will only upload the archives to Sonatype
+// It will still have to be released manually: http://central.sonatype.org/pages/releasing-the-deployment.html
+//noinspection GroovyAssignabilityCheck
+uploadArchives {
+  repositories {
+    mavenDeployer {
+      beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+      repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+        authentication(userName: ossrhUsername, password: ossrhPassword)
+      }
+
+      snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+        authentication(userName: ossrhUsername, password: ossrhPassword)
+      }
+
+      pom.project {
+        name project.name
+        packaging 'jar'
+        description description
+        url 'https://github.com/PharmGKB/pgkb-common'
+
+        scm {
+          connection 'scm:git@github.com:PharmGKB/pgkb-common.git'
+          developerConnection 'scm:git@github.com:PharmGKB/pgkb-common.git'
+          url 'https://github.com/PharmGKB/pgkb-common'
+        }
+        licenses {
+          license {
+            name 'MPL 2.0'
+            url 'http://mozilla.org/MPL/2.0/'
+          }
+        }
+        organization {
+          name 'PharmGKB'
+          url 'https://www.pharmgkb.org'
+        }
+        developers {
+          developer {
+            id 'markwoon'
+            name 'Mark Woon'
+          }
+          developer {
+            id 'whaleyr'
+            name 'Ryan Whaley'
+          }
+        }
+      }
+    }
+  }
+}
