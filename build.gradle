@@ -14,6 +14,7 @@ def getVersionName = {
 
 
 apply plugin: 'java'
+apply plugin: 'osgi'
 apply plugin: 'maven'
 apply plugin: 'signing'
 
@@ -54,6 +55,9 @@ jar {
   manifest {
     attributes 'Implementation-Title': project.name
     attributes 'Implementation-Version': project.version
+    instruction 'Import-Package',
+        'javax.annotation;resolution:=optional',
+        '*'
   }
 }
 
@@ -79,6 +83,12 @@ signing {
 }
 
 
+/*
+ ----- BEGIN LICENSE BLOCK -----
+ This Source Code Form is subject to the terms of the Mozilla Public License, v.2.0.
+ If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ ----- END LICENSE BLOCK -----
+ */
 // This will only upload the archives to Sonatype
 // It will still have to be released manually: http://central.sonatype.org/pages/releasing-the-deployment.html
 //noinspection GroovyAssignabilityCheck
