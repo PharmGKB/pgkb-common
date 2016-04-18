@@ -9,6 +9,7 @@ package org.pharmgkb.common.comparator;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -31,5 +32,13 @@ public class HaplotypeNameComparatorTest {
     assertEquals(-1, HaplotypeNameComparator.getComparator().compare("*2", "*11"));
     assertEquals(1, HaplotypeNameComparator.getComparator().compare("*13", "*3"));
     assertEquals(1, HaplotypeNameComparator.getComparator().compare("H3", "H2"));
+
+    assertEquals(0, HaplotypeNameComparator.getComparator().compare("H2 EM", "H2 EM"));
+    assertTrue(HaplotypeNameComparator.getComparator().compare("H2 EM", "H2 PM") < 0);
+    assertTrue(HaplotypeNameComparator.getComparator().compare("H2 PM", "H2 EM") > 0);
+
+    assertTrue(HaplotypeNameComparator.getComparator().compare("*1", "H2") < 0);
+    assertTrue(HaplotypeNameComparator.getComparator().compare("*1", "TPMT") < 0);
+    assertTrue(HaplotypeNameComparator.getComparator().compare("TPMT", "BRCA") > 0);
   }
 }

@@ -16,7 +16,13 @@ import com.google.common.base.Preconditions;
  *
  * @author Mark Woon
  */
-public class PathUtils {
+public final class PathUtils {
+
+  /**
+   * Private constructor to prevent instantiation of utility class.
+   */
+  private PathUtils() {
+  }
 
 
   /**

@@ -41,6 +41,7 @@ public class ChromosomeNameComparatorTest {
     assertEquals(-1, ChromosomeNameComparator.getComparator().compare("13", "21"));
     assertEquals(-1, ChromosomeNameComparator.getComparator().compare("13", "X"));
     assertEquals(-1, ChromosomeNameComparator.getComparator().compare("20", "X"));
+    assertEquals(1, ChromosomeNameComparator.getComparator().compare("X", "20"));
     assertEquals(-1, ChromosomeNameComparator.getComparator().compare("X", "Y"));
     assertEquals(0, ChromosomeNameComparator.getComparator().compare("X", "X"));
   }

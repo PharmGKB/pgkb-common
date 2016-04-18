@@ -67,10 +67,7 @@ public class HaplotypeNameComparator implements Comparator<String> {
 
       String restPortion1 = StringUtils.trimToNull(matcher1.group(3));
       String restPortion2 = StringUtils.trimToNull(matcher2.group(3));
-      rez = ObjectUtils.compare(restPortion1, restPortion2);
-      if (rez != 0) {
-        return rez;
-      }
+      return ObjectUtils.compare(restPortion1, restPortion2);
     }
     return ObjectUtils.compare(name1, name2);
   }

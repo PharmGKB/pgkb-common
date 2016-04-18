@@ -7,6 +7,7 @@
 package org.pharmgkb.common.util;
 
 import java.nio.file.Paths;
+import net.trajano.commons.testing.UtilityClassTestUtil;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -18,6 +19,13 @@ import static org.junit.Assert.assertEquals;
  * @author Mark Woon
  */
 public class PathUtilsTest {
+
+
+  @Test
+  public void testUtilityClass() throws Exception {
+    UtilityClassTestUtil.assertUtilityClassWellDefined(PathUtils.class);
+  }
+
 
   @Test
   public void testGetFilename() {

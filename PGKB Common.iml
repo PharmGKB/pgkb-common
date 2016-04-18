@@ -16,5 +16,6 @@
     <orderEntry type="library" exported="" name="Commons-lang3" level="project" />
     <orderEntry type="library" exported="" name="Guava" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="JUnit" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="Commons-testing" level="project" />
   </component>
 </module>
