@@ -1,3 +1,14 @@
+plugins {
+  id 'java'
+  id 'jacoco'
+  id 'com.github.kt3k.coveralls' version '2.6.3'
+  id 'osgi'
+  id 'signing'
+  id 'com.jfrog.bintray' version '1.6'
+  id 'maven-publish'
+}
+
+
 def getVersionName = {
   try {
     def stdout = new ByteArrayOutputStream()
@@ -5,32 +16,12 @@ def getVersionName = {
       commandLine 'git', 'describe', '--tags'
       standardOutput = stdout
     }
-    return stdout.toString().trim()
+    return stdout.toString().trim().substring(1)
   }
   catch (ignored) {
     return null
   }
 }
-
-buildscript {
-  repositories {
-    mavenCentral()
-    // needed only for SNAPSHOT versions
-    //maven { url "http://oss.sonatype.org/content/repositories/snapshots/" }
-  }
-  dependencies {
-    classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3"
-    classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.6.3'
-  }
-}
-
-apply plugin: 'java'
-apply plugin: 'jacoco'
-apply plugin: 'com.github.kt3k.coveralls'
-apply plugin: 'osgi'
-apply plugin: 'signing'
-apply plugin: 'maven'
-apply plugin: 'io.codearte.nexus-staging'
 
 
 sourceCompatibility = 1.8
@@ -41,9 +32,15 @@ archivesBaseName = "pgkb-common"
 
 ext {
   description = 'PharmGKB common packages.'
+  url = 'https://github.com/PharmGKB/pgkb-common.git'
+  scm = 'scm:git@github.com:PharmGKB/pgkb-common.git'
+  orgName = 'PharmGKB'
+  orgUrl = 'https://www.pharmgkb.org'
   // grab user/pwd from environment for Travis CI
-  sonatypeUser = hasProperty('ossrhUsername') ? ossrhUsername : System.getenv('OSSRH_USERNAME')
-  sonatypePwd = hasProperty('ossrhPassword') ? ossrhPassword : System.getenv('OSSRH_PASSWORD')
+  sonatypeUser = project.hasProperty('ossrhUsername') ? ossrhUsername : System.getenv('OSSRH_USERNAME')
+  sonatypePwd  = project.hasProperty('ossrhPassword') ? ossrhPassword : System.getenv('OSSRH_PASSWORD')
+  bintrayUser = project.hasProperty('bintrayUsername') ? bintrayUsername : System.getenv('BINTRAY_USERNAME')
+  bintrayKey  = project.hasProperty('bintrayApiKey')   ? bintrayApiKey   : System.getenv('BINTRAY_API_KEY')
 }
 
 
@@ -109,52 +106,73 @@ signing {
   sign configurations.archives
 }
 
+bintray {
+  user = project.ext.bintrayUser
+  key = project.ext.bintrayKey
+  publications = [ 'PgkbPublication' ]
+  dryRun = false
+  publish = true
 
-// This will only upload the archives to Sonatype
-// It will still have to be released manually: http://central.sonatype.org/pages/releasing-the-deployment.html
-//noinspection GroovyAssignabilityCheck
-uploadArchives {
-  repositories {
-    mavenDeployer {
-      beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+  pkg {
+    repo = 'maven'
+    name = project.name
+    desc = project.ext.description
+    userOrg = project.ext.orgName
+    licenses = [ 'MPL-2.0' ]
+    issueTrackerUrl = project.ext.url + '/issues'
+    vcsUrl = project.ext.url
+    githubRepo = 'PharmGKB/pgkb-common'
 
-      repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-        authentication(userName: sonatypeUser, password: sonatypePwd)
+    version {
+      name = project.version
+      vcsTag = 'v' + project.version
+      mavenCentralSync {
+        user = project.ext.sonatypeUser
+        password = project.ext.sonatypePwd
+        close = 1
       }
+    }
+  }
+}
 
-      snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-        authentication(userName: sonatypeUser, password: sonatypePwd)
-      }
+publishing {
+  publications {
+    PgkbPublication(MavenPublication) {
+      from components.java
+      artifact javadocJar
+      artifact sourcesJar
 
-      pom.project {
-        name project.name
-        packaging 'jar'
-        description project.ext.description
-        url 'https://github.com/PharmGKB/pgkb-common'
-
-        scm {
-          connection 'scm:git@github.com:PharmGKB/pgkb-common.git'
-          developerConnection 'scm:git@github.com:PharmGKB/pgkb-common.git'
-          url 'https://github.com/PharmGKB/pgkb-common'
-        }
-        licenses {
-          license {
-            name 'MPL 2.0'
-            url 'http://mozilla.org/MPL/2.0/'
+      pom.withXml {
+        asNode().children().last() + {
+          resolveStrategy = Closure.DELEGATE_FIRST
+          name project.name
+          description project.ext.description
+          url project.ext.url
+          scm {
+            url project.ext.url
+            connection project.ext.scm
+            developerConnection project.ext.scm
           }
-        }
-        organization {
-          name 'PharmGKB'
-          url 'https://www.pharmgkb.org'
-        }
-        developers {
-          developer {
-            id 'markwoon'
-            name 'Mark Woon'
+          licenses {
+            license {
+              name 'MPL 2.0'
+              url 'http://mozilla.org/MPL/2.0/'
+              distribution 'repo'
+            }
           }
-          developer {
-            id 'whaleyr'
-            name 'Ryan Whaley'
+          organization {
+            name project.ext.orgName
+            url project.ext.orgUrl
+          }
+          developers {
+            developer {
+              id 'markwoon'
+              name 'Mark Woon'
+            }
+            developer {
+              id 'whaleyr'
+              name 'Ryan Whaley'
+            }
           }
         }
       }
