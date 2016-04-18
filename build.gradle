@@ -127,7 +127,7 @@ uploadArchives {
       pom.project {
         name project.name
         packaging 'jar'
-        description description
+        description project.ext.description
         url 'https://github.com/PharmGKB/pgkb-common'
 
         scm {
