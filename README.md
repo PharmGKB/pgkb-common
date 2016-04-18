@@ -4,6 +4,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/PharmGKB/pgkb-common/badge.svg?branch=master)](https://coveralls.io/github/PharmGKB/pgkb-common?branch=master)
 [![codecov.io](https://codecov.io/github/PharmGKB/pgkb-common/coverage.svg?branch=master)](https://codecov.io/github/PharmGKB/pgkb-common?branch=master)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.pharmgkb/pgkb-common/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.pharmgkb/pgkb-common)
+[ ![Download](https://api.bintray.com/packages/pharmgkb/maven/pgkb-common/images/download.svg) ](https://bintray.com/pharmgkb/maven/pgkb-common/_latestVersion)
 
 This package contains common code shared among all PharmGKB projects.
 
@@ -17,7 +18,7 @@ This package contains common code shared among all PharmGKB projects.
   <dependency>
     <groupId>org.pharmgkb</groupId>
     <artifactId>pgkb-common</artifactId>
-    <version>0.1.0</version>
+    <version>0.1.1</version>
   </dependency>
   ...
 </dependencies>
@@ -25,4 +26,4 @@ This package contains common code shared among all PharmGKB projects.
 
 ### Non-Maven
 
-You can download jars from the [Central Maven Repository](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.pharmgkb%22%20a%3A%22pgkb-common%22).
+You can download jars from [Bintray](https://bintray.com/pharmgkb/maven/pgkb-common/view#files/org/pharmgkb/pgkb-common).

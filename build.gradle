@@ -16,6 +16,7 @@ def getVersionName = {
       commandLine 'git', 'describe', '--tags'
       standardOutput = stdout
     }
+    // strip of leading "v"
     return stdout.toString().trim().substring(1)
   }
   catch (ignored) {
@@ -31,7 +32,7 @@ project.version = getVersionName()
 archivesBaseName = "pgkb-common"
 
 ext {
-  description = 'PharmGKB common packages.'
+  description = 'Common code shared among all PharmGKB projects.'
   url = 'https://github.com/PharmGKB/pgkb-common.git'
   scm = 'scm:git@github.com:PharmGKB/pgkb-common.git'
   orgName = 'PharmGKB'
@@ -45,7 +46,7 @@ ext {
 
 
 repositories {
-  mavenCentral()
+  jcenter()
 }
 
 //noinspection GroovyAssignabilityCheck
@@ -106,6 +107,7 @@ signing {
   sign configurations.archives
 }
 
+
 bintray {
   user = project.ext.bintrayUser
   key = project.ext.bintrayKey
@@ -117,7 +119,7 @@ bintray {
     repo = 'maven'
     name = project.name
     desc = project.ext.description
-    userOrg = project.ext.orgName
+    userOrg = 'pharmgkb'
     licenses = [ 'MPL-2.0' ]
     issueTrackerUrl = project.ext.url + '/issues'
     vcsUrl = project.ext.url
