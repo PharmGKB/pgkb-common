@@ -5,12 +5,11 @@ notifications:
   slack:
     secure: Eid9eR4miPOG67OlSb7TmobdrhMWfy+Wt/RXvyx+tX47rRTFokBr4G6mCJKlzmA5sRz7c4kEtklfm4I2ZcDAqS9Ks65yRAPGoqw9FvYanldDisLfOqpXPIgRWzAYQELS6vTMml1RGDGoJuSN+bwtf+OVENLAGqWua1V/c0HwqVx4qBskoTbRbk/jVKUxrFk7w6Yy8qk+ct7lq7aFA0/jO8T+frjRg+7JO6zjT/IZ6cCG3PCUlu+zqsfEUp9zTJEb71Ymlae7+CXBrsWkXwOp1Z5Kp4ZfRfPhm12/vHaDdSt5XQ1bjLum4Kv1zXEq/8IJyxQINFEkt8efOJwb8mJnctHY7lgZl+JDkuUONUyC9N9RKuth3pXQDrvh/iZ9La/Yy3AIyjxh1VJDe5N09xVEaoM6wg22GaeZISolMySFosXqnAINbsrSxRqTOTdFwK3j+++JesuLcoIkovT7LT2BE1wCDhGGo8q6vmRNIWoS35x4Cf+6e10IAb51CTnF3+b0wj9qTweFAytIhgl3PxhH1Vfkygnw3sIzQAFSjiKAKSVrrXi9uQ9z5gztWKh0tx28JqPFVdCeIrI/3dRqQgtgpa8Peait0ssHjHTZ+4lSRCL6eG/TpIkxwjRqprvVRTvLMGUD1IjjVORixV6a2pFzgGb2NkH2rMODv1XziKxPNik=
 
-env:
-  global:
-    - OSSRH_USERNAME=travis
-    - OSSRH_PASSWORD=dummy
-
 install: ./gradlew jar
+
+after_success:
+  - ./gradlew jacocoTestReport coveralls
+  - bash <(curl -s https://codecov.io/bash)
 
 # gradle-specific cache configuration:
 before_cache:
