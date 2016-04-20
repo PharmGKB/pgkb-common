@@ -41,5 +41,6 @@ public class PathUtilsTest {
     assertEquals("foo", PathUtils.getBaseFilename(Paths.get("/a/dir/for/foo.xml")));
     assertEquals("foo", PathUtils.getBaseFilename(Paths.get("/a/dir/for/foo.xml")));
     assertEquals("foo", PathUtils.getBaseFilename(Paths.get("/a/dir/for/foo")));
+    assertEquals("foo.bar", PathUtils.getBaseFilename(Paths.get("/a/dir/for/foo.bar.xml")));
   }
 }

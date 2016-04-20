@@ -43,10 +43,10 @@ public final class PathUtils {
     Preconditions.checkNotNull(file);
 
     String fileName = getFilename(file);
-    int idx = fileName.indexOf(".");
+    int idx = fileName.lastIndexOf(".");
     if (idx == -1) {
       return fileName;
     }
-    return fileName.substring(0, fileName.indexOf("."));
+    return fileName.substring(0, idx);
   }
 }
