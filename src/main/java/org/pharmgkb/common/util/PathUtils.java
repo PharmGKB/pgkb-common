@@ -6,7 +6,10 @@
  */
 package org.pharmgkb.common.util;
 
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import javax.annotation.Nonnull;
 import com.google.common.base.Preconditions;
 
@@ -48,5 +51,26 @@ public final class PathUtils {
       return fileName;
     }
     return fileName.substring(0, idx);
+  }
+
+
+  /**
+   * Converts a resource file name into a {@link Path}.
+   *
+   * @param filename a relative filename (e.g. {@code org/pharmgkb/common/file.txt})
+   */
+  public static @Nonnull Path getPathToResource(@Nonnull String filename) {
+
+    Preconditions.checkNotNull(filename);
+    URL url = PathUtils.class.getClassLoader().getResource(filename);
+    if (url == null) {
+      throw new IllegalArgumentException("No such resource: " + filename);
+    }
+    try {
+      return Paths.get(url.toURI());
+    } catch (URISyntaxException ex) {
+      // should never happen
+      throw new IllegalStateException("Filename '" + filename + "' translated to invalid URI (" + url + ")", ex);
+    }
   }
 }

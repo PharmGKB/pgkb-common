@@ -6,11 +6,13 @@
  */
 package org.pharmgkb.common.util;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import net.trajano.commons.testing.UtilityClassTestUtil;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 
 /**
@@ -42,5 +44,20 @@ public class PathUtilsTest {
     assertEquals("foo", PathUtils.getBaseFilename(Paths.get("/a/dir/for/foo.xml")));
     assertEquals("foo", PathUtils.getBaseFilename(Paths.get("/a/dir/for/foo")));
     assertEquals("foo.bar", PathUtils.getBaseFilename(Paths.get("/a/dir/for/foo.bar.xml")));
+  }
+
+
+  @Test
+  public void testGetPathToResourceGood() {
+
+    Path p = PathUtils.getPathToResource("org/pharmgkb/common/util/PathUtilsTest.txt");
+    assertTrue(Files.exists(p));
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testGetPathToResourceBad() {
+
+    Path p = PathUtils.getPathToResource("org/pharmgkb/common/util/nonexistent.tsv");
+    fail("Should not be able to find file");
   }
 }
