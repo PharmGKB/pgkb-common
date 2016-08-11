@@ -7,8 +7,10 @@
 package org.pharmgkb.common.comparator;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -22,6 +24,8 @@ import org.apache.commons.lang3.StringUtils;
 public class HaplotypeNameComparator implements Comparator<String> {
   private static final Pattern sf_starPattern = Pattern.compile("(.*)(\\d+)(.*)");
   private static final Comparator<String> sf_comparator = new HaplotypeNameComparator();
+  private static final List<String> sf_topTerms = ImmutableList.of("Any","All");
+  private static final List<String> sf_bottomTerms = ImmutableList.of("Other","Unknown");
 
   /**
    * Gets an instance of this comparator.
@@ -43,6 +47,13 @@ public class HaplotypeNameComparator implements Comparator<String> {
     if (name1 == null) {
       return -1;
     } else if (name2 == null) {
+      return 1;
+    }
+    
+    if (sf_topTerms.contains(name1) || sf_bottomTerms.contains(name2)) {
+      return -1;
+    }
+    if (sf_topTerms.contains(name2) || sf_bottomTerms.contains(name1)) {
       return 1;
     }
 
