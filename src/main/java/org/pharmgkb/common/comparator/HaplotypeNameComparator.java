@@ -18,6 +18,15 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * Comparator for haplotype names.  This takes common allele nomenclature into account (i.e. treat numbers as numbers,
  * not strings).
+ * 
+ * The rules for how this sorts:
+ * <ol>
+ *   <li>The terms <code>Any</code> and <code>All</code> always get sorted to the beginning</li>
+ *   <li>The terms <code>Unknown</code> and <code>Other</code> always get sorted to the end</li>
+ *   <li>if the term contains numbers (e.g. *2, H3, *3B) the terms will be String sorted by the initial character(s), 
+ *   Integer sorted by the following numbers, then String sorted by any following characters</li>
+ *   <li>Otherwise just do regular String sorting</li>
+ * </ol>
  *
  * @author Ryan Whaley
  */
