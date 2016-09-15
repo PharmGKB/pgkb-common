@@ -50,8 +50,7 @@ public class PathUtilsTest {
   @Test
   public void testGetPathToResourceGood() {
 
-    Path p = PathUtils.getPathToResource("org/pharmgkb/common/util/PathUtilsTest.txt");
-    assertTrue(Files.exists(p));
+    assertTrue(Files.exists(PathUtils.getPathToResource("org/pharmgkb/common/util/PathUtilsTest.txt")));
   }
 
   @Test(expected = IllegalArgumentException.class)
