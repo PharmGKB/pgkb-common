@@ -34,6 +34,7 @@ public class HaplotypeNameComparatorTest {
 
     assertEquals(0, HaplotypeNameComparator.getComparator().compare("*1", "*1"));
     assertEquals(-1, HaplotypeNameComparator.getComparator().compare("*1", "*11"));
+    assertEquals(-1, HaplotypeNameComparator.getComparator().compare("*1", "*100"));
     assertEquals(-1, HaplotypeNameComparator.getComparator().compare("*2", "*11"));
     assertEquals(1, HaplotypeNameComparator.getComparator().compare("*13", "*3"));
     assertEquals(1, HaplotypeNameComparator.getComparator().compare("H3", "H2"));
@@ -57,6 +58,7 @@ public class HaplotypeNameComparatorTest {
     List<String> input = new ArrayList<>();
     input.add("*3");
     input.add("Other");
+    input.add("*100");
     input.add("Any");
     input.add("*1");
     
@@ -67,6 +69,7 @@ public class HaplotypeNameComparatorTest {
     assertEquals("Any", it.next());
     assertEquals("*1", it.next());
     assertEquals("*3", it.next());
+    assertEquals("*100", it.next());
     assertEquals("Other", it.next());
   }
 }

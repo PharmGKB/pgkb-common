@@ -31,7 +31,7 @@ import org.apache.commons.lang3.StringUtils;
  * @author Ryan Whaley
  */
 public class HaplotypeNameComparator implements Comparator<String> {
-  private static final Pattern sf_starPattern = Pattern.compile("(.*)(\\d+)(.*)");
+  private static final Pattern sf_starPattern = Pattern.compile("(\\D*)(\\d+)(.*)");
   private static final Comparator<String> sf_comparator = new HaplotypeNameComparator();
   private static final List<String> sf_topTerms = ImmutableList.of("Any","All");
   private static final List<String> sf_bottomTerms = ImmutableList.of("Other","Unknown");
