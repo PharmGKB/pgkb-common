@@ -24,13 +24,20 @@ public class UrlUtils {
 
 
   /**
-   * Checks if {@code urlString} is a valid {@code http} or {@cdoe https} URL.
+   * Checks if {@code urlString} is a valid {@code http} or {@code https} URL.
    */
   public static boolean isValidWebUrl(String urlString) {
 
     try {
       URI uri = new URL(urlString).toURI();
-      return sf_webSchemes.contains(uri.getScheme());
+      if (!sf_webSchemes.contains(uri.getScheme())) {
+        return false;
+      }
+      if (uri.getHost() == null) {
+        return false;
+      }
+      return true;
+
     } catch (Exception e) {
       return false;
     }
