@@ -6,10 +6,13 @@
  */
 package org.pharmgkb.common.util;
 
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import javax.annotation.Nonnull;
 import com.google.common.base.Preconditions;
 
@@ -67,6 +70,13 @@ public final class PathUtils {
       throw new IllegalArgumentException("No such resource: " + filename);
     }
     try {
+      if (url.getProtocol().equalsIgnoreCase("jar")) {
+        try {
+          FileSystems.newFileSystem(url.toURI(), Collections.emptyMap());
+        } catch (IOException ex) {
+          throw new IllegalStateException("Unable to create zip/jar filesystem", ex);
+        }
+      }
       return Paths.get(url.toURI());
     } catch (URISyntaxException ex) {
       // should never happen
