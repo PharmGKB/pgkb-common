@@ -7,8 +7,10 @@
 package org.pharmgkb.common.util;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -70,14 +72,19 @@ public final class PathUtils {
       throw new IllegalArgumentException("No such resource: " + filename);
     }
     try {
+      URI uri = url.toURI();
       if (url.getProtocol().equalsIgnoreCase("jar")) {
         try {
-          FileSystems.newFileSystem(url.toURI(), Collections.emptyMap());
-        } catch (IOException ex) {
-          throw new IllegalStateException("Unable to create zip/jar filesystem", ex);
+          FileSystems.getFileSystem(uri);
+        } catch (FileSystemNotFoundException ex) {
+          try {
+            FileSystems.newFileSystem(uri, Collections.emptyMap());
+          } catch (IOException ex2) {
+            throw new IllegalStateException("Unable to create zip/jar filesystem", ex2);
+          }
         }
       }
-      return Paths.get(url.toURI());
+      return Paths.get(uri);
     } catch (URISyntaxException ex) {
       // should never happen
       throw new IllegalStateException("Filename '" + filename + "' translated to invalid URI (" + url + ")", ex);
