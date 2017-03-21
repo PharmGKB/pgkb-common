@@ -1,5 +1,6 @@
 package org.pharmgkb.common.util;
 
+import net.trajano.commons.testing.UtilityClassTestUtil;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
@@ -7,9 +8,17 @@ import static org.junit.Assert.assertTrue;
 
 
 /**
+ * JUnit test for {@link UrlUtils}.
+ *
  * @author Mark Woon
  */
 public class UrlUtilsTest {
+
+  @Test
+  public void testUtilityClass() throws Exception {
+    UtilityClassTestUtil.assertUtilityClassWellDefined(PathUtils.class);
+  }
+
 
   @Test
   public void testUrls() {
