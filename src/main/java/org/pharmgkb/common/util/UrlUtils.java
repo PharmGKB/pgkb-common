@@ -41,7 +41,7 @@ public class UrlUtils {
    * </ul>
    */
   public static boolean isValidWebUrl(@Nonnull String urlString) {
-    return isValidUrl(urlString, true, false, false, false);
+    return isValid(urlString, true, false, false, false);
   }
 
 
@@ -52,8 +52,8 @@ public class UrlUtils {
    *   <li>Does NOT allow private IPs.</li>
    * </ul>
    */
-  public static boolean isValidUrl(@Nonnull String urlString) {
-    return isValidUrl(urlString, false, false, false, false);
+  public static boolean isValid(@Nonnull String urlString) {
+    return isValid(urlString, false, false, false, false);
   }
 
 
@@ -63,9 +63,9 @@ public class UrlUtils {
    * @param noFtp true if ftp protocol is not allowed
    * @param allowLocalhost true if localhost should be allowed
    * @param allowPrivateIp true if private IP addresses should be allowed
-   * @param verify true to check if URL actually points to something (see caveats for {@link #isReachableUrl(URL)})
+   * @param verify true to check if URL actually points to something (see caveats for {@link #isReachable(URL)})
    */
-  public static boolean isValidUrl(@Nonnull String urlString, boolean noFtp, boolean allowLocalhost,
+  public static boolean isValid(@Nonnull String urlString, boolean noFtp, boolean allowLocalhost,
       boolean allowPrivateIp, boolean verify) {
 
     try {
@@ -103,7 +103,7 @@ public class UrlUtils {
       }
 
       if (verify) {
-        if (!isReachableUrl(url)) {
+        if (!isReachable(url)) {
           return false;
         }
       }
@@ -120,7 +120,7 @@ public class UrlUtils {
    * For FTP URLs, this will only verify that we can connect to the server, not whether the resource is actually
    * available.
    */
-  public static boolean isReachableUrl(@Nonnull URL url) {
+  public static boolean isReachable(@Nonnull URL url) {
     try {
       if (sf_webSchemes.contains(url.getProtocol())) {
         HttpURLConnection connection = (HttpURLConnection)url.openConnection();

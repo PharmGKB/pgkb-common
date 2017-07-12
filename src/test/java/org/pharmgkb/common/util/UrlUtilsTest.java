@@ -70,48 +70,48 @@ public class UrlUtilsTest {
 
   @Test
   public void testUrls() {
-    assertTrue(UrlUtils.isValidUrl("http://www.pharmgkb.org"));
-    assertTrue(UrlUtils.isValidUrl("http://www.pharmgkb.org/bar.txt"));
-    assertTrue(UrlUtils.isValidUrl("http://www.pharmgkb.org:8080"));
-    assertTrue(UrlUtils.isValidUrl("http://www.pharmgkb.org:8080/bar.txt"));
-    assertTrue(UrlUtils.isValidUrl("http://hi:there@www.pharmgkb.org/"));
+    assertTrue(UrlUtils.isValid("http://www.pharmgkb.org"));
+    assertTrue(UrlUtils.isValid("http://www.pharmgkb.org/bar.txt"));
+    assertTrue(UrlUtils.isValid("http://www.pharmgkb.org:8080"));
+    assertTrue(UrlUtils.isValid("http://www.pharmgkb.org:8080/bar.txt"));
+    assertTrue(UrlUtils.isValid("http://hi:there@www.pharmgkb.org/"));
 
-    assertTrue(UrlUtils.isValidUrl("https://www.pharmgkb.org"));
-    assertTrue(UrlUtils.isValidUrl("https://www.pharmgkb.org/bar.txt"));
-    assertTrue(UrlUtils.isValidUrl("https://www.pharmgkb.org:8080"));
-    assertTrue(UrlUtils.isValidUrl("https://www.pharmgkb.org:8080/bar.txt"));
-    assertTrue(UrlUtils.isValidUrl("https://hi:there@www.pharmgkb.org/"));
+    assertTrue(UrlUtils.isValid("https://www.pharmgkb.org"));
+    assertTrue(UrlUtils.isValid("https://www.pharmgkb.org/bar.txt"));
+    assertTrue(UrlUtils.isValid("https://www.pharmgkb.org:8080"));
+    assertTrue(UrlUtils.isValid("https://www.pharmgkb.org:8080/bar.txt"));
+    assertTrue(UrlUtils.isValid("https://hi:there@www.pharmgkb.org/"));
 
-    assertTrue(UrlUtils.isValidUrl("ftp://www.pharmgkb.org"));
-    assertTrue(UrlUtils.isValidUrl("ftp://www.pharmgkb.org/bar.txt"));
-    assertTrue(UrlUtils.isValidUrl("ftp://hi:there@www.pharmgkb.org:8080"));
-    assertTrue(UrlUtils.isValidUrl("ftp://hi:there@www.pharmgkb.org:8080/bar.txt"));
+    assertTrue(UrlUtils.isValid("ftp://www.pharmgkb.org"));
+    assertTrue(UrlUtils.isValid("ftp://www.pharmgkb.org/bar.txt"));
+    assertTrue(UrlUtils.isValid("ftp://hi:there@www.pharmgkb.org:8080"));
+    assertTrue(UrlUtils.isValid("ftp://hi:there@www.pharmgkb.org:8080/bar.txt"));
 
-    assertTrue(UrlUtils.isValidUrl("http://171.67.192.16"));
-    assertTrue(UrlUtils.isValidUrl("http://171.67.192.16:8080"));
-    assertTrue(UrlUtils.isValidUrl("http://172.168.15.1"));
-    assertTrue(UrlUtils.isValidUrl("http://172.168.33.1"));
+    assertTrue(UrlUtils.isValid("http://171.67.192.16"));
+    assertTrue(UrlUtils.isValid("http://171.67.192.16:8080"));
+    assertTrue(UrlUtils.isValid("http://172.168.15.1"));
+    assertTrue(UrlUtils.isValid("http://172.168.33.1"));
     // ipv6
-    assertTrue(UrlUtils.isValidUrl("http://[2001:db8:a0b:12f0::1]/index.html"));
-    assertTrue(UrlUtils.isValidUrl("http://[2001:db8:a0b:12f0::1]:80/index.html"));
+    assertTrue(UrlUtils.isValid("http://[2001:db8:a0b:12f0::1]/index.html"));
+    assertTrue(UrlUtils.isValid("http://[2001:db8:a0b:12f0::1]:80/index.html"));
 
     // localhost
-    assertFalse(UrlUtils.isValidUrl("http://localhost"));
+    assertFalse(UrlUtils.isValid("http://localhost"));
     // private ip
-    assertFalse(UrlUtils.isValidUrl("http://127.0.0.1"));
-    assertFalse(UrlUtils.isValidUrl("http://10.0.0.1:8080"));
-    assertFalse(UrlUtils.isValidUrl("http://172.16.1.1"));
-    assertFalse(UrlUtils.isValidUrl("http://172.22.1.1"));
-    assertFalse(UrlUtils.isValidUrl("http://172.32.1.1"));
-    assertFalse(UrlUtils.isValidUrl("http://[fd01:db8:a0b:12f0::1]:80/index.html"));
+    assertFalse(UrlUtils.isValid("http://127.0.0.1"));
+    assertFalse(UrlUtils.isValid("http://10.0.0.1:8080"));
+    assertFalse(UrlUtils.isValid("http://172.16.1.1"));
+    assertFalse(UrlUtils.isValid("http://172.22.1.1"));
+    assertFalse(UrlUtils.isValid("http://172.32.1.1"));
+    assertFalse(UrlUtils.isValid("http://[fd01:db8:a0b:12f0::1]:80/index.html"));
 
-    assertFalse(UrlUtils.isValidUrl("http://"));
-    assertFalse(UrlUtils.isValidUrl("http://."));
-    assertFalse(UrlUtils.isValidUrl("http://.com"));
-    assertFalse(UrlUtils.isValidUrl("https:// "));
-    assertFalse(UrlUtils.isValidUrl("ftp://"));
-    assertFalse(UrlUtils.isValidUrl("ftp://::::@example.com"));
-    assertFalse(UrlUtils.isValidUrl("mailto:foo@bar.com"));
+    assertFalse(UrlUtils.isValid("http://"));
+    assertFalse(UrlUtils.isValid("http://."));
+    assertFalse(UrlUtils.isValid("http://.com"));
+    assertFalse(UrlUtils.isValid("https:// "));
+    assertFalse(UrlUtils.isValid("ftp://"));
+    assertFalse(UrlUtils.isValid("ftp://::::@example.com"));
+    assertFalse(UrlUtils.isValid("mailto:foo@bar.com"));
   }
 
 
@@ -119,31 +119,31 @@ public class UrlUtilsTest {
   public void testLocalAndPrivateUrls() {
 
     // localhost
-    assertTrue(UrlUtils.isValidUrl("http://localhost", true, true, true, false));
+    assertTrue(UrlUtils.isValid("http://localhost", true, true, true, false));
     // private ip
-    assertTrue(UrlUtils.isValidUrl("http://127.0.0.1", true, true, true, false));
-    assertTrue(UrlUtils.isValidUrl("http://10.0.0.1:8080", true, true, true, false));
-    assertTrue(UrlUtils.isValidUrl("http://172.16.1.1", true, true, true, false));
-    assertTrue(UrlUtils.isValidUrl("http://172.22.1.1", true, true, true, false));
-    assertTrue(UrlUtils.isValidUrl("http://172.32.1.1", true, true, true, false));
-    assertTrue(UrlUtils.isValidUrl("http://[fd01:db8:a0b:12f0::1]:80/index.html", true, true, true, false));
+    assertTrue(UrlUtils.isValid("http://127.0.0.1", true, true, true, false));
+    assertTrue(UrlUtils.isValid("http://10.0.0.1:8080", true, true, true, false));
+    assertTrue(UrlUtils.isValid("http://172.16.1.1", true, true, true, false));
+    assertTrue(UrlUtils.isValid("http://172.22.1.1", true, true, true, false));
+    assertTrue(UrlUtils.isValid("http://172.32.1.1", true, true, true, false));
+    assertTrue(UrlUtils.isValid("http://[fd01:db8:a0b:12f0::1]:80/index.html", true, true, true, false));
   }
 
 
   @Test
   public void testIsReachableUrl() throws Exception {
 
-    assertTrue(UrlUtils.isReachableUrl(new URL("http://www.pharmgkb.org")));
-    assertTrue(UrlUtils.isReachableUrl(new URL("https://www.pharmgkb.org")));
-    assertTrue(UrlUtils.isReachableUrl(new URL("ftp://mirrors.sonic.net/cygwin/")));
-    assertTrue(UrlUtils.isReachableUrl(new URL("ftp://anonymous:foo%40bar.com@ftp.swfwmd.state.fl.us/pub/README.txt")));
+    assertTrue(UrlUtils.isReachable(new URL("http://www.pharmgkb.org")));
+    assertTrue(UrlUtils.isReachable(new URL("https://www.pharmgkb.org")));
+    assertTrue(UrlUtils.isReachable(new URL("ftp://mirrors.sonic.net/cygwin/")));
+    assertTrue(UrlUtils.isReachable(new URL("ftp://anonymous:foo%40bar.com@ftp.swfwmd.state.fl.us/pub/README.txt")));
   }
 
 
   @Test
   public void testVerify() {
 
-    assertTrue(UrlUtils.isValidUrl("http://www.pharmgkb.org", true, false, false, true));
-    assertFalse(UrlUtils.isValidUrl("http://www.pharmgkboo.org", true, false, false, true));
+    assertTrue(UrlUtils.isValid("http://www.pharmgkb.org", true, false, false, true));
+    assertFalse(UrlUtils.isValid("http://www.pharmgkboo.org", true, false, false, true));
   }
 }
