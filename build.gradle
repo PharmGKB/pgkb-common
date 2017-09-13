@@ -1,7 +1,7 @@
 plugins {
   id 'java'
   id 'jacoco'
-  id 'com.github.kt3k.coveralls' version '2.6.3'
+  id 'com.github.kt3k.coveralls' version '2.8.1'
   id 'osgi'
   id 'signing'
   id 'com.jfrog.bintray' version '1.7.3'
@@ -50,7 +50,6 @@ repositories {
   jcenter()
 }
 
-//noinspection GroovyAssignabilityCheck
 dependencies {
   compile group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
   compile group: 'com.google.guava', name: 'guava', version: '23.0'
@@ -124,7 +123,7 @@ bintray {
     licenses = [ 'MPL-2.0' ]
     issueTrackerUrl = project.ext.url + '/issues'
     vcsUrl = project.ext.url
-    githubRepo = 'PharmGKB/pgkb-common'
+    githubRepo = 'PharmGKB/' + archivesBaseName
 
     version {
       name = project.version
