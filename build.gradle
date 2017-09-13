@@ -51,6 +51,7 @@ repositories {
 }
 
 dependencies {
+  compile group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.3'
   compile group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
   compile group: 'com.google.guava', name: 'guava', version: '23.0'
   compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.6'
