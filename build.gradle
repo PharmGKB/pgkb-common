@@ -82,7 +82,7 @@ jar {
     attributes 'Implementation-Title': project.name
     attributes 'Implementation-Version': project.version
     instruction 'Import-Package',
-        'javax.annotation;resolution:=optional',
+        'javax.annotation;bundle-symbolic-name="org.jsr-305";resolution:=optional',
         '*'
   }
 }
