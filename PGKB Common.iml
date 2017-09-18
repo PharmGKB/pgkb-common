@@ -13,10 +13,12 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="JSR 305" level="project" />
+    <orderEntry type="library" exported="" name="Commons-beanutils" level="project" />
     <orderEntry type="library" exported="" name="Commons-lang3" level="project" />
+    <orderEntry type="library" exported="" name="Commons-text" level="project" />
     <orderEntry type="library" exported="" name="Guava" level="project" />
+    <orderEntry type="library" exported="" name="SLF4J" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="JUnit" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="Commons-testing" level="project" />
-    <orderEntry type="library" exported="" name="Commons-beanutils" level="project" />
   </component>
 </module>

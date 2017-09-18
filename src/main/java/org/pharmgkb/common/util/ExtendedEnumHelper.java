@@ -16,7 +16,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.WordUtils;
+import org.apache.commons.text.WordUtils;
 
 
 /**
@@ -51,43 +51,34 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
    */
   public void add(T theEnum, int id, @Nonnull String shortName, @Nullable String displayName,
       @Nullable String... additionalNames) {
-    Preconditions.checkNotNull(shortName, "shortName is null");
 
-    // log as well as throw any errors because it may get swallowed and hidden since this is going to be called
-    // during enum class instantiation
-    if (m_idMap.containsKey(id)) {
-      throw new IllegalStateException("An enum already exists with Id '" + id + "' for " +
-          theEnum.getClass().getSimpleName());
+    Preconditions.checkArgument(!m_idMap.containsKey(id), "Duplicate ID '%s' for %s", id,
+        theEnum.getClass().getSimpleName());
+
+    Preconditions.checkNotNull(shortName, "shortName is null");
+    String strippedShortName = StringUtils.stripToNull(shortName);
+    Preconditions.checkArgument(strippedShortName != null, "Empty shortName for %s",
+        theEnum.getClass().getSimpleName());
+    Preconditions.checkArgument(!strippedShortName.contains(" "), "Spaces in shortName for %s",
+        theEnum.getClass().getSimpleName());
+    Preconditions.checkArgument(!StringUtils.isNumeric(strippedShortName), "Numeric shortName for %s",
+        theEnum.getClass().getSimpleName());
+    Preconditions.checkArgument(!m_shortNameMap.containsKey(strippedShortName),
+        "Duplicate shortName '%s' for %s", strippedShortName, theEnum.getClass().getSimpleName());
+
+    String strippedDisplayName = StringUtils.stripToNull(displayName);
+    if (strippedDisplayName != null) {
+      Preconditions.checkArgument(!m_displayNameMap.containsKey(strippedDisplayName),
+          "Duplicate displayName '%s' for %s", strippedDisplayName, theEnum.getClass().getSimpleName());
     }
+
     m_idMap.put(id, theEnum);
 
-    //noinspection ConstantConditions
-    shortName = StringUtils.stripToNull(shortName);
-    if (shortName == null) {
-      throw new IllegalArgumentException("Short name is required (for " + theEnum.getClass().getSimpleName() + ")");
-    }
-    if (shortName.contains(" ")) {
-      throw new IllegalArgumentException("Short name cannot have any spaces: '" + shortName + "' for " +
-          theEnum.getClass().getSimpleName());
-    }
-    if (StringUtils.isNumeric(shortName)) {
-      throw new IllegalArgumentException("Short name cannot be numeric: '" + shortName + "' for " +
-          theEnum.getClass().getSimpleName());
-    }
-    if (m_shortNameMap.containsKey(shortName)) {
-      throw new IllegalStateException("An enum already exists with the name '" + shortName + "' for " +
-          theEnum.getClass().getSimpleName());
-    }
-    m_shortNameMap.put(shortName, theEnum);
-    m_lcShortNameMap.put(shortName.toLowerCase(), theEnum);
+    m_shortNameMap.put(strippedShortName, theEnum);
+    m_lcShortNameMap.put(strippedShortName.toLowerCase(), theEnum);
 
-    displayName = StringUtils.stripToNull(displayName);
-    if (displayName != null) {
-      if (m_displayNameMap.containsKey(displayName)) {
-        throw new IllegalStateException("An enum already exists with the display name '" + displayName + "' for " +
-            theEnum.getClass().getSimpleName());
-      }
-      m_displayNameMap.put(displayName, theEnum);
+    if (strippedDisplayName != null) {
+      m_displayNameMap.put(strippedDisplayName, theEnum);
     }
     if (!sf_enumMap.containsKey(theEnum.getClass())) {
       sf_enumMap.put(theEnum.getClass(), this);
@@ -103,8 +94,7 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
   /**
    * Looks for the enum with the given Id.
    */
-  public @Nullable
-  T lookupById(int id) {
+  public @Nullable T lookupById(int id) {
     return m_idMap.get(id);
   }
 
@@ -191,7 +181,10 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
    */
   public static @Nonnull String camelCaseFormat(@Nonnull String name) {
     Preconditions.checkNotNull(name, "name is null");
-    name = sf_punctuationPattern.matcher(name.toLowerCase()).replaceAll("");
-    return StringUtils.deleteWhitespace(StringUtils.uncapitalize(WordUtils.capitalize(name)));
+    String strippedName = StringUtils.stripToNull(sf_punctuationPattern.matcher(name.toLowerCase()).replaceAll(""));
+    if (strippedName == null) {
+      throw new IllegalArgumentException("'" + name + "' converts to empty string");
+    }
+    return StringUtils.deleteWhitespace(StringUtils.uncapitalize(WordUtils.capitalize(strippedName)));
   }
 }
