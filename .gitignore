@@ -2,17 +2,23 @@
 /.idea/libraries/Gradle__*.xml
 /.idea/dictionaries/
 /.idea/gradle.xml
+/.idea/markdown*
+/.idea/misc.xml
 /.idea/modules/
 /.idea/modules.xml
+/.idea/sassLintPlugin.xml
 /.idea/scssLintPlugin.xml
 /.idea/shelf/
+/.idea/vcs.xml
 /.idea/workspace.xml
 /.idea/watcherTasks.xml
 
 # External tools
 .gradle/
-/bower_components/
 /node_modules/
+
+# Wiki checkout
+/*.wiki/
 
 # Temporary files
 .DS_Store

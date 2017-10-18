@@ -1,40 +1,40 @@
 plugins {
   id 'java'
   id 'jacoco'
-  id 'com.github.kt3k.coveralls' version '2.8.1'
+  id 'com.github.kt3k.coveralls' version '2.8.2'
   id 'osgi'
   id 'signing'
   id 'com.jfrog.bintray' version '1.7.3'
   id 'maven-publish'
 }
 
-
-def getVersionName = {
+def getVersionName() {
+  def errOut = new ByteArrayOutputStream()
   try {
-    def stdout = new ByteArrayOutputStream()
+    def stdOut = new ByteArrayOutputStream()
     exec {
       commandLine 'git', 'describe', '--tags'
-      standardOutput = stdout
+      standardOutput = stdOut
+      errorOutput = errOut
     }
     // strip of leading "v"
-    return stdout.toString().trim().substring(1)
-  }
-  catch (ignored) {
-    return null
+    return stdOut.toString().trim().substring(1)
+  } catch (ignore) {
+    logger.info('Error running git describe (' + errOut.toString().trim() + '), defaulting to 0.0.0')
+    return '0.0.0'
   }
 }
-
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 project.group = 'org.pharmgkb'
 project.version = getVersionName()
-archivesBaseName = "pgkb-common"
 
 ext {
+  baseName = 'pgkb-common'
   description = 'Common code shared among all PharmGKB projects.'
-  url = 'https://github.com/PharmGKB/pgkb-common.git'
-  scm = 'scm:git@github.com:PharmGKB/pgkb-common.git'
+  url = 'https://github.com/PharmGKB/' + project.ext.baseName + '.git'
+  scm = 'scm:git@github.com:PharmGKB/' + project.ext.baseName + '.git'
   orgName = 'PharmGKB'
   orgUrl = 'https://www.pharmgkb.org'
   // grab properties from environment for Travis CI
@@ -52,8 +52,7 @@ repositories {
 
 dependencies {
   compile group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.3'
-  compile group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
-  compile group: 'com.google.guava', name: 'guava', version: '23.0'
+  compile group: 'com.google.guava', name: 'guava', version: '23.2-jre'
   compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.6'
   compile group: 'org.apache.commons', name: 'commons-text', version: '1.1'
   compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
@@ -62,130 +61,4 @@ dependencies {
   testCompile group: 'net.trajano.commons', name: 'commons-testing', version: '2.1.0'
 }
 
-
-task printVersion {
-  doLast {
-    println project.version
-  }
-}
-
-
-jacocoTestReport {
-  reports {
-    xml.enabled = true // coveralls plugin depends on xml format report
-    html.enabled = true
-  }
-}
-
-
-jar {
-  manifest {
-    attributes 'Implementation-Title': project.name
-    attributes 'Implementation-Version': project.version
-    instruction 'Import-Package',
-        'javax.annotation;bundle-symbolic-name="org.jsr-305";resolution:=optional',
-        '*'
-  }
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-  classifier = 'javadoc'
-  from 'build/docs/javadoc'
-}
-
-task sourcesJar(type: Jar) {
-  classifier = 'sources'
-  from sourceSets.main.allSource
-}
-
-artifacts {
-  archives jar
-  archives javadocJar
-  archives sourcesJar
-}
-
-
-signing {
-  sign configurations.archives
-}
-
-
-bintray {
-  user = project.ext.bintrayUser
-  key = project.ext.bintrayKey
-  publications = [ 'PgkbPublication' ]
-  dryRun = false
-  publish = true
-
-  pkg {
-    repo = 'maven'
-    name = project.name
-    desc = project.ext.description
-    userOrg = 'pharmgkb'
-    licenses = [ 'MPL-2.0' ]
-    issueTrackerUrl = project.ext.url + '/issues'
-    vcsUrl = project.ext.url
-    githubRepo = 'PharmGKB/' + archivesBaseName
-
-    version {
-      name = project.version
-      vcsTag = 'v' + project.version
-      gpg {
-        sign = true
-        passphrase = project.ext.gpgPwd
-      }
-      mavenCentralSync {
-        sync = true
-        user = project.ext.sonatypeUser
-        password = project.ext.sonatypePwd
-        close = '1'
-      }
-    }
-  }
-}
-
-publishing {
-  publications {
-    PgkbPublication(MavenPublication) {
-      from components.java
-      artifact javadocJar
-      artifact sourcesJar
-
-      pom.withXml {
-        asNode().children().last() + {
-          resolveStrategy = Closure.DELEGATE_FIRST
-          name project.name
-          packaging 'jar'
-          description project.ext.description
-          url project.ext.url
-          scm {
-            url project.ext.url
-            connection project.ext.scm
-            developerConnection project.ext.scm
-          }
-          licenses {
-            license {
-              name 'MPL 2.0'
-              url 'http://mozilla.org/MPL/2.0/'
-              distribution 'repo'
-            }
-          }
-          organization {
-            name project.ext.orgName
-            url project.ext.orgUrl
-          }
-          developers {
-            developer {
-              id 'markwoon'
-              name 'Mark Woon'
-            }
-            developer {
-              id 'whaleyr'
-              name 'Ryan Whaley'
-            }
-          }
-        }
-      }
-    }
-  }
-}
+apply from: 'pgkb-build.gradle'

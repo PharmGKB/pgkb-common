@@ -1,0 +1,154 @@
+// This script plugin contains the standard PGKB gradle build config/tasks.
+//
+//
+
+
+/**
+ * Prints project's version.
+ */
+task printVersion {
+  doLast {
+    println project.version
+  }
+}
+
+
+jacocoTestReport {
+  reports {
+    xml.enabled = true // coveralls plugin depends on xml format report
+    html.enabled = true
+  }
+}
+
+
+/**
+ * Checks if this project uses FindBug's JSR-305 library.
+ * This checks transitive dependencies as well, so need not be declared in the project's
+ * dependencies list.
+ */
+//noinspection GroovyAssignabilityCheck
+def usesJsr305 = {
+  boolean hasJsr305 = false
+  project.configurations.compile.resolvedConfiguration.resolvedArtifacts.each {
+    if (it.moduleVersion.toString().startsWith('com.google.code.findbugs:jsr305:')) {
+      hasJsr305 = true
+    }
+  }
+  return hasJsr305
+}
+
+jar {
+  manifest {
+    attributes 'Implementation-Title': project.name
+    attributes 'Implementation-Version': project.version
+  }
+  if (usesJsr305()) {
+    manifest {
+      instruction 'Import-Package',
+          'javax.annotation;bundle-symbolic-name="org.jsr-305";resolution:=optional',
+          '*'
+    }
+  }
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+  classifier = 'javadoc'
+  from 'build/docs/javadoc'
+}
+
+task sourcesJar(type: Jar) {
+  classifier = 'sources'
+  from sourceSets.main.allSource
+}
+
+artifacts {
+  archives jar
+  archives javadocJar
+  archives sourcesJar
+}
+
+signing {
+  sign configurations.archives
+}
+
+
+bintray {
+  user = project.ext.bintrayUser
+  key = project.ext.bintrayKey
+  publications = [ 'PgkbPublication' ]
+  dryRun = false
+  publish = true
+
+  pkg {
+    repo = 'maven'
+    name = project.name
+    desc = project.ext.description
+    userOrg = 'pharmgkb'
+    licenses = [ 'MPL-2.0' ]
+    issueTrackerUrl = project.ext.url + '/issues'
+    vcsUrl = project.ext.url
+    githubRepo = 'PharmGKB/' + project.ext.baseName
+
+    version {
+      name = project.version
+      vcsTag = 'v' + project.version
+      gpg {
+        sign = true
+        passphrase = project.ext.gpgPwd
+      }
+      mavenCentralSync {
+        sync = true
+        user = project.ext.sonatypeUser
+        password = project.ext.sonatypePwd
+        close = '1'
+      }
+    }
+  }
+}
+
+
+publishing {
+  publications {
+    PgkbPublication(MavenPublication) {
+      from components.java
+      artifact javadocJar
+      artifact sourcesJar
+
+      pom.withXml {
+        asNode().children().last() + {
+          resolveStrategy = Closure.DELEGATE_FIRST
+          name project.name
+          packaging 'jar'
+          description project.ext.description
+          url project.ext.url
+          scm {
+            url project.ext.url
+            connection project.ext.scm
+            developerConnection project.ext.scm
+          }
+          licenses {
+            license {
+              name 'MPL 2.0'
+              url 'http://mozilla.org/MPL/2.0/'
+              distribution 'repo'
+            }
+          }
+          organization {
+            name project.ext.orgName
+            url project.ext.orgUrl
+          }
+          developers {
+            developer {
+              id 'markwoon'
+              name 'Mark Woon'
+            }
+            developer {
+              id 'whaleyr'
+              name 'Ryan Whaley'
+            }
+          }
+        }
+      }
+    }
+  }
+}
