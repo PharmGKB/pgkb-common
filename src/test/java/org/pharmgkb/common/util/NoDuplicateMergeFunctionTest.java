@@ -2,6 +2,7 @@ package org.pharmgkb.common.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.function.Function;
@@ -35,8 +36,9 @@ public class NoDuplicateMergeFunctionTest {
   public void testMergeDup() {
 
     List<String> list = Lists.newArrayList("C", "C", "A");
-    list.stream()
+    Map rez = list.stream()
         .collect(Collectors.toMap(s -> "key:" + s, Function.identity(), new NoDuplicateMergeFunction<>(), TreeMap::new));
+    System.out.println(rez.size());
     fail("Should never get here");
   }
 }
