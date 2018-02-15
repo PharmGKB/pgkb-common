@@ -38,7 +38,10 @@ def usesJsr305 = {
 }
 
 jar {
+  inputs.property("moduleName", project.ext.moduleName)
   manifest {
+    attributes 'Automatic-Module-Name': project.ext.moduleName
+    attributes 'Bundle-SymbolicName': project.ext.moduleName
     attributes 'Implementation-Title': project.name
     attributes 'Implementation-Version': project.version
   }

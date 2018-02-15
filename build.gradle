@@ -4,7 +4,7 @@ plugins {
   id 'com.github.kt3k.coveralls' version '2.8.2'
   id 'osgi'
   id 'signing'
-  id 'com.jfrog.bintray' version '1.7.3'
+  id 'com.jfrog.bintray' version '1.8.0'
   id 'maven-publish'
 }
 
@@ -32,6 +32,7 @@ project.version = getVersionName()
 
 ext {
   baseName = 'pgkb-common'
+  moduleName = 'org.pharmgkb.common'
   description = 'Common code shared among all PharmGKB projects.'
   url = 'https://github.com/PharmGKB/' + project.ext.baseName + '.git'
   scm = 'scm:git@github.com:PharmGKB/' + project.ext.baseName + '.git'
@@ -52,9 +53,10 @@ repositories {
 
 dependencies {
   compile group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.3'
-  compile group: 'com.google.guava', name: 'guava', version: '23.2-jre'
-  compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.6'
-  compile group: 'org.apache.commons', name: 'commons-text', version: '1.1'
+  compile group: 'commons-collections', name: 'commons-collections', version: '3.2.2'
+  compile group: 'com.google.guava', name: 'guava', version: '24.0-jre'
+  compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
+  compile group: 'org.apache.commons', name: 'commons-text', version: '1.2'
   compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
 
   testCompile group: 'junit', name: 'junit', version: '4.12'
