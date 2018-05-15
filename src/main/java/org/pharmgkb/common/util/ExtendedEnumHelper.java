@@ -125,6 +125,9 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
    */
   public @Nullable T fromString(String value) {
 
+    if (value == null) {
+      return null;
+    }
     if (StringUtils.isNumeric(value)) {
       return lookupById(Integer.parseInt(value));
     } else {
