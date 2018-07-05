@@ -6,9 +6,6 @@
  */
 package org.pharmgkb.common.util;
 
-import javax.annotation.Nonnull;
-
-
 /**
  * This interface should be implemented by all enums.  Implementors should also make available
  * all accessor methods from {@link ExtendedEnumHelper} as static methods.
@@ -30,11 +27,11 @@ public interface ExtendedEnum {
   /**
    * Gets the short name of this enum.
    */
-  @Nonnull String getShortName();
+  String getShortName();
 
 
   /**
    * Gets the display name of this enum.  Will return short name if no display name is defined.
    */
-  @Nonnull String getDisplayName();
+  String getDisplayName();
 }

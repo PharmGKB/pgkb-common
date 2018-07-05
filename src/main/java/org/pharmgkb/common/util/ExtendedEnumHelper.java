@@ -10,13 +10,12 @@ import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Map;
 import java.util.regex.Pattern;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.WordUtils;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 
 /**
@@ -36,7 +35,7 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
   /**
    * This constructor registers the {@link ExtendedEnum} for conversion by BeanUtils.
    */
-  public ExtendedEnumHelper(@Nonnull Class clz) {
+  public ExtendedEnumHelper(Class clz) {
     Preconditions.checkNotNull(clz, "clz is null");
     ConvertUtils.register(ExtendedEnumConverter.getConverter(), clz);
   }
@@ -49,7 +48,7 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
    * already being used
    * @throws IllegalArgumentException if the short name has a space in it
    */
-  public void add(T theEnum, int id, @Nonnull String shortName, @Nullable String displayName,
+  public void add(T theEnum, int id, String shortName, @Nullable String displayName,
       @Nullable String... additionalNames) {
 
     Preconditions.checkArgument(!m_idMap.containsKey(id), "Duplicate ID '%s' for %s", id,
@@ -103,7 +102,7 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
    *
    * @return the enum for the given name, or null if none can be found
    */
-  public @Nullable T lookupByName(@Nonnull String name) {
+  public @Nullable T lookupByName(String name) {
     Preconditions.checkNotNull(name, "name is null");
 
     if (m_displayNameMap.containsKey(name)) {
@@ -139,14 +138,14 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
   /**
    * Gets all the enums sorted by Id.
    */
-  public @Nonnull Collection<T> getAllSortedById() {
+  public Collection<T> getAllSortedById() {
     return m_idMap.values();
   }
 
   /**
    * Gets all the enums sorted by name.
    */
-  public @Nonnull Collection<T> getAllSortedByName() {
+  public Collection<T> getAllSortedByName() {
 
     if (m_displayNameMap.isEmpty()) {
       return m_shortNameMap.values();
@@ -158,7 +157,7 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
   /**
    * Gets the ExtendedEnumHelper to use to perform lookups for the specified ExtendedEnum class.
    */
-  public static @Nullable ExtendedEnumHelper getExtendedEnumHelper(@Nonnull Class enumClass) {
+  public static @Nullable ExtendedEnumHelper getExtendedEnumHelper(Class enumClass) {
     Preconditions.checkNotNull(enumClass, "enumClass is null");
 
     if (!sf_enumMap.containsKey(enumClass)) {
@@ -182,7 +181,7 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
   /**
    * Converts the given name into camel case format.
    */
-  public static @Nonnull String camelCaseFormat(@Nonnull String name) {
+  public static String camelCaseFormat(String name) {
     Preconditions.checkNotNull(name, "name is null");
     String strippedName = StringUtils.stripToNull(sf_punctuationPattern.matcher(name.toLowerCase()).replaceAll(""));
     if (strippedName == null) {

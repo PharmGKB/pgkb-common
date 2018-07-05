@@ -1,6 +1,5 @@
 package org.pharmgkb.common.util;
 
-import javax.annotation.Nonnull;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -87,12 +86,12 @@ public class ExtendedEnumHelperTest {
     }
 
     @Override
-    public @Nonnull String getShortName() {
+    public String getShortName() {
       return "shortName";
     }
 
     @Override
-    public @Nonnull String getDisplayName() {
+    public String getDisplayName() {
       return "displayName";
     }
   }

@@ -7,7 +7,6 @@ import java.net.URLConnection;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.annotation.Nonnull;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Sets;
 
@@ -40,7 +39,7 @@ public class UrlUtils {
    *   <li>Does NOT allow private IPs.</li>
    * </ul>
    */
-  public static boolean isValidWebUrl(@Nonnull String urlString) {
+  public static boolean isValidWebUrl(String urlString) {
     return isValid(urlString, true, false, false, false);
   }
 
@@ -52,7 +51,7 @@ public class UrlUtils {
    *   <li>Does NOT allow private IPs.</li>
    * </ul>
    */
-  public static boolean isValid(@Nonnull String urlString) {
+  public static boolean isValid(String urlString) {
     return isValid(urlString, false, false, false, false);
   }
 
@@ -65,7 +64,7 @@ public class UrlUtils {
    * @param allowPrivateIp true if private IP addresses should be allowed
    * @param verify true to check if URL actually points to something (see caveats for {@link #isReachable(URL)})
    */
-  public static boolean isValid(@Nonnull String urlString, boolean noFtp, boolean allowLocalhost,
+  public static boolean isValid(String urlString, boolean noFtp, boolean allowLocalhost,
       boolean allowPrivateIp, boolean verify) {
 
     try {
@@ -103,9 +102,7 @@ public class UrlUtils {
       }
 
       if (verify) {
-        if (!isReachable(url)) {
-          return false;
-        }
+        return isReachable(url);
       }
       return true;
 
@@ -120,7 +117,7 @@ public class UrlUtils {
    * For FTP URLs, this will only verify that we can connect to the server, not whether the resource is actually
    * available.
    */
-  public static boolean isReachable(@Nonnull URL url) {
+  public static boolean isReachable(URL url) {
     try {
       if (sf_webSchemes.contains(url.getProtocol())) {
         HttpURLConnection connection = (HttpURLConnection)url.openConnection();

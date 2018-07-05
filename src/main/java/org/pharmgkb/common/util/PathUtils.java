@@ -15,7 +15,6 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
-import javax.annotation.Nonnull;
 import com.google.common.base.Preconditions;
 
 
@@ -37,7 +36,7 @@ public final class PathUtils {
    * Gets the name of the file.
    * Does not validate if {@code file} is a regular file.
    */
-  public static @Nonnull String getFilename(@Nonnull Path file) {
+  public static String getFilename(Path file) {
     Preconditions.checkNotNull(file);
 
     return file.getName(file.getNameCount() - 1).toString();
@@ -47,7 +46,7 @@ public final class PathUtils {
    * Gets the base name of the file (i.e. file name without the extension).
    * Does not validate if {@code file} is a regular file.
    */
-  public static @Nonnull String getBaseFilename(@Nonnull Path file) {
+  public static String getBaseFilename(Path file) {
     Preconditions.checkNotNull(file);
 
     String fileName = getFilename(file);
@@ -64,9 +63,9 @@ public final class PathUtils {
    *
    * @param filename a relative filename (e.g. {@code org/pharmgkb/common/file.txt})
    */
-  public static @Nonnull Path getPathToResource(@Nonnull String filename) {
-
+  public static Path getPathToResource(String filename) {
     Preconditions.checkNotNull(filename);
+
     URL url = PathUtils.class.getClassLoader().getResource(filename);
     if (url == null) {
       throw new IllegalArgumentException("No such resource: " + filename);

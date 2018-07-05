@@ -6,9 +6,9 @@
  */
 package org.pharmgkb.common.util;
 
-import javax.annotation.Nullable;
 import org.apache.commons.beanutils.ConversionException;
 import org.apache.commons.beanutils.Converter;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 
 /**

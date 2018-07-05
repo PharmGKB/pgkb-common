@@ -3,7 +3,7 @@ package org.pharmgkb.common.comparator;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 
 /**

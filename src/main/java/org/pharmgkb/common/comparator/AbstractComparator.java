@@ -1,7 +1,6 @@
 package org.pharmgkb.common.comparator;
 
 import java.util.Comparator;
-import javax.annotation.Nonnull;
 import com.google.common.base.Preconditions;
 
 
@@ -19,7 +18,7 @@ public abstract class AbstractComparator<T> implements Comparator<T>{
 
    * @return the order in which results should be returned
    */
-  public final @Nonnull SortOrder getOrder() {
+  public final SortOrder getOrder() {
     return m_order;
   }
 
@@ -28,7 +27,7 @@ public abstract class AbstractComparator<T> implements Comparator<T>{
 
    * @param order the order in which results should be returned
    */
-  protected final void setOrder(@Nonnull SortOrder order) {
+  protected final void setOrder(SortOrder order) {
     Preconditions.checkNotNull(order);
     m_order = order;
   }
