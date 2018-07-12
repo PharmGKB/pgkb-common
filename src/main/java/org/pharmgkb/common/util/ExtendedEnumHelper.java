@@ -122,7 +122,7 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
    * If value is an integer return enum with given Id, otherwise return enum with given name.
    * Helps provide functionality for type conversion in RESTful services.
    */
-  public @Nullable T fromString(String value) {
+  public @Nullable T fromString(@Nullable String value) {
 
     if (value == null) {
       return null;
