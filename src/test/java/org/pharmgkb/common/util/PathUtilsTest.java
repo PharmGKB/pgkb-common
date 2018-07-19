@@ -38,6 +38,15 @@ public class PathUtilsTest {
   }
 
   @Test
+  public void testGetFileExtension() {
+
+    assertEquals("ai", PathUtils.getFileExtension(Paths.get("/a/dir/foo.ai")));
+    assertEquals("asdfasdf", PathUtils.getFileExtension(Paths.get("/a/dir/foo.asdfasdf")));
+    assertNull(PathUtils.getFileExtension(Paths.get("/a/dir/foo")));
+    assertNull(PathUtils.getFileExtension(Paths.get("/a/dir/foo.")));
+  }
+
+  @Test
   public void testGetBaseFilename() {
 
     assertEquals("foo", PathUtils.getBaseFilename(Paths.get("/a/dir/for/foo.xml")));

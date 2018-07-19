@@ -16,6 +16,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import com.google.common.base.Preconditions;
+import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 
 /**
@@ -40,6 +42,20 @@ public final class PathUtils {
     Preconditions.checkNotNull(file);
 
     return file.getName(file.getNameCount() - 1).toString();
+  }
+
+
+  /**
+   * Gets the file extension, if one exists.  Does not include ".".
+   * Does not validate if {@code file} is a regular file.
+   */
+  public static @Nullable String getFileExtension(Path file) {
+    String filename = getFilename(file);
+    int idx = filename.indexOf(".");
+    if (idx == -1) {
+      return null;
+    }
+    return StringUtils.stripToNull(filename.substring(idx + 1));
   }
 
   /**
