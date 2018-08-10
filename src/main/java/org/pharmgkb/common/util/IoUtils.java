@@ -2,6 +2,7 @@ package org.pharmgkb.common.util;
 
 import java.io.Closeable;
 import java.lang.invoke.MethodHandles;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,11 +23,13 @@ public class IoUtils {
   }
 
 
-  public static void closeQuietly(Closeable closeable) {
-    try {
-      closeable.close();
-    } catch (Exception ex) {
-      sf_logger.warn("Error closing {}", closeable.getClass(), ex);
+  public static void closeQuietly(@Nullable Closeable closeable) {
+    if (closeable != null) {
+      try {
+        closeable.close();
+      } catch (Exception ex) {
+        sf_logger.warn("Error closing {}", closeable.getClass(), ex);
+      }
     }
   }
 }
