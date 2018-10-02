@@ -51,8 +51,10 @@ public class HaplotypeNameComparatorTest {
     assertTrue(HaplotypeNameComparator.getComparator().compare("*1", "H2") < 0);
     assertTrue(HaplotypeNameComparator.getComparator().compare("*1", "TPMT") < 0);
     assertTrue(HaplotypeNameComparator.getComparator().compare("TPMT", "BRCA") > 0);
+
+    assertEquals(1, HaplotypeNameComparator.getComparator().compare("Unknown", "Unknown function"));
   }
-  
+
   @Test
   public void testCollectionSorting() {
     List<String> input = new ArrayList<>();
@@ -61,10 +63,10 @@ public class HaplotypeNameComparatorTest {
     input.add("*100");
     input.add("Any");
     input.add("*1");
-    
+
     Set<String> orderedSet = new TreeSet<>(HaplotypeNameComparator.getComparator());
     orderedSet.addAll(input);
-    
+
     Iterator<String> it = orderedSet.iterator();
     assertEquals("Any", it.next());
     assertEquals("*1", it.next());
