@@ -1,17 +1,14 @@
-/*
- ----- BEGIN LICENSE BLOCK -----
- This Source Code Form is subject to the terms of the Mozilla Public License, v.2.0.
- If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
- ----- END LICENSE BLOCK -----
- */
 package org.pharmgkb.common.util;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Maps;
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.WordUtils;
@@ -24,12 +21,12 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @author Mark Woon
  */
 public class ExtendedEnumHelper<T extends ExtendedEnum> {
-  private static final Map<Class, ExtendedEnumHelper> sf_enumMap = Maps.newHashMap();
-  private Map<Integer, T> m_idMap = Maps.newTreeMap();
-  private Map<String, T> m_shortNameMap = Maps.newTreeMap();
-  private Map<String, T> m_lcShortNameMap = Maps.newTreeMap();
-  private Map<String, T> m_displayNameMap = Maps.newTreeMap();
-  private Map<String, T> m_additionalNamesMap = Maps.newTreeMap();
+  private static final Map<Class, ExtendedEnumHelper> sf_enumMap = new HashMap<>();
+  private Map<Integer, T> m_idMap = new TreeMap<>();
+  private Map<String, T> m_shortNameMap = new TreeMap<>();
+  private Map<String, T> m_lcShortNameMap = new TreeMap<>();
+  private Map<String, T> m_displayNameMap = new TreeMap<>();
+  private Map<String, T> m_additionalNamesMap = new TreeMap<>();
 
 
   /**
@@ -157,7 +154,7 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
   /**
    * Gets the ExtendedEnumHelper to use to perform lookups for the specified ExtendedEnum class.
    */
-  public static @Nullable ExtendedEnumHelper getExtendedEnumHelper(Class enumClass) {
+  public static @Nullable <T extends ExtendedEnum> ExtendedEnumHelper<T> getExtendedEnumHelper(Class<T> enumClass) {
     Preconditions.checkNotNull(enumClass, "enumClass is null");
 
     if (!sf_enumMap.containsKey(enumClass)) {
@@ -173,6 +170,7 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
         throw new IllegalStateException("No enumerations in class " + enumClass.getName());
       }
     }
+    //noinspection unchecked
     return sf_enumMap.get(enumClass);
   }
 
@@ -188,5 +186,29 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
       throw new IllegalArgumentException("'" + name + "' converts to empty string");
     }
     return StringUtils.deleteWhitespace(StringUtils.uncapitalize(WordUtils.capitalize(strippedName)));
+  }
+
+
+  /**
+   * Converts {@link ExtendedEnum} into a {@link Map}.
+   * This is primarily used to serialize standalone {@link ExtendedEnum}s to JSON and overriding default behavior.
+   */
+  public static Map<String, Object> toMap(ExtendedEnum extendedEnum) {
+    Preconditions.checkNotNull(extendedEnum);
+    Map<String, Object> map = new HashMap<>();
+    map.put("displayName", extendedEnum.getDisplayName());
+    map.put("shortName", extendedEnum.getShortName());
+    map.put("id", extendedEnum.getId());
+    return map;
+  }
+
+  public static SortedSet<Map<String, Object>> toMap(Collection<? extends ExtendedEnum> extendedEnums) {
+    Preconditions.checkNotNull(extendedEnums);
+    SortedSet<Map<String, Object>> results = new TreeSet<>((o1, o2) ->
+        ((String)o1.get("displayName")).compareToIgnoreCase((String)o2.get("displayName")));
+    extendedEnums.stream()
+        .map(ExtendedEnumHelper::toMap)
+        .forEach(results::add);
+    return results;
   }
 }

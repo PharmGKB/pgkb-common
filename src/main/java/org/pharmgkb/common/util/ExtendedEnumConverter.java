@@ -1,9 +1,3 @@
-/*
- ----- BEGIN LICENSE BLOCK -----
- This Source Code Form is subject to the terms of the Mozilla Public License, v.2.0.
- If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
- ----- END LICENSE BLOCK -----
- */
 package org.pharmgkb.common.util;
 
 import org.apache.commons.beanutils.ConversionException;
@@ -28,7 +22,8 @@ public class ExtendedEnumConverter implements Converter {
   @Override
   public @Nullable <T> T convert(Class<T> aClass, Object o) {
 
-    ExtendedEnumHelper helper = ExtendedEnumHelper.getExtendedEnumHelper(aClass);
+    //noinspection unchecked
+    ExtendedEnumHelper helper = ExtendedEnumHelper.getExtendedEnumHelper((Class<? extends ExtendedEnum>)aClass);
     if (helper != null && ExtendedEnum.class.isAssignableFrom(aClass)) {
       if (o instanceof String) {
         return aClass.cast(helper.fromString((String)o));
