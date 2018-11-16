@@ -153,8 +153,10 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
 
   /**
    * Gets the ExtendedEnumHelper to use to perform lookups for the specified ExtendedEnum class.
+   *
+   * @throws IllegalStateException if attempting to lookup an {@link ExtendedEnum} that hasn't been registered
    */
-  public static @Nullable <T extends ExtendedEnum> ExtendedEnumHelper<T> getExtendedEnumHelper(Class<T> enumClass) {
+  public static <T extends ExtendedEnum> ExtendedEnumHelper<T> getExtendedEnumHelper(Class<T> enumClass) {
     Preconditions.checkNotNull(enumClass, "enumClass is null");
 
     if (!sf_enumMap.containsKey(enumClass)) {
@@ -170,8 +172,12 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
         throw new IllegalStateException("No enumerations in class " + enumClass.getName());
       }
     }
+    ExtendedEnumHelper extendedEnumHelper = sf_enumMap.get(enumClass);
+    if (extendedEnumHelper == null) {
+      throw new IllegalStateException("Unregistered ExtendedEnum: " + enumClass);
+    }
     //noinspection unchecked
-    return sf_enumMap.get(enumClass);
+    return extendedEnumHelper;
   }
 
 
