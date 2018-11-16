@@ -4,9 +4,7 @@ import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.SortedSet;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.regex.Pattern;
 import com.google.common.base.Preconditions;
 import org.apache.commons.beanutils.ConvertUtils;
@@ -192,29 +190,5 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
       throw new IllegalArgumentException("'" + name + "' converts to empty string");
     }
     return StringUtils.deleteWhitespace(StringUtils.uncapitalize(WordUtils.capitalize(strippedName)));
-  }
-
-
-  /**
-   * Converts {@link ExtendedEnum} into a {@link Map}.
-   * This is primarily used to serialize standalone {@link ExtendedEnum}s to JSON and overriding default behavior.
-   */
-  public static Map<String, Object> toMap(ExtendedEnum extendedEnum) {
-    Preconditions.checkNotNull(extendedEnum);
-    Map<String, Object> map = new HashMap<>();
-    map.put("displayName", extendedEnum.getDisplayName());
-    map.put("shortName", extendedEnum.getShortName());
-    map.put("id", extendedEnum.getId());
-    return map;
-  }
-
-  public static SortedSet<Map<String, Object>> toMap(Collection<? extends ExtendedEnum> extendedEnums) {
-    Preconditions.checkNotNull(extendedEnums);
-    SortedSet<Map<String, Object>> results = new TreeSet<>((o1, o2) ->
-        ((String)o1.get("displayName")).compareToIgnoreCase((String)o2.get("displayName")));
-    extendedEnums.stream()
-        .map(ExtendedEnumHelper::toMap)
-        .forEach(results::add);
-    return results;
   }
 }
