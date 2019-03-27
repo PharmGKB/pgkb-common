@@ -1,15 +1,8 @@
-/*
- ----- BEGIN LICENSE BLOCK -----
- This Source Code Form is subject to the terms of the Mozilla Public License, v.2.0.
- If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
- ----- END LICENSE BLOCK -----
- */
 package org.pharmgkb.common.util;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import net.trajano.commons.testing.UtilityClassTestUtil;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -21,12 +14,6 @@ import static org.junit.Assert.*;
  * @author Mark Woon
  */
 public class PathUtilsTest {
-
-
-  @Test
-  public void testUtilityClass() throws Exception {
-    UtilityClassTestUtil.assertUtilityClassWellDefined(PathUtils.class);
-  }
 
 
   @Test
