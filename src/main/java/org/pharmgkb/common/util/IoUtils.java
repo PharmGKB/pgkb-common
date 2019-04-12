@@ -1,6 +1,5 @@
 package org.pharmgkb.common.util;
 
-import java.io.Closeable;
 import java.lang.invoke.MethodHandles;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
@@ -23,7 +22,7 @@ public class IoUtils {
   }
 
 
-  public static void closeQuietly(@Nullable Closeable closeable) {
+  public static void closeQuietly(@Nullable AutoCloseable closeable) {
     if (closeable != null) {
       try {
         closeable.close();
