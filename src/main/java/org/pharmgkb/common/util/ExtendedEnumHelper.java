@@ -22,8 +22,8 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
   private static final Map<Class, ExtendedEnumHelper> sf_enumMap = new HashMap<>();
   private Map<Integer, T> m_idMap = new TreeMap<>();
   private Map<String, T> m_shortNameMap = new TreeMap<>();
-  private Map<String, T> m_lcShortNameMap = new TreeMap<>();
   private Map<String, T> m_displayNameMap = new TreeMap<>();
+  private Map<String, T> m_lcNameMap = new TreeMap<>();
   private Map<String, T> m_additionalNamesMap = new TreeMap<>();
 
 
@@ -69,10 +69,11 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
     m_idMap.put(id, theEnum);
 
     m_shortNameMap.put(strippedShortName, theEnum);
-    m_lcShortNameMap.put(strippedShortName.toLowerCase(), theEnum);
+    m_lcNameMap.put(strippedShortName.toLowerCase(), theEnum);
 
     if (strippedDisplayName != null) {
       m_displayNameMap.put(strippedDisplayName, theEnum);
+      m_lcNameMap.put(strippedDisplayName.toLowerCase(), theEnum);
     }
     if (!sf_enumMap.containsKey(theEnum.getClass())) {
       sf_enumMap.put(theEnum.getClass(), this);
@@ -109,7 +110,7 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
     if (m_additionalNamesMap.containsKey(name)) {
       return m_additionalNamesMap.get(name);
     }
-    return m_lcShortNameMap.get(name.toLowerCase());
+    return m_lcNameMap.get(name.toLowerCase());
   }
 
 
