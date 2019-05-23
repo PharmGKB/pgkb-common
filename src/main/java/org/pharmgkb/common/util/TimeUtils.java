@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.format.FormatStyle;
 import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -16,8 +17,11 @@ import java.util.concurrent.TimeUnit;
  * @author Mark Woon
  */
 public class TimeUtils {
-  private static final DateTimeFormatter sf_simpleDateFormatter = DateTimeFormatter.ofPattern("M/d/yy")
+  private static final DateTimeFormatter sf_shortDateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)
       .withZone(ZoneId.systemDefault());
+  private static final DateTimeFormatter sf_longDateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)
+      .withZone(ZoneId.systemDefault());
+
   private static final DateTimeFormatter sf_simpleDateTimeFormatter = DateTimeFormatter.ofPattern("M/d/yy h:mm a z")
       .withZone(ZoneId.systemDefault());
 
@@ -33,15 +37,20 @@ public class TimeUtils {
    * Formats {@code date} as "M/d/yy'.
    */
   public static String humanReadableDate(TemporalAccessor time) {
-    return sf_simpleDateFormatter.format(time);
+    return sf_shortDateFormatter.format(time);
   }
 
 
   /**
-   * Parses "M/d/yy" formatted strings into a {@link Date}.
+   * Parses "M/d/yy" or "MMMM d, yyyy" formatted strings into a {@link Date}.
    */
   public static Date parseToDate(String time) throws DateTimeParseException {
-    TemporalAccessor temporalAccessor = sf_simpleDateFormatter.parse(time);
+    TemporalAccessor temporalAccessor;
+    try {
+      temporalAccessor = sf_shortDateFormatter.parse(time);
+    } catch (DateTimeParseException ex) {
+      temporalAccessor = sf_longDateFormatter.parse(time);
+    }
     LocalDate ld = LocalDate.from(temporalAccessor);
     return Date.from(ld.atStartOfDay(ZoneId.systemDefault()).toInstant());
   }

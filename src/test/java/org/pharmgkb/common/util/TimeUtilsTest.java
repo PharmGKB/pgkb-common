@@ -44,6 +44,7 @@ public class TimeUtilsTest {
   @Test
   public void testParseDate() {
     assertEquals(new Date(1558249200000L), TimeUtils.parseToDate("5/19/19"));
+    assertEquals(new Date(1558249200000L), TimeUtils.parseToDate("May 19, 2019"));
   }
 
 
