@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
  * @author Mark Woon
  */
 public class TimeUtils {
+  private static final DateTimeFormatter sf_mediumDateFormatter = DateTimeFormatter.ofPattern("M/d/yyyy");
   private static final DateTimeFormatter sf_shortDateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)
       .withZone(ZoneId.systemDefault());
   private static final DateTimeFormatter sf_longDateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)
@@ -49,7 +50,11 @@ public class TimeUtils {
     try {
       temporalAccessor = sf_shortDateFormatter.parse(time);
     } catch (DateTimeParseException ex) {
-      temporalAccessor = sf_longDateFormatter.parse(time);
+      try {
+        temporalAccessor = sf_mediumDateFormatter.parse(time);
+      } catch (DateTimeParseException ex2) {
+        temporalAccessor = sf_longDateFormatter.parse(time);
+      }
     }
     LocalDate ld = LocalDate.from(temporalAccessor);
     return Date.from(ld.atStartOfDay(ZoneId.systemDefault()).toInstant());
