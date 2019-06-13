@@ -21,22 +21,6 @@ jacocoTestReport {
 }
 
 
-/**
- * Checks if this project uses FindBug's JSR-305 library.
- * This checks transitive dependencies as well, so need not be declared in the project's
- * dependencies list.
- */
-//noinspection GroovyAssignabilityCheck
-def usesJsr305 = {
-  boolean hasJsr305 = false
-  project.configurations.compile.resolvedConfiguration.resolvedArtifacts.each {
-    if (it.moduleVersion.toString().startsWith('com.google.code.findbugs:jsr305:')) {
-      hasJsr305 = true
-    }
-  }
-  return hasJsr305
-}
-
 jar {
   inputs.property("moduleName", project.ext.moduleName)
   manifest {
@@ -45,13 +29,11 @@ jar {
     attributes 'Implementation-Title': project.name
     attributes 'Implementation-Version': project.version
   }
-  if (usesJsr305()) {
-    manifest {
-      instruction 'Import-Package',
-          'javax.annotation;bundle-symbolic-name="org.jsr-305";resolution:=optional',
-          '*'
-    }
-  }
+}
+
+tasks.withType(Javadoc) {
+  // disable the crazy super-strict doclint tool in Java 8
+  options.addStringOption('Xdoclint:none', '-quiet')
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
@@ -117,38 +99,35 @@ publishing {
       artifact javadocJar
       artifact sourcesJar
 
-      pom.withXml {
-        asNode().children().last() + {
-          resolveStrategy = Closure.DELEGATE_FIRST
-          name project.name
-          packaging 'jar'
-          description project.ext.description
-          url project.ext.url
-          scm {
-            url project.ext.url
-            connection project.ext.scm
-            developerConnection project.ext.scm
+      pom {
+        name = project.name
+        description = project.ext.description
+        url = project.ext.url
+        packaging = 'jar'
+        scm {
+          url = project.ext.url
+          connection = project.ext.scm
+          developerConnection = project.ext.scm
+        }
+        licenses {
+          license {
+            name = 'MPL 2.0'
+            url = 'http://mozilla.org/MPL/2.0/'
+            distribution = 'repo'
           }
-          licenses {
-            license {
-              name 'MPL 2.0'
-              url 'http://mozilla.org/MPL/2.0/'
-              distribution 'repo'
-            }
+        }
+        organization {
+          name = project.ext.orgName
+          url = project.ext.orgUrl
+        }
+        developers {
+          developer {
+            id = 'markwoon'
+            name = 'Mark Woon'
           }
-          organization {
-            name project.ext.orgName
-            url project.ext.orgUrl
-          }
-          developers {
-            developer {
-              id 'markwoon'
-              name 'Mark Woon'
-            }
-            developer {
-              id 'whaleyr'
-              name 'Ryan Whaley'
-            }
+          developer {
+            id = 'whaleyr'
+            name = 'Ryan Whaley'
           }
         }
       }
