@@ -77,12 +77,34 @@ public final class PathUtils {
   /**
    * Converts a resource file name into a {@link Path}.
    *
-   * @param filename a relative filename (e.g. {@code org/pharmgkb/common/file.txt})
+   * @param filename a relative filename from root (e.g. {@code org/pharmgkb/common/file.txt})
    */
   public static Path getPathToResource(String filename) {
     Preconditions.checkNotNull(filename);
 
+    if (filename.startsWith("/")) {
+      filename = filename.substring(1);
+    }
+
     URL url = PathUtils.class.getClassLoader().getResource(filename);
+    return getPath(url, filename);
+  }
+
+  /**
+   * Converts a resource file name into a {@link Path}.
+   *
+   * @param clz the class the filename is relative to
+   * @param filename a relative filename from root (e.g. {@code org/pharmgkb/common/file.txt})
+   */
+  public static Path getPathToResource(Class clz, String filename) {
+    Preconditions.checkNotNull(filename);
+
+    URL url = clz.getResource(filename);
+    return getPath(url, filename);
+  }
+
+
+  private static Path getPath(@Nullable URL url, String filename) {
     if (url == null) {
       throw new IllegalArgumentException("No such resource: " + filename);
     }
@@ -99,7 +121,13 @@ public final class PathUtils {
           }
         }
       }
-      return Paths.get(uri);
+
+      Path path = Paths.get(uri);
+      if (path == null) {
+        throw new IllegalStateException("Cannot find file '" + uri + "' for  '" + filename + "'");
+      }
+      return path;
+
     } catch (URISyntaxException ex) {
       // should never happen
       throw new IllegalStateException("Filename '" + filename + "' translated to invalid URI (" + url + ")", ex);
