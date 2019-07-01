@@ -6,18 +6,18 @@ jdk: openjdk8
 notifications:
   slack:
     rooms:
-      - secure: HMLhKJfppYTgi5reCVBg7S/Hnvu9yfB3iAyxiPuTpstn4oqkabfssQicS2RSE3NVBFl95nCmoIX7KhQ24riGRXsW57t2Xf8YlLvTf97eErCDMDft/Fz2fIxkHm3oJbfGj4oZaP1pn32nS3hFE01EvuUCyk5L/Qr9y6NYLQrgB+w=
+      - secure: Dlx1WdoYjRI/+kPGpX1WYk/02srpAiFnBGiCVKESqwBr2Mkz4zlwsYsQx0N1bKn5ILU74ZMB/PU0i//p4IfZBxKbFuZfjAyS13Z0qJCzVT9oUx3AUgHgZw/+M6XMhRyn11z2WggkA5s8X22U/ANDMcxMNvi451iL1K9OC05zrO/GD7DF0edyUZ/AK0h3Z1mDE0R71H6AK/89oyZQ40S2U5IZ+NJydFjeXvou61h0INb117HQ68b8OGjevocrz0+QSlxsoJObB9A5sMEZ0uxWJcf09e/12IdnzBrHSjhftpKiZRsxBhchuhdujT+N/qmd4hXIeIhkOjVZAT2+hixh6/0wPd0paoBP+p3xVS4Na96IlgNdclbWQhWI9R2uxphNf7gDn1IJjrsKvHpryHGLvtPR2xGg8mmyMzw8/3L818Gyi20uxVD8JCror0TVuy3k3nPQTlv8mF5uOCWQEaNx0BFuK3Z9eTWs5c3P/rvSY7a/fA/+K7T1H8KsgvovjGVNxHIOeltVEqNCD8L1nCK/NwJC+CF41V9RtLdAlDJCfNyUYunXijpxfcoANyjNsckyYCYjd+Z7Veo3VZqghaAu+6S4pkMjY8geDBKO2JzYvi9WpBO1ibizc4cIqtgYijDu5gq6+SD9ymgveJggcc+F9bzMKFgLeKhabVP6Cx8sWAk=
 
 install: "./gradlew jar"
 
 after_success:
-- "./gradlew jacocoTestReport coveralls"
-- bash <(curl -s https://codecov.io/bash)
+  - ./gradlew jacocoTestReport coveralls
+  - bash <(curl -s https://codecov.io/bash)
 
 # gradle-specific cache configuration:
 before_cache:
-- rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
 cache:
   directories:
-  - "$HOME/.gradle/caches/"
-  - "$HOME/.gradle/wrapper/"
+    - "$HOME/.gradle/caches/"
+    - "$HOME/.gradle/wrapper/"
