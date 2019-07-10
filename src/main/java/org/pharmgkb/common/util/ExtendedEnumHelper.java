@@ -80,7 +80,14 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
     }
     if (additionalNames != null) {
       for (String additionalName : additionalNames) {
-        m_additionalNamesMap.put(additionalName, theEnum);
+        if (additionalName != null) {
+          m_additionalNamesMap.put(additionalName, theEnum);
+          ExtendedEnum oldVal = m_lcNameMap.put(additionalName.toLowerCase(), theEnum);
+          if (oldVal != null && oldVal != theEnum) {
+            throw new IllegalArgumentException(String.format("Additional name '%s' for %s mapped to %s and %s",
+                additionalName, theEnum.getClass().getSimpleName(), oldVal, theEnum));
+          }
+        }
       }
     }
   }
