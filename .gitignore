@@ -1,4 +1,5 @@
 # IntelliJ files
+/.idea/$CACHE_FILE$
 /.idea/libraries/Gradle__*.xml
 /.idea/dictionaries/
 /.idea/gradle.xml
