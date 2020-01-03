@@ -1,8 +1,8 @@
 package org.pharmgkb.common.util;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
@@ -10,11 +10,11 @@ import static org.junit.Assert.*;
  *
  * @author Mark Woon
  */
-public class ExtendedEnumHelperTest {
+class ExtendedEnumHelperTest {
 
 
   @Test
-  public void testCamelCaseFormat() {
+  void testCamelCaseFormat() {
 
     assertEquals("helloWorld", ExtendedEnumHelper.camelCaseFormat("Hello World"));
     assertEquals("helloWorld", ExtendedEnumHelper.camelCaseFormat("Hello, World"));
@@ -31,7 +31,7 @@ public class ExtendedEnumHelperTest {
 
 
   @Test
-  public void testAdd() {
+  void testAdd() {
 
     ExtendedEnumHelper<Foo> enumHelper = new ExtendedEnumHelper<>(Foo.class);
     enumHelper.add(Foo.ONE, 1, "one", "One");
@@ -39,39 +39,39 @@ public class ExtendedEnumHelperTest {
       enumHelper.add(Foo.ONE, 1, "one", "One");
       fail("Duplicate id");
     } catch (IllegalArgumentException ex) {
-      assertTrue(ex.getMessage(), ex.getMessage().startsWith("Duplicate ID"));
+      assertTrue(ex.getMessage().startsWith("Duplicate ID"), ex.getMessage());
     }
 
     try {
       enumHelper.add(Foo.ONE, 2, " ", "One");
       fail("Empty shortName");
     } catch (IllegalArgumentException ex) {
-      assertTrue(ex.getMessage(), ex.getMessage().startsWith("Empty shortName"));
+      assertTrue(ex.getMessage().startsWith("Empty shortName"), ex.getMessage());
     }
     try {
       enumHelper.add(Foo.ONE, 2, "o n e", "One");
       fail("Spaces in shortName");
     } catch (IllegalArgumentException ex) {
-      assertTrue(ex.getMessage(), ex.getMessage().startsWith("Spaces in shortName"));
+      assertTrue(ex.getMessage().startsWith("Spaces in shortName"), ex.getMessage());
     }
     try {
       enumHelper.add(Foo.ONE, 2, "1", "One");
       fail("Numeric shortName");
     } catch (IllegalArgumentException ex) {
-      assertTrue(ex.getMessage(), ex.getMessage().startsWith("Numeric shortName"));
+      assertTrue(ex.getMessage().startsWith("Numeric shortName"), ex.getMessage());
     }
     try {
       enumHelper.add(Foo.ONE, 2, "one", "One");
       fail("Duplicate shortName");
     } catch (IllegalArgumentException ex) {
-      assertTrue(ex.getMessage(), ex.getMessage().startsWith("Duplicate shortName"));
+      assertTrue(ex.getMessage().startsWith("Duplicate shortName"), ex.getMessage());
     }
 
     try {
       enumHelper.add(Foo.ONE, 2, "two", "One");
       fail("Duplicate displayName");
     } catch (IllegalArgumentException ex) {
-      assertTrue(ex.getMessage(), ex.getMessage().startsWith("Duplicate displayName"));
+      assertTrue(ex.getMessage().startsWith("Duplicate displayName"), ex.getMessage());
     }
   }
 

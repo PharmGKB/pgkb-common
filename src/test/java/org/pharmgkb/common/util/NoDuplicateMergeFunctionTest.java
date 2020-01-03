@@ -8,11 +8,11 @@ import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import com.google.common.collect.Lists;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
 
 /**
@@ -20,10 +20,10 @@ import static org.junit.Assert.fail;
  *
  * @author Mark Woon
  */
-public class NoDuplicateMergeFunctionTest {
+class NoDuplicateMergeFunctionTest {
 
   @Test
-  public void testMerge() {
+  void testMerge() {
 
     List<String> list = Lists.newArrayList("C", "B", "A");
     SortedMap<String, String> sortedMap = list.stream()
@@ -32,13 +32,14 @@ public class NoDuplicateMergeFunctionTest {
     assertThat(Lists.newArrayList("key:A", "key:B", "key:C"), equalTo(orderedList));
   }
 
-  @Test(expected = RuntimeException.class)
-  public void testMergeDup() {
+  @Test
+  void testMergeDup() {
 
-    List<String> list = Lists.newArrayList("C", "C", "A");
-    Map rez = list.stream()
-        .collect(Collectors.toMap(s -> "key:" + s, Function.identity(), new NoDuplicateMergeFunction<>(), TreeMap::new));
-    System.out.println(rez.size());
-    fail("Should never get here");
+    Assertions.assertThrows(RuntimeException.class, () -> {
+      List<String> list = Lists.newArrayList("C", "C", "A");
+      Map rez = list.stream()
+          .collect(Collectors.toMap(s -> "key:" + s, Function.identity(), new NoDuplicateMergeFunction<>(), TreeMap::new));
+      System.out.println(rez.size());
+    });
   }
 }

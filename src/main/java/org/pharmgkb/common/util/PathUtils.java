@@ -1,9 +1,3 @@
-/*
- ----- BEGIN LICENSE BLOCK -----
- This Source Code Form is subject to the terms of the Mozilla Public License, v.2.0.
- If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
- ----- END LICENSE BLOCK -----
- */
 package org.pharmgkb.common.util;
 
 import java.io.IOException;
@@ -122,11 +116,7 @@ public final class PathUtils {
         }
       }
 
-      Path path = Paths.get(uri);
-      if (path == null) {
-        throw new IllegalStateException("Cannot find file '" + uri + "' for  '" + filename + "'");
-      }
-      return path;
+      return Paths.get(uri);
 
     } catch (URISyntaxException ex) {
       // should never happen

@@ -1,14 +1,9 @@
-/*
- ----- BEGIN LICENSE BLOCK -----
- This Source Code Form is subject to the terms of the Mozilla Public License, v.2.0.
- If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
- ----- END LICENSE BLOCK -----
- */
 package org.pharmgkb.common.comparator;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
@@ -16,11 +11,11 @@ import static org.junit.Assert.assertEquals;
  *
  * @author Mark Woon
  */
-public class ChromosomePositionComparatorTest {
+class ChromosomePositionComparatorTest {
 
 
   @Test
-  public void testComparator() {
+  void testComparator() {
 
     assertEquals(0, ChromosomePositionComparator.getComparator().compare(null, null));
     assertEquals(-1, ChromosomePositionComparator.getComparator().compare(null, "chr1:1"));
@@ -33,14 +28,20 @@ public class ChromosomePositionComparatorTest {
   }
 
 
-  @Test(expected = IllegalArgumentException.class)
-  public void testBadArg1() throws IllegalArgumentException {
-    ChromosomePositionComparator.getComparator().compare("chr1", "chr1:100");
+  @Test
+  void testBadArg1() throws IllegalArgumentException {
+    Assertions.assertThrows(IllegalArgumentException.class, () -> {
+      //noinspection ResultOfMethodCallIgnored
+      ChromosomePositionComparator.getComparator().compare("chr1", "chr1:100");
+    });
   }
 
 
-  @Test(expected = IllegalArgumentException.class)
-  public void testBadArg2() throws IllegalArgumentException {
-    ChromosomePositionComparator.getComparator().compare("chr1:1", ":100");
+  @Test
+  void testBadArg2() throws IllegalArgumentException {
+    Assertions.assertThrows(IllegalArgumentException.class, () -> {
+      //noinspection ResultOfMethodCallIgnored
+      ChromosomePositionComparator.getComparator().compare("chr1:1", ":100");
+    });
   }
 }

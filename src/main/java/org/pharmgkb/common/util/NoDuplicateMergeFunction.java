@@ -6,7 +6,7 @@ import java.util.function.BinaryOperator;
 
 /**
  * This is a merge function that rejects duplicate keys.
- * Use to collect a stream into a {@link SortedMap}.
+ * Used to collect a stream into a {@link SortedMap}.
  * <p>
  * Example:
  * {@code

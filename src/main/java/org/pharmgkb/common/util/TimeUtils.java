@@ -95,39 +95,33 @@ public class TimeUtils {
     }
 
     if (mins > 0) {
-      if (stringBuilder.length() > 0) {
-        stringBuilder.insert(0, " and ");
-        hasAnd = true;
-      }
+      hasAnd = addCommas(stringBuilder, false);
       prependDuration(stringBuilder, mins, "minute", "minutes");
     }
 
     if (hours > 0) {
-      if (stringBuilder.length() > 0) {
-        if (hasAnd) {
-          stringBuilder.insert(0, ", ");
-        } else {
-          stringBuilder.insert(0, " and ");
-          hasAnd = true;
-        }
-      }
+      hasAnd = addCommas(stringBuilder, hasAnd);
       prependDuration(stringBuilder, hours, "hour", "hours");
     }
 
-
     if (days > 0) {
-      if (stringBuilder.length() > 0) {
-        if (hasAnd) {
-          stringBuilder.insert(0, ", ");
-        } else {
-          stringBuilder.insert(0, " and ");
-          hasAnd = true;
-        }
-      }
+      addCommas(stringBuilder, hasAnd);
       prependDuration(stringBuilder, days, "day", "days");
     }
 
     return stringBuilder.toString();
+  }
+
+  private static boolean addCommas(StringBuilder stringBuilder, boolean hasAnd) {
+    if (stringBuilder.length() > 0) {
+      if (hasAnd) {
+        stringBuilder.insert(0, ", ");
+      } else {
+        stringBuilder.insert(0, " and ");
+        hasAnd = true;
+      }
+    }
+    return hasAnd;
   }
 
 

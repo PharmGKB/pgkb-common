@@ -1,10 +1,10 @@
 package org.pharmgkb.common.util;
 
 import java.net.URL;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 /**
@@ -12,11 +12,11 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Mark Woon
  */
-public class UrlUtilsTest {
+class UrlUtilsTest {
 
 
   @Test
-  public void testWebUrls() {
+  void testWebUrls() {
     assertTrue(UrlUtils.isValidWebUrl("http://www.pharmgkb.org"));
     assertTrue(UrlUtils.isValidWebUrl("http://www.pharmgkb.org/bar.txt"));
     assertTrue(UrlUtils.isValidWebUrl("http://www.pharmgkb.org:8080"));
@@ -63,7 +63,7 @@ public class UrlUtilsTest {
 
 
   @Test
-  public void testUrls() {
+  void testUrls() {
     assertTrue(UrlUtils.isValid("http://www.pharmgkb.org"));
     assertTrue(UrlUtils.isValid("http://www.pharmgkb.org/bar.txt"));
     assertTrue(UrlUtils.isValid("http://www.pharmgkb.org:8080"));
@@ -110,7 +110,7 @@ public class UrlUtilsTest {
 
 
   @Test
-  public void testLocalAndPrivateUrls() {
+  void testLocalAndPrivateUrls() {
 
     // localhost
     assertTrue(UrlUtils.isValid("http://localhost", true, true, true, false));
@@ -125,7 +125,7 @@ public class UrlUtilsTest {
 
 
   @Test
-  public void testIsReachableUrl() throws Exception {
+  void testIsReachableUrl() throws Exception {
 
     assertTrue(UrlUtils.isReachable(new URL("http://www.pharmgkb.org")));
     assertTrue(UrlUtils.isReachable(new URL("https://www.pharmgkb.org")));
@@ -135,7 +135,7 @@ public class UrlUtilsTest {
 
 
   @Test
-  public void testVerify() {
+  void testVerify() {
 
     assertTrue(UrlUtils.isValid("http://www.pharmgkb.org", true, false, false, true));
     assertFalse(UrlUtils.isValid("http://www.pharmgkboo.org", true, false, false, true));

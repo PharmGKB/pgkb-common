@@ -1,9 +1,3 @@
-/*
- ----- BEGIN LICENSE BLOCK -----
- This Source Code Form is subject to the terms of the Mozilla Public License, v.2.0.
- If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
- ----- END LICENSE BLOCK -----
- */
 package org.pharmgkb.common.comparator;
 
 import java.util.ArrayList;
@@ -11,10 +5,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 /**
@@ -22,11 +16,11 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Mark Woon
  */
-public class HaplotypeNameComparatorTest {
+class HaplotypeNameComparatorTest {
 
 
   @Test
-  public void testComparator() {
+  void testComparator() {
 
     assertEquals(0, HaplotypeNameComparator.getComparator().compare(null, null));
     assertEquals(-1, HaplotypeNameComparator.getComparator().compare(null, "*1"));
@@ -56,7 +50,7 @@ public class HaplotypeNameComparatorTest {
   }
 
   @Test
-  public void testCollectionSorting() {
+  void testCollectionSorting() {
     List<String> input = new ArrayList<>();
     input.add("*3");
     input.add("Other");

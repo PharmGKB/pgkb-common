@@ -1,14 +1,8 @@
-/*
- ----- BEGIN LICENSE BLOCK -----
- This Source Code Form is subject to the terms of the Mozilla Public License, v.2.0.
- If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
- ----- END LICENSE BLOCK -----
- */
 package org.pharmgkb.common.comparator;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
@@ -16,11 +10,11 @@ import static org.junit.Assert.assertEquals;
  *
  * @author Mark Woon
  */
-public class ChromosomeNameComparatorTest {
+class ChromosomeNameComparatorTest {
 
 
   @Test
-  public void testComparator() {
+  void testComparator() {
 
     assertEquals(0, ChromosomeNameComparator.getComparator().compare(null, null));
     assertEquals(-1, ChromosomeNameComparator.getComparator().compare(null, "chr1"));

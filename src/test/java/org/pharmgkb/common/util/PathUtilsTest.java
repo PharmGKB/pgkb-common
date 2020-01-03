@@ -2,9 +2,10 @@ package org.pharmgkb.common.util;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
@@ -12,11 +13,11 @@ import static org.junit.Assert.*;
  *
  * @author Mark Woon
  */
-public class PathUtilsTest {
+class PathUtilsTest {
 
 
   @Test
-  public void testGetFilename() {
+  void testGetFilename() {
 
     assertEquals("foo.xml", PathUtils.getFilename(Paths.get("/a/dir/for/foo.xml")));
     assertEquals("foo.xml", PathUtils.getFilename(Paths.get("/a/dir/for/foo.xml")));
@@ -24,7 +25,7 @@ public class PathUtilsTest {
   }
 
   @Test
-  public void testGetFileExtension() {
+  void testGetFileExtension() {
 
     assertEquals("ai", PathUtils.getFileExtension(Paths.get("/a/dir/foo.ai")));
     assertEquals("asdfasdf", PathUtils.getFileExtension(Paths.get("/a/dir/foo.asdfasdf")));
@@ -33,7 +34,7 @@ public class PathUtilsTest {
   }
 
   @Test
-  public void testGetBaseFilename() {
+  void testGetBaseFilename() {
 
     assertEquals("foo", PathUtils.getBaseFilename(Paths.get("/a/dir/for/foo.xml")));
     assertEquals("foo", PathUtils.getBaseFilename(Paths.get("/a/dir/for/foo.xml")));
@@ -43,17 +44,17 @@ public class PathUtilsTest {
 
 
   @Test
-  public void testGetPathToResourceGood() {
+  void testGetPathToResourceGood() {
 
     assertTrue(Files.exists(PathUtils.getPathToResource("org/pharmgkb/common/util/PathUtilsTest.txt")));
     assertTrue(Files.exists(PathUtils.getPathToResource("/org/pharmgkb/common/util/PathUtilsTest.txt")));
     assertTrue(Files.exists(PathUtils.getPathToResource(PathUtils.class, "PathUtilsTest.txt")));
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void testGetPathToResourceBad() {
+  @Test
+  void testGetPathToResourceBad() {
 
-    PathUtils.getPathToResource("org/pharmgkb/common/util/nonexistent.tsv");
-    fail("Should not be able to find file");
+    Assertions.assertThrows(IllegalArgumentException.class, () ->
+        PathUtils.getPathToResource("org/pharmgkb/common/util/nonexistent.tsv"));
   }
 }

@@ -8,7 +8,7 @@ buildscript {
 }
 
 plugins {
-  id 'java'
+  id 'java-library'
   id 'jacoco'
   id 'com.github.kt3k.coveralls' version '2.8.2'
   id 'signing'
@@ -35,8 +35,8 @@ def getVersionName() {
   }
 }
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
 project.group = 'org.pharmgkb'
 project.version = getVersionName()
 
@@ -62,15 +62,16 @@ repositories {
 }
 
 dependencies {
-  compile group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
-  compile group: 'commons-collections', name: 'commons-collections', version: '3.2.2'
-  compile group: 'com.google.guava', name: 'guava', version: '28.0-jre'
-  compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
-  compile group: 'org.apache.commons', name: 'commons-text', version: '1.7'
-  compile group: 'org.checkerframework', name: 'checker-qual', version: '2.10.1'
-  compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.28'
+  implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
+  implementation group: 'commons-collections', name: 'commons-collections', version: '3.2.2'
+  implementation group: 'com.google.guava', name: 'guava', version: '28.1-jre'
+  implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
+  implementation group: 'org.apache.commons', name: 'commons-text', version: '1.8'
+  implementation group: 'org.checkerframework', name: 'checker-qual', version: '3.0.0'
+  implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.28'
 
-  testCompile group: 'junit', name: 'junit', version: '4.12'
+  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.5.2'
+  testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '2.2'
 }
 
 apply from: 'pgkb-build.gradle'

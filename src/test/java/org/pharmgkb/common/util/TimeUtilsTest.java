@@ -5,10 +5,10 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.Date;
 import java.util.TimeZone;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
@@ -16,17 +16,17 @@ import static org.junit.Assert.assertEquals;
  *
  * @author Mark Woon
  */
-public class TimeUtilsTest {
+class TimeUtilsTest {
 
-  @BeforeClass
-  public static void beforeClass() {
+  @BeforeAll
+  static void beforeClass() {
     // make sure test timezone is consistent
     TimeZone.setDefault(TimeZone.getTimeZone("America/Los_Angeles"));
   }
 
 
   @Test
-  public void testDate() {
+  void testDate() {
 
     assertEquals("5/21/19", TimeUtils.humanReadableDate(new Date(1558462184401L)));
     assertEquals("5/1/19", TimeUtils.humanReadableDate(new Date(1556733184000L)));
@@ -34,7 +34,7 @@ public class TimeUtilsTest {
 
 
   @Test
-  public void testDateInstant() {
+  void testDateInstant() {
 
     assertEquals("5/19/19", TimeUtils.humanReadableDate(LocalDateTime.of(2019, Month.MAY, 19, 1, 10)));
     assertEquals("5/2/19", TimeUtils.humanReadableDate(LocalDateTime.of(2019, Month.MAY, 2, 1, 10)));
@@ -42,7 +42,7 @@ public class TimeUtilsTest {
 
 
   @Test
-  public void testParseDate() {
+  void testParseDate() {
     assertEquals(new Date(1558249200000L), TimeUtils.parseToDate("5/19/19"));
     assertEquals(new Date(1558249200000L), TimeUtils.parseToDate("05/19/19"));
     assertEquals(new Date(1558249200000L), TimeUtils.parseToDate("5/19/2019"));
@@ -51,7 +51,7 @@ public class TimeUtilsTest {
 
 
   @Test
-  public void testDateFlow() {
+  void testDateFlow() {
 
     Date date = new Date(1558249200000L);
     String dateString = TimeUtils.humanReadableDate(date);
@@ -64,7 +64,7 @@ public class TimeUtilsTest {
 
 
   @Test
-  public void testDateTime() {
+  void testDateTime() {
 
     assertEquals("5/21/19 5:53 AM PDT", TimeUtils.humanReadableDateTime(new Date(1558443184000L)));
     assertEquals("12/1/18 10:16 PM PST", TimeUtils.humanReadableDateTime(new Date(1543731364000L)));
@@ -73,7 +73,7 @@ public class TimeUtilsTest {
 
 
   @Test
-  public void testDuration() {
+  void testDuration() {
 
     Duration duration = Duration.ofSeconds(1);
     assertEquals("1 second", TimeUtils.humanReadableDuration(duration));
@@ -98,7 +98,6 @@ public class TimeUtilsTest {
 
     duration = duration.plusDays(4);
     assertEquals("5 days, 2 hours, 4 minutes and 39 seconds", TimeUtils.humanReadableDuration(duration));
-
 
     duration = Duration.ofDays(5);
     assertEquals("5 days", TimeUtils.humanReadableDuration(duration));

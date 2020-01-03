@@ -2,9 +2,9 @@ package org.pharmgkb.common.comparator;
 
 import java.util.HashSet;
 import java.util.Set;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
@@ -12,11 +12,11 @@ import static org.junit.Assert.assertEquals;
  *
  * @author Mark Woon
  */
-public class CollectionComparatorTest {
+class CollectionComparatorTest {
 
 
   @Test
-  public void testNatural() {
+  void testNatural() {
 
     Set<Integer> a = new HashSet<>();
     Set<Integer> b = new HashSet<>();
@@ -34,7 +34,7 @@ public class CollectionComparatorTest {
   }
 
   @Test
-  public void testReverse() {
+  void testReverse() {
 
     Set<Integer> a = new HashSet<>();
     Set<Integer> b = new HashSet<>();

@@ -3,9 +3,9 @@ package org.pharmgkb.common.util;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 import com.google.common.base.Stopwatch;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 /**
@@ -13,11 +13,11 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Mark Woon
  */
-public class ThrottlerTest {
+class ThrottlerTest {
 
 
   @Test
-  public void testNoThrottler() {
+  void testNoThrottler() {
     Stopwatch stopwatch = Stopwatch.createStarted();
     IntStream.range(0, 10)
         .parallel()
@@ -29,7 +29,7 @@ public class ThrottlerTest {
   }
 
   @Test
-  public void test1Second() {
+  void test1Second() {
     Throttler throttler = new Throttler(1, TimeUnit.SECONDS);
     Stopwatch stopwatch = Stopwatch.createStarted();
     IntStream.range(0, 10)
@@ -43,7 +43,7 @@ public class ThrottlerTest {
 
 
   @Test
-  public void test500Milliseconds() {
+  void test500Milliseconds() {
     Throttler throttler = new Throttler(500, TimeUnit.MILLISECONDS);
     Stopwatch stopwatch = Stopwatch.createStarted();
     IntStream.range(0, 10)

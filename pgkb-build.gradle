@@ -13,6 +13,24 @@ task printVersion {
 }
 
 
+test {
+  useJUnitPlatform()
+  testLogging {
+    // set options for log level LIFECYCLE
+    events 'passed', 'skipped', 'failed'
+    exceptionFormat 'short'
+
+    // remove standard output/error logging from --info builds
+    // by assigning only 'failed' and 'skipped' events
+    info.events = ['failed', 'skipped']
+
+    // set options for log level DEBUG
+    debug.events = ['started', 'passed', 'skipped', 'failed']
+    debug.exceptionFormat = 'full'
+  }
+}
+
+
 jacocoTestReport {
   reports {
     xml.enabled = true // coveralls plugin depends on xml format report
@@ -22,7 +40,7 @@ jacocoTestReport {
 
 
 jar {
-  inputs.property("moduleName", project.ext.moduleName)
+  inputs.property('moduleName', project.ext.moduleName)
   manifest {
     attributes 'Automatic-Module-Name': project.ext.moduleName
     attributes 'Bundle-SymbolicName': project.ext.moduleName
@@ -37,12 +55,12 @@ tasks.withType(Javadoc) {
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-  classifier = 'javadoc'
+  archiveClassifier.set('javadoc')
   from 'build/docs/javadoc'
 }
 
 task sourcesJar(type: Jar) {
-  classifier = 'sources'
+  archiveClassifier.set('sources')
   from sourceSets.main.allSource
 }
 
