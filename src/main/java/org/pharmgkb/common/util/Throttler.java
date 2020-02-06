@@ -42,7 +42,7 @@ public class Throttler {
 
   /**
    * Returns when next operation can performed.
-   * This will block until until minimum time has elapsed.
+   * This will block until the minimum time has elapsed.
    */
   public void next() {
 
