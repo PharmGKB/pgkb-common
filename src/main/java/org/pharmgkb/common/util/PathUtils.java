@@ -45,7 +45,7 @@ public final class PathUtils {
    */
   public static @Nullable String getFileExtension(Path file) {
     String filename = getFilename(file);
-    int idx = filename.indexOf(".");
+    int idx = filename.lastIndexOf(".");
     if (idx == -1) {
       return null;
     }

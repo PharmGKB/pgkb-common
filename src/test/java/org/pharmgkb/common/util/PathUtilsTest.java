@@ -29,6 +29,7 @@ class PathUtilsTest {
 
     assertEquals("ai", PathUtils.getFileExtension(Paths.get("/a/dir/foo.ai")));
     assertEquals("asdfasdf", PathUtils.getFileExtension(Paths.get("/a/dir/foo.asdfasdf")));
+    assertEquals("zip", PathUtils.getFileExtension(Paths.get("/a/dir/foo.xml.zip")));
     assertNull(PathUtils.getFileExtension(Paths.get("/a/dir/foo")));
     assertNull(PathUtils.getFileExtension(Paths.get("/a/dir/foo.")));
   }
