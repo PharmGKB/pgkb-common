@@ -38,7 +38,7 @@ class ThrottlerTest {
     long elapsed = stopwatch.elapsed(TimeUnit.MILLISECONDS);
     System.out.printf("%,d ms%n", elapsed);
     assertTrue(elapsed >= 9000);
-    assertTrue(elapsed < 10010);
+    assertTrue(elapsed < 10100);
   }
 
 
