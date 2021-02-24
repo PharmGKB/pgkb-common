@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 import com.google.common.base.Preconditions;
@@ -118,6 +119,15 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
       return m_additionalNamesMap.get(name);
     }
     return m_lcNameMap.get(name.toLowerCase());
+  }
+
+  /**
+   * Looks for the enum with the given name and returns an {@link Optional} result
+   * @param name a display, short, or additional name to lookup, required
+   * @return a non-null Optional wrapper of the enum found
+   */
+  public Optional<T> lookupByNameOptional(String name) {
+    return Optional.ofNullable(lookupByName(name));
   }
 
 
