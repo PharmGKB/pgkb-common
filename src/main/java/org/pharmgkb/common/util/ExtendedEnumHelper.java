@@ -4,7 +4,6 @@ import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 import com.google.common.base.Preconditions;
@@ -21,6 +20,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 public class ExtendedEnumHelper<T extends ExtendedEnum> {
   private static final Map<Class, ExtendedEnumHelper> sf_enumMap = new HashMap<>();
+  private final Class m_enumClass;
   private Map<Integer, T> m_idMap = new TreeMap<>();
   private Map<String, T> m_shortNameMap = new TreeMap<>();
   private Map<String, T> m_displayNameMap = new TreeMap<>();
@@ -33,6 +33,7 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
    */
   public ExtendedEnumHelper(Class clz) {
     Preconditions.checkNotNull(clz, "clz is null");
+    m_enumClass = clz;
     ConvertUtils.register(ExtendedEnumConverter.getConverter(), clz);
   }
 
@@ -122,12 +123,17 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
   }
 
   /**
-   * Looks for the enum with the given name and returns an {@link Optional} result
-   * @param name a display, short, or additional name to lookup, required
-   * @return a non-null Optional wrapper of the enum found
+   * Looks for the enum with the given name.
+   *
+   * @return the enum for the given name
+   * @throws IllegalArgumentException if no enum for the given name exists
    */
-  public Optional<T> lookupByNameOptional(String name) {
-    return Optional.ofNullable(lookupByName(name));
+  public T lookupByNameOrThrow(String name) {
+    T rez = lookupByName(name);
+    if (rez == null) {
+      throw new IllegalArgumentException("No such " + m_enumClass.getSimpleName() + ": '" + name + "'");
+    }
+    return rez;
   }
 
 
