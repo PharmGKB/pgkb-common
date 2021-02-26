@@ -22,10 +22,12 @@ class HaplotypeNameComparatorTest {
   @Test
   void testComparator() {
 
+    //noinspection EqualsWithItself
     assertEquals(0, HaplotypeNameComparator.getComparator().compare(null, null));
     assertEquals(-1, HaplotypeNameComparator.getComparator().compare(null, "*1"));
     assertEquals(1, HaplotypeNameComparator.getComparator().compare("*1", null));
 
+    //noinspection EqualsWithItself
     assertEquals(0, HaplotypeNameComparator.getComparator().compare("*1", "*1"));
     assertEquals(-1, HaplotypeNameComparator.getComparator().compare("*1", "*11"));
     assertEquals(-1, HaplotypeNameComparator.getComparator().compare("*1", "*100"));
@@ -38,6 +40,10 @@ class HaplotypeNameComparatorTest {
     assertEquals(-1, HaplotypeNameComparator.getComparator().compare("*1", "Other"));
     assertEquals(1, HaplotypeNameComparator.getComparator().compare("Unknown", "*1"));
 
+    assertEquals(-1, HaplotypeNameComparator.getComparator().compare("CYP2C6*2", "CYP2D6*2"));
+    assertEquals(1, HaplotypeNameComparator.getComparator().compare("CYP2D6*10", "CYP2D6*2"));
+
+    //noinspection EqualsWithItself
     assertEquals(0, HaplotypeNameComparator.getComparator().compare("H2 EM", "H2 EM"));
     assertTrue(HaplotypeNameComparator.getComparator().compare("H2 EM", "H2 PM") < 0);
     assertTrue(HaplotypeNameComparator.getComparator().compare("H2 PM", "H2 EM") > 0);

@@ -25,7 +25,8 @@ import org.apache.commons.lang3.StringUtils;
  * @author Ryan Whaley
  */
 public class HaplotypeNameComparator implements Comparator<String> {
-  private static final Pattern sf_starPattern = Pattern.compile("(\\D*)(\\d+)(.*)");
+  private static final Pattern sf_strictStarPattern = Pattern.compile("(.*)\\*(\\d+)(.*)");
+  private static final Pattern sf_looseStarPattern = Pattern.compile("(\\D*)(\\d+)(.*)");
   private static final Comparator<String> sf_comparator = new HaplotypeNameComparator();
   private static final List<String> sf_topTerms = ImmutableList.of("Any","All");
   private static final List<String> sf_bottomTerms = ImmutableList.of("Other","Unknown");
@@ -60,29 +61,39 @@ public class HaplotypeNameComparator implements Comparator<String> {
       return 1;
     }
 
-    Matcher matcher1 = sf_starPattern.matcher(name1);
-    Matcher matcher2 = sf_starPattern.matcher(name2);
+    Matcher matcher1 = sf_strictStarPattern.matcher(name1);
+    Matcher matcher2 = sf_strictStarPattern.matcher(name2);
     if (matcher1.matches() && matcher2.matches()) {
-      String prePortion1 = StringUtils.trimToNull(matcher1.group(1));
-      String prePortion2 = StringUtils.trimToNull(matcher2.group(1));
-      int rez = ObjectUtils.compare(prePortion1, prePortion2);
-      if (rez != 0) {
-        return rez;
-      }
+      return compareMatchers(matcher1, matcher2);
+    }
 
-      String starPortion1 = matcher1.group(2);
-      String starPortion2 = matcher2.group(2);
-      int star1 = Integer.parseInt(starPortion1);
-      int star2 = Integer.parseInt(starPortion2);
-      rez = ObjectUtils.compare(star1, star2);
-      if (rez != 0) {
-        return rez;
-      }
-
-      String restPortion1 = StringUtils.trimToNull(matcher1.group(3));
-      String restPortion2 = StringUtils.trimToNull(matcher2.group(3));
-      return ObjectUtils.compare(restPortion1, restPortion2);
+    matcher1 = sf_looseStarPattern.matcher(name1);
+    matcher2 = sf_looseStarPattern.matcher(name2);
+    if (matcher1.matches() && matcher2.matches()) {
+      return compareMatchers(matcher1, matcher2);
     }
     return ObjectUtils.compare(name1, name2);
+  }
+
+  private int compareMatchers(Matcher matcher1, Matcher matcher2) {
+    String prePortion1 = StringUtils.trimToNull(matcher1.group(1));
+    String prePortion2 = StringUtils.trimToNull(matcher2.group(1));
+    int rez = ObjectUtils.compare(prePortion1, prePortion2);
+    if (rez != 0) {
+      return rez;
+    }
+
+    String starPortion1 = matcher1.group(2);
+    String starPortion2 = matcher2.group(2);
+    int star1 = Integer.parseInt(starPortion1);
+    int star2 = Integer.parseInt(starPortion2);
+    rez = ObjectUtils.compare(star1, star2);
+    if (rez != 0) {
+      return rez;
+    }
+
+    String restPortion1 = StringUtils.trimToNull(matcher1.group(3));
+    String restPortion2 = StringUtils.trimToNull(matcher2.group(3));
+    return ObjectUtils.compare(restPortion1, restPortion2);
   }
 }
