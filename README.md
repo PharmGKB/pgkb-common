@@ -1,7 +1,6 @@
 # PharmGKB Common
 
 [![Build Status](https://travis-ci.org/PharmGKB/pgkb-common.svg?branch=master)](https://travis-ci.org/PharmGKB/pgkb-common)
-[![Coverage Status](https://coveralls.io/repos/github/PharmGKB/pgkb-common/badge.svg?branch=master)](https://coveralls.io/github/PharmGKB/pgkb-common?branch=master)
 [![codecov.io](https://codecov.io/github/PharmGKB/pgkb-common/coverage.svg?branch=master)](https://codecov.io/github/PharmGKB/pgkb-common?branch=master)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.pharmgkb/pgkb-common/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.pharmgkb/pgkb-common)
 
