@@ -28,10 +28,15 @@ test {
     debug.events = ['started', 'passed', 'skipped', 'failed']
     debug.exceptionFormat = 'full'
   }
+
+  // always generate reports after tests are run
+  finalizedBy jacocoTestReport
 }
 
 
 jacocoTestReport {
+  // tests must be run before generating the report
+  dependsOn test
   reports {
     xml.enabled = true // coveralls plugin depends on xml format report
     html.enabled = true

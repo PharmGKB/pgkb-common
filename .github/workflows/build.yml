@@ -29,11 +29,13 @@ jobs:
       - name: Build and test
         run: ./gradlew test
 
-      - name: Upload coverage reports
-        if: success()
-        run: |
-          ./gradlew jacocoTestReport coveralls
-          bash <(curl -s https://codecov.io/bash)
+      - name: Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Codecov
+        uses: codecov/codecov-action@v1
 
       - name: Send Slack notification on failure
         if: failure()
