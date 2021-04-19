@@ -38,7 +38,7 @@ jacocoTestReport {
   // tests must be run before generating the report
   dependsOn test
   reports {
-    xml.enabled = true // coveralls plugin depends on xml format report
+    xml.enabled = true // codecov depends on xml format report
     html.enabled = true
   }
 }
