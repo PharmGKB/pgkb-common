@@ -17,9 +17,12 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="CheckerFramework Annotations" level="project" />
     <orderEntry type="library" exported="" name="Commons-beanutils" level="project" />
+    <orderEntry type="library" exported="" name="Commons-cli" level="project" />
+    <orderEntry type="library" exported="" name="Commons-io" level="project" />
     <orderEntry type="library" exported="" name="Commons-lang3" level="project" />
     <orderEntry type="library" exported="" name="Commons-text" level="project" />
     <orderEntry type="library" exported="" name="Guava" level="project" />
+    <orderEntry type="library" exported="" name="HttpComponents Client" level="project" />
     <orderEntry type="library" exported="" name="SLF4J" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="JUnit" level="project" />
   </component>
