@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 public class Throttler {
   private static final Logger sf_logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
   /** Minimum time between requests in millisecond. */
-  private long m_minTime;
+  private final long m_minTime;
   /** Time of last operation. */
   private long m_lastScheduledAction = System.currentTimeMillis();
 
