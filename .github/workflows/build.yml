@@ -1,13 +1,18 @@
-name: Build project
+name: Build & Tests
 
 on:
   push:
     branches:
       - "*"
+    paths-ignore:
+      - "**.md"
+  pull_request:
+    paths-ignore:
+      - "**.md"
 
 jobs:
   build:
-    name: Build project
+    name: Build and Test
     runs-on: ubuntu-latest
 
     steps:
