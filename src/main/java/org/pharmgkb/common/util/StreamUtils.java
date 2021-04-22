@@ -39,6 +39,9 @@ public class StreamUtils {
   /**
    * Opens an {@link InputStream} to the specified file.
    * Automatically unwraps .gz or .zip files.
+   * <p>
+   * In zip files, this will look for a file minus the ".zip" extension (i.e. expect file named {@code foo.txt} if
+   * zipped filename is {@code foo.txt.zip}.
    */
   public static InputStream openInputStream(Path path) throws IOException {
 
@@ -53,6 +56,7 @@ public class StreamUtils {
     if (filename.endsWith(".gz")) {
       return new GZIPInputStream(Files.newInputStream(path), 65536);
     } else if (filename.endsWith(".zip")) {
+      origFilename = origFilename.substring(0, origFilename.length() - 4);
       return new ZippedFileInputStream(Files.newInputStream(path), origFilename);
     } else {
       return Files.newInputStream(path);
@@ -62,6 +66,9 @@ public class StreamUtils {
   /**
    * Opens an {@link Reader} to the specified file.
    * Automatically unwraps .gz or .zip files.
+   * <p>
+   * In zip files, this will look for a file minus the ".zip" extension (i.e. expect file named {@code foo.txt} if
+   * zipped filename is {@code foo.txt.zip}.
    */
   public static BufferedReader openReader(Path path) throws IOException {
 
@@ -76,6 +83,7 @@ public class StreamUtils {
     if (filename.endsWith(".gz")) {
       return new BufferedReader(new InputStreamReader(new GZIPInputStream(Files.newInputStream(path), 65536)));
     } else if (filename.endsWith(".zip")) {
+      origFilename = origFilename.substring(0, origFilename.length() - 4);
       return new BufferedReader(new InputStreamReader(new ZippedFileInputStream(Files.newInputStream(path), origFilename)));
     } else {
       return Files.newBufferedReader(path);
