@@ -21,11 +21,11 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class ExtendedEnumHelper<T extends ExtendedEnum> {
   private static final Map<Class, ExtendedEnumHelper> sf_enumMap = new HashMap<>();
   private final Class m_enumClass;
-  private Map<Integer, T> m_idMap = new TreeMap<>();
-  private Map<String, T> m_shortNameMap = new TreeMap<>();
-  private Map<String, T> m_displayNameMap = new TreeMap<>();
-  private Map<String, T> m_lcNameMap = new TreeMap<>();
-  private Map<String, T> m_additionalNamesMap = new TreeMap<>();
+  private final Map<Integer, T> m_idMap = new TreeMap<>();
+  private final Map<String, T> m_shortNameMap = new TreeMap<>();
+  private final Map<String, T> m_displayNameMap = new TreeMap<>();
+  private final Map<String, T> m_lcNameMap = new TreeMap<>();
+  private final Map<String, T> m_additionalNamesMap = new TreeMap<>();
 
 
   /**
@@ -186,6 +186,7 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
       Field[] fields = enumClass.getFields();
       if (fields.length > 0) {
         try {
+          //noinspection ResultOfMethodCallIgnored
           fields[0].get(enumClass);
         } catch (IllegalAccessException ex) {
           throw new IllegalStateException("Cannot access enums in class " + enumClass.getName(), ex);

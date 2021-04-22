@@ -44,6 +44,9 @@ public class ZippedFileInputStream extends InputStream {
   }
 
 
+  /**
+   * Looks for specified {@code filename} in {@link InputStream}.
+   */
   private void findFile(InputStream in, String filename) throws IOException {
     if (in instanceof ZipInputStream) {
       m_zipInputStream = (ZipInputStream)in;
