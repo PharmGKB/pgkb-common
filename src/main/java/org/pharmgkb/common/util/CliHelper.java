@@ -59,7 +59,7 @@ public class CliHelper {
 
   public CliHelper addOption(Option option) {
 
-    if (option.getArgName().equals("h") || option.getArgName().equals("v")) {
+    if (option.getOpt().equals("h") || option.getOpt().equals("v")) {
       throw new IllegalArgumentException("-h and -v are reserved arguments");
     }
     if (option.isRequired()) {
