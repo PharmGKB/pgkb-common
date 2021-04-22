@@ -22,6 +22,9 @@ public class ExtendedEnumConverter implements Converter {
   @Override
   public @Nullable <T> T convert(Class<T> aClass, Object o) {
 
+    if (o == null) {
+      return null;
+    }
     if (ExtendedEnum.class.isAssignableFrom(aClass)) {
       //noinspection unchecked
       ExtendedEnumHelper helper = ExtendedEnumHelper.getExtendedEnumHelper((Class<? extends ExtendedEnum>)aClass);
