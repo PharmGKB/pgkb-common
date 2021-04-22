@@ -3,10 +3,7 @@ package org.pharmgkb.common.util;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.zip.ZipInputStream;
 import org.junit.jupiter.api.Test;
 
@@ -23,9 +20,8 @@ class ZippedFileInputStreamTest {
   private static final String sf_filename = "ZippedFileInputStreamTest.txt";
 
 
-  private Path getPathToTestFile() throws URISyntaxException {
-    URL url = getClass().getResource(sf_zipFilename);
-    return Paths.get(url.toURI());
+  private Path getPathToTestFile() {
+    return PathUtils.getPathToResource(ZippedFileInputStreamTest.class, sf_zipFilename);
   }
 
 

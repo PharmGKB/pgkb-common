@@ -28,6 +28,46 @@ class ExtendedEnumHelperTest {
     }
   }
 
+  @Test
+  void testGetAllSorted() {
+    ExtendedEnumHelper<Hero> helper = ExtendedEnumHelper.getExtendedEnumHelper(Hero.class);
+    assertArrayEquals(
+        new Hero[] {Hero.WonderWoman, Hero.Superman, Hero.Batman},
+        helper.getAllSortedById().toArray(new Hero[0])
+    );
+    assertArrayEquals(
+        new Hero[] {Hero.Batman, Hero.Superman, Hero.WonderWoman},
+        helper.getAllSortedByName().toArray(new Hero[0])
+    );
+  }
+
+  @Test
+  void testLookup() {
+    ExtendedEnumHelper<Hero> helper = ExtendedEnumHelper.getExtendedEnumHelper(Hero.class);
+
+    assertEquals(Hero.WonderWoman, helper.lookupByName("Diana"));
+    assertEquals(Hero.WonderWoman, helper.lookupByName("Diana Prince"));
+    assertEquals(Hero.WonderWoman, helper.lookupByName("diana"));
+    assertNull(helper.lookupByName("1"));
+    assertNull(helper.lookupByName("Diana Ross"));
+
+    assertEquals(Hero.WonderWoman, helper.lookupByNameOrThrow("Diana"));
+    assertEquals(Hero.WonderWoman, helper.lookupByNameOrThrow("Diana Prince"));
+    assertEquals(Hero.WonderWoman, helper.lookupByNameOrThrow("diana"));
+    assertEquals(Hero.WonderWoman, helper.fromString("1"));
+    assertThrows(IllegalArgumentException.class, () -> {
+      helper.lookupByNameOrThrow("1");
+    });
+    assertThrows(IllegalArgumentException.class, () -> {
+      helper.lookupByNameOrThrow("Diana Ross");
+    });
+
+    assertEquals(Hero.WonderWoman, helper.fromString("Diana"));
+    assertEquals(Hero.WonderWoman, helper.fromString("Diana Prince"));
+    assertEquals(Hero.WonderWoman, helper.fromString("diana"));
+    assertEquals(Hero.WonderWoman, helper.fromString("1"));
+    assertNull(helper.lookupByName("Diana Ross"));
+  }
 
 
   @Test

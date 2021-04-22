@@ -1,5 +1,8 @@
 package org.pharmgkb.common.util;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import org.apache.commons.cli.Option;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -59,9 +62,34 @@ class CliHelperTest {
     assertEquals("Unrecognized option: -q", ch.getError());
   }
 
+  @Test
+  void testReservedArg() {
+    CliHelper ch = new CliHelper(CliHelperTest.class);
+
+    assertThrows(IllegalArgumentException.class, () -> ch.addOption("h", "foo", "bar"));
+    assertThrows(IllegalArgumentException.class, () -> ch.addOption("v", "foo", "bar"));
+
+    assertThrows(IllegalArgumentException.class, () -> ch.addOption("h", "foo", "bar", false, "h"));
+    assertThrows(IllegalArgumentException.class, () -> ch.addOption("v", "foo", "bar", false, "v"));
+
+    assertThrows(IllegalArgumentException.class, () -> ch.addOption("h", "foo", "bar", false, "h", 1, true));
+    assertThrows(IllegalArgumentException.class, () -> ch.addOption("v", "foo", "bar", false, "v", 1, true));
+
+    assertThrows(IllegalArgumentException.class, () -> ch.addOption(Option.builder("h")
+        .longOpt("foo")
+        .desc("bar")
+        .hasArg(false)
+        .build()));
+    assertThrows(IllegalArgumentException.class, () -> ch.addOption(Option.builder("v")
+        .longOpt("foo")
+        .desc("bar")
+        .hasArg(false)
+        .build()));
+  }
+
 
   @Test
-  void testGotDir() {
+  void testGotDirNotExist() {
 
     CliHelper ch = new CliHelper(CliHelperTest.class);
     ch.addOption("d", "directory", "directory desc", true, "dir");
@@ -70,6 +98,53 @@ class CliHelperTest {
     assertFalse(ch.isHelpRequested());
     assertFalse(ch.hasError());
     assertEquals("/some/path", ch.getValue("d"));
+    assertThrows(IllegalArgumentException.class, () -> ch.getValidDirectory("d", false));
+  }
+
+  @Test
+  void testGotDir() throws Exception {
+
+    CliHelper ch = new CliHelper(CliHelperTest.class);
+    ch.addOption("d", "directory", "directory desc", true, "dir");
+
+    Path file = PathUtils.getPathToResource(getClass(), "PathUtilsTest.txt");
+    Path dir = file.getParent();
+
+    assertTrue(ch.parse(new String[]{ "-d", dir.toString() }));
+    assertFalse(ch.isHelpRequested());
+    assertFalse(ch.hasError());
+    assertEquals(dir.toString(), ch.getValue("d"));
+    assertEquals(dir, ch.getValidDirectory("d", false));
+  }
+
+
+  @Test
+  void testGotFileNotExist() {
+
+    CliHelper ch = new CliHelper(CliHelperTest.class);
+    ch.addOption("f", "file", "file desc", true, "f");
+
+    assertTrue(ch.parse(new String[]{ "-f", "/some/path" }));
+    assertFalse(ch.isHelpRequested());
+    assertFalse(ch.hasError());
+    assertEquals("/some/path", ch.getValue("f"));
+    assertEquals(Paths.get("/some/path"), ch.getValidFile("f", false));
+    assertThrows(IllegalArgumentException.class, () -> ch.getValidFile("f", true));
+  }
+
+  @Test
+  void testGotFile() {
+
+    CliHelper ch = new CliHelper(CliHelperTest.class);
+    ch.addOption("f", "file", "file desc", true, "f");
+
+    Path file = PathUtils.getPathToResource(getClass(), "PathUtilsTest.txt");
+
+    assertTrue(ch.parse(new String[]{ "-f", file.toString() }));
+    assertFalse(ch.isHelpRequested());
+    assertFalse(ch.hasError());
+    assertEquals(file.toString(), ch.getValue("f"));
+    assertEquals(file, ch.getValidFile("f", true));
   }
 
 
@@ -83,5 +158,32 @@ class CliHelperTest {
     assertFalse(ch.isHelpRequested());
     assertTrue(ch.hasError());
     assertEquals("Missing argument for option: d", ch.getError());
+  }
+
+  @Test
+  void testFlag() {
+    CliHelper ch = new CliHelper(CliHelperTest.class);
+    ch.addOption("b", "beep", "beep boop");
+
+    assertTrue(ch.parse(new String[] { "-b" }));
+    assertFalse(ch.isHelpRequested());
+    assertFalse(ch.hasError());
+    assertFalse(ch.hasOption("d"));
+    assertTrue(ch.hasOption("b"));
+  }
+
+  @Test
+  void testCustomOption() {
+    CliHelper ch = new CliHelper(CliHelperTest.class);
+    ch.addOption(Option.builder("b")
+        .longOpt("beep")
+        .desc("beep boop")
+        .build());
+
+    assertTrue(ch.parse(new String[] { "-b" }));
+    assertFalse(ch.isHelpRequested());
+    assertFalse(ch.hasError());
+    assertFalse(ch.hasOption("d"));
+    assertTrue(ch.hasOption("b"));
   }
 }
