@@ -38,8 +38,8 @@ jacocoTestReport {
   // tests must be run before generating the report
   dependsOn test
   reports {
-    xml.enabled = true // codecov depends on xml format report
-    html.enabled = true
+    xml.required = true // codecov depends on xml format report
+    html.required = true
   }
 }
 
