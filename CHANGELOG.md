@@ -1,3 +1,17 @@
+## [0.4.0](https://github.com/PharmGKB/pgkb-common/compare/v0.3.0...v0.4.0) (2021-09-05)
+
+
+### Features
+
+* merge pgkb-common-io into pgkb-common ([7f8cb61](https://github.com/PharmGKB/pgkb-common/commit/7f8cb6165d7d3555a46eb7b2b04ef319a54ebedd))
+
+
+### Bug Fixes
+
+* avoid NPE ([e042f06](https://github.com/PharmGKB/pgkb-common/commit/e042f06e690a4e6cd675aeb7b188144c5fe9e1a7))
+* fix reserved arg check for custom options ([021eb37](https://github.com/PharmGKB/pgkb-common/commit/021eb3772b1c800b61bcb61ad42cd091aea5e411))
+* fix zip file handling ([a0d0298](https://github.com/PharmGKB/pgkb-common/commit/a0d0298b1b51788218a0642417dbc3efcb63dccb))
+
 ## [0.3.0](https://github.com/PharmGKB/pgkb-common/compare/v0.2.2...v0.3.0) (2021-04-08)
 
 
