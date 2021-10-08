@@ -1,3 +1,10 @@
+## [0.5.0](https://github.com/PharmGKB/pgkb-common/compare/v0.4.0...v0.5.0) (2021-10-08)
+
+
+### Features
+
+* add support for --version flag to CliHelper ([5abae87](https://github.com/PharmGKB/pgkb-common/commit/5abae8766e51fca9136e59c09f2646dba53a4c5f))
+
 ## [0.4.0](https://github.com/PharmGKB/pgkb-common/compare/v0.3.0...v0.4.0) (2021-09-05)
 
 
