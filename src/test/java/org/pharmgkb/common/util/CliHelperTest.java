@@ -19,8 +19,8 @@ class CliHelperTest {
   @Test
   void testHelp() {
 
-    CliHelper ch = new CliHelper(CliHelperTest.class);
-    ch.addOption("d", "directory", "directory", true, "dir");
+    CliHelper ch = new CliHelper(CliHelperTest.class)
+        .addOption("d", "directory", "directory", true, "dir");
 
     assertFalse(ch.parse(new String[]{ "-h" }));
     assertTrue(ch.isHelpRequested());
@@ -28,8 +28,8 @@ class CliHelperTest {
 
 
     // with other args
-    ch = new CliHelper(CliHelperTest.class);
-    ch.addOption("d", "directory", "directory", true, "dir");
+    ch = new CliHelper(CliHelperTest.class)
+        .addOption("d", "directory", "directory", true, "dir");
 
     assertFalse(ch.parse(new String[]{ "-h", "-d", "/some/path" }));
     assertTrue(ch.isHelpRequested());
@@ -38,10 +38,33 @@ class CliHelperTest {
 
 
   @Test
+  void testVersion() {
+
+    CliHelper ch = new CliHelper(CliHelperTest.class)
+        .addVersion("FooBar 1.0")
+        .addOption("d", "directory", "directory", true, "dir");
+
+    assertFalse(ch.parse(new String[]{ "-version" }));
+    assertTrue(ch.isVersionRequested());
+    assertFalse(ch.hasError());
+
+
+    // with other args
+    ch = new CliHelper(CliHelperTest.class)
+        .addVersion("FooBar 1.0")
+        .addOption("d", "directory", "directory", true, "dir");
+
+    assertFalse(ch.parse(new String[]{ "--version", "-d", "/some/path" }));
+    assertTrue(ch.isVersionRequested());
+    assertFalse(ch.hasError());
+  }
+
+
+  @Test
   void testNoArgs() {
 
-    CliHelper ch = new CliHelper(CliHelperTest.class);
-    ch.addOption("d", "directory", "directory", true, "dir");
+    CliHelper ch = new CliHelper(CliHelperTest.class)
+        .addOption("d", "directory", "directory", true, "dir");
 
     assertFalse(ch.parse(null));
     assertFalse(ch.isHelpRequested());
@@ -53,8 +76,8 @@ class CliHelperTest {
   @Test
   void testUnknownArg() {
 
-    CliHelper ch = new CliHelper(CliHelperTest.class);
-    ch.addOption("d", "directory", "directory", true, "dir");
+    CliHelper ch = new CliHelper(CliHelperTest.class)
+        .addOption("d", "directory", "directory", true, "dir");
 
     assertFalse(ch.parse(new String[] { "-h", "-q" }));
     assertFalse(ch.isHelpRequested());

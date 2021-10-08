@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -25,9 +26,11 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @author Mark Woon
  */
 public class CliHelper {
-  private static final String sf_verboseFlag = "verbose";
   private static final String sf_helpFlag = "help";
+  private static final String sf_verboseFlag = "verbose";
+  private static final String sf_versionFlag = "version";
   private final String m_name;
+  private String m_version;
   /**
    * Shadow collection of options with nothing required so that we can check if help was requested
    * without hitting a parsing exception.
@@ -57,6 +60,16 @@ public class CliHelper {
   }
 
 
+  /**
+   * Add version option that prints specified {@code version}.
+   */
+  public CliHelper addVersion(String version) {
+    Preconditions.checkArgument(version != null);
+    m_version = version;
+    return addOption(new Option(sf_versionFlag, sf_versionFlag, false, "print version and exit"));
+  }
+
+
   public CliHelper addOption(Option option) {
 
     if (option.getOpt().equals("h") || option.getOpt().equals("v")) {
@@ -76,8 +89,8 @@ public class CliHelper {
    */
   public CliHelper addOption(String shortName, String longName, String description) {
 
-    if (shortName.equals("h") || shortName.equals("v")) {
-      throw new IllegalArgumentException("-h and -v are reserved arguments");
+    if (shortName.equals("h") || shortName.equals("v") || shortName.equals(sf_verboseFlag)) {
+      throw new IllegalArgumentException("-h, -v and -version are reserved arguments");
     }
     Option opt = Option.builder(shortName)
         .longOpt(longName)
@@ -151,6 +164,10 @@ public class CliHelper {
       m_commandLine = parser.parse(m_helpOptions, args);
       if (isHelpRequested()) {
         printHelp();
+        return false;
+      }
+      if (isVersionRequested()) {
+        System.out.println(m_version);
         return false;
       }
       parser = new DefaultParser();
@@ -316,6 +333,10 @@ public class CliHelper {
    */
   public boolean isHelpRequested() {
     return m_commandLine != null && m_commandLine.hasOption(sf_helpFlag);
+  }
+
+  public boolean isVersionRequested() {
+    return m_version != null && m_commandLine != null && m_commandLine.hasOption(sf_versionFlag);
   }
 
 
