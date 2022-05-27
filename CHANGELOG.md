@@ -1,3 +1,19 @@
+## [0.5.1](https://github.com/PharmGKB/pgkb-common/compare/v0.5.0...v0.5.1) (2022-05-27)
+
+
+### ⚠ BREAKING CHANGES
+
+* upgrade to yarn 3.2.1 and update dependencies
+
+### Bug Fixes
+
+* throw InvalidPathException when path is invalid ([fd1e790](https://github.com/PharmGKB/pgkb-common/commit/fd1e7908eb170f704af0193a9e7fe2ec160ce51d))
+
+
+### Build System
+
+* upgrade to yarn 3.2.1 and update dependencies ([d903a7b](https://github.com/PharmGKB/pgkb-common/commit/d903a7b2548f46463518db7f32d1ba0ab430d6ee))
+
 ## [0.5.0](https://github.com/PharmGKB/pgkb-common/compare/v0.4.0...v0.5.0) (2021-10-08)
 
 
