@@ -239,9 +239,11 @@ public class CliHelper {
    * Gets the value for the given option as a {@link File}.
    *
    * @param createIfNotExist if true and directory doesn't exist, create the directory;
-   * otherwise, if false and directory doesn't exist, throw IllegalArgumentException
+   * otherwise, if false and directory doesn't exist, throw InvalidPathException
    * @return the directory
-   * @throws IllegalArgumentException if option was not specified or directory doesn't exist
+   * @throws IllegalArgumentException if option was not specified
+   * @throws InvalidPathException if specified path is not a directory or {@code createIfNotExist} is false and
+   * directory doesn't exist
    */
   public Path getValidDirectory(String opt, boolean createIfNotExist) throws IOException {
 
@@ -254,12 +256,12 @@ public class CliHelper {
       if (Files.isDirectory(dir)) {
         return dir;
       }
-      throw new IOException("Not a valid directory: " + dir);
+      throw new InvalidPathException("Not a valid directory: " + dir);
     } else if (createIfNotExist) {
       Files.createDirectories(dir);
       return dir;
     }
-    throw new IllegalArgumentException("No such directory: " + dir);
+    throw new InvalidPathException("No such directory: " + dir);
   }
 
 
@@ -280,17 +282,17 @@ public class CliHelper {
   /**
    * Gets the value for the given option as a {@link Path}, that must point to an existing file.
    *
-   * @throws IllegalArgumentException if file doesn't exist
+   * @throws InvalidPathException if file doesn't exist
    */
-  public Path getValidFile(String opt, boolean mustExist) {
+  public Path getValidFile(String opt, boolean mustExist) throws InvalidPathException {
     Path p = getPath(opt);
     if (!Files.exists(p)) {
       if (mustExist) {
-        throw new IllegalArgumentException("File '" + p.toString() + "' does not exist");
+        throw new InvalidPathException("File '" + p + "' does not exist");
       }
     } else {
       if (!Files.isRegularFile(p)) {
-        throw new IllegalArgumentException("Not a file: '" + p.toString());
+        throw new InvalidPathException("Not a file: '" + p);
       }
     }
     return p;
@@ -347,5 +349,12 @@ public class CliHelper {
 
     HelpFormatter formatter = new HelpFormatter();
     formatter.printHelp(m_name, m_options);
+  }
+
+
+  public static class InvalidPathException extends IllegalArgumentException {
+    InvalidPathException(String msg) {
+      super(msg);
+    }
   }
 }
