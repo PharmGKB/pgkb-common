@@ -9,6 +9,7 @@
   "license": "MPL-2.0",
   "packageManager": "yarn@3.2.1",
   "devDependencies": {
+    "@google/semantic-release-replace-plugin": "^1.1.0",
     "@semantic-release/changelog": "^6.0.1",
     "@semantic-release/git": "^10.0.1",
     "conventional-changelog-conventionalcommits": "^5.0.0",
@@ -16,7 +17,7 @@
   },
   "release": {
     "branches": [
-      "master"
+      "main"
     ],
     "plugins": [
       "@semantic-release/commit-analyzer",
