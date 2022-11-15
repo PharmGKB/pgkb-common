@@ -1,3 +1,19 @@
+## [0.5.2](https://github.com/PharmGKB/pgkb-common/compare/v0.5.1...v0.5.2) (2022-11-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* update dependencies
+
+### Bug Fixes
+
+* add TimeUtils.humanReadablePreciseDuration ([50e2065](https://github.com/PharmGKB/pgkb-common/commit/50e20659b4bf93d0338ddae4e84e69c970bf6ff5))
+
+
+### Miscellaneous Chores
+
+* update dependencies ([d977c37](https://github.com/PharmGKB/pgkb-common/commit/d977c37b7256db55b1a1a3c1e5477f82b77a11c8))
+
 ## [0.5.1](https://github.com/PharmGKB/pgkb-common/compare/v0.5.0...v0.5.1) (2022-05-27)
 
 
