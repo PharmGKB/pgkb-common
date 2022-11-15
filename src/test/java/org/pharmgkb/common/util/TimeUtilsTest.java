@@ -108,4 +108,45 @@ class TimeUtilsTest {
     duration = duration.plusMinutes(1);
     assertEquals("5 days, 1 minute and 16 seconds", TimeUtils.humanReadableDuration(duration));
   }
+
+
+  @Test
+  void testPreciseDuration() {
+
+    Duration duration = Duration.ofMillis(39);
+    assertEquals("39 ms", TimeUtils.humanReadablePreciseDuration(duration));
+
+    duration = duration.plusSeconds(1);
+    assertEquals("1 second and 39 ms", TimeUtils.humanReadablePreciseDuration(duration));
+
+    duration = duration.plusSeconds(38);
+    assertEquals("39 seconds and 39 ms", TimeUtils.humanReadablePreciseDuration(duration));
+
+    duration = duration.plusMinutes(1);
+    assertEquals("1 minute and 39 seconds", TimeUtils.humanReadablePreciseDuration(duration));
+
+    duration = duration.plusMinutes(3);
+    assertEquals("4 minutes and 39 seconds", TimeUtils.humanReadablePreciseDuration(duration));
+
+    duration = duration.plusHours(1);
+    assertEquals("1 hour, 4 minutes and 39 seconds", TimeUtils.humanReadablePreciseDuration(duration));
+
+    duration = duration.plusHours(1);
+    assertEquals("2 hours, 4 minutes and 39 seconds", TimeUtils.humanReadablePreciseDuration(duration));
+
+    duration = duration.plusDays(1);
+    assertEquals("1 day, 2 hours, 4 minutes and 39 seconds", TimeUtils.humanReadablePreciseDuration(duration));
+
+    duration = duration.plusDays(4);
+    assertEquals("5 days, 2 hours, 4 minutes and 39 seconds", TimeUtils.humanReadablePreciseDuration(duration));
+
+    duration = Duration.ofDays(5);
+    assertEquals("5 days", TimeUtils.humanReadablePreciseDuration(duration));
+
+    duration = duration.plusSeconds(16);
+    assertEquals("5 days and 16 seconds", TimeUtils.humanReadablePreciseDuration(duration));
+
+    duration = duration.plusMinutes(1);
+    assertEquals("5 days, 1 minute and 16 seconds", TimeUtils.humanReadablePreciseDuration(duration));
+  }
 }

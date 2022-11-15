@@ -112,6 +112,44 @@ public class TimeUtils {
     return stringBuilder.toString();
   }
 
+  public static String humanReadablePreciseDuration(Duration duration) {
+
+    long days = duration.toDays();
+    long hours = duration.toHours() - TimeUnit.DAYS.toHours(duration.toDays());
+    long mins = duration.toMinutes() - TimeUnit.HOURS.toMinutes(duration.toHours());
+    long secs = duration.getSeconds() - TimeUnit.MINUTES.toSeconds(duration.toMinutes());
+    long ms = TimeUnit.NANOSECONDS.toMillis(duration.getNano());
+
+    StringBuilder stringBuilder = new StringBuilder();
+    boolean hasAnd = false;
+
+    if (ms > 0 && mins == 0 && hours == 0 && days == 0) {
+      prependDuration(stringBuilder, ms, "ms", "ms");
+    }
+
+    if (secs > 0) {
+      hasAnd = addCommas(stringBuilder, false);
+      prependDuration(stringBuilder, secs, "second", "seconds");
+    }
+
+    if (mins > 0) {
+      hasAnd = addCommas(stringBuilder, false);
+      prependDuration(stringBuilder, mins, "minute", "minutes");
+    }
+
+    if (hours > 0) {
+      hasAnd = addCommas(stringBuilder, hasAnd);
+      prependDuration(stringBuilder, hours, "hour", "hours");
+    }
+
+    if (days > 0) {
+      addCommas(stringBuilder, hasAnd);
+      prependDuration(stringBuilder, days, "day", "days");
+    }
+
+    return stringBuilder.toString();
+  }
+
   private static boolean addCommas(StringBuilder stringBuilder, boolean hasAnd) {
     if (stringBuilder.length() > 0) {
       if (hasAnd) {
