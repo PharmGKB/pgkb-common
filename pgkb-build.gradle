@@ -76,6 +76,9 @@ artifacts {
 }
 
 signing {
+  if (project.ext.has('signing.key')) {
+    useInMemoryPgpKeys(project.ext['signing.key'], project.ext['signing.password'])
+  }
   sign jar
   sign javadocJar
   sign sourcesJar
