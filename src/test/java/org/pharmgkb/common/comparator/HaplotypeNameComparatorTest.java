@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -73,5 +74,36 @@ class HaplotypeNameComparatorTest {
     assertEquals("*3", it.next());
     assertEquals("*100", it.next());
     assertEquals("Other", it.next());
+  }
+
+  /**
+   * This test demonstrates how the {@link HaplotypeNameComparator} does not comply with the comparator contract.
+   * <p>
+   * It is disabled by default.
+   */
+  @Test
+  @Disabled()
+  void testMixedNomenclature() {
+    String na1 = "c.1371C>T";
+    String na2 = "c.557A>G";
+    String na3 = "c.1627A>G (*5)";
+    String na4 = "c.85T>C (*9 A)";
+
+    List<String> items = new ArrayList<>();
+    items.add(na1);
+    items.add(na2);
+    items.add(na3);
+    items.add(na4);
+    items.sort(HaplotypeNameComparator.getComparator());
+    System.out.println(items);
+
+    List<String> checkItems = new ArrayList<>();
+    checkItems.add(na4);
+    checkItems.add(na3);
+    checkItems.add(na2);
+    checkItems.add(na1);
+    checkItems.sort(HaplotypeNameComparator.getComparator());
+    System.out.println(checkItems);
+    assertEquals(items, checkItems);
   }
 }

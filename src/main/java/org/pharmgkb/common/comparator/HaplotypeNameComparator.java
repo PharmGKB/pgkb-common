@@ -12,7 +12,12 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * Comparator for haplotype names.  This takes common allele nomenclature into account (i.e. treat numbers as numbers,
  * not strings).
- * 
+ * <p>
+ * <b>WARNING!  DANGER!</b> This comparator does NOT comply with the comparator contract.
+ * It DOES NOT GUARANTEE TRANSITIVITY (i.e. if A > B and B > C, then A > C) if all haplotype names being compared are
+ * not of like kind (i.e. all strict star pattern, all loose star pattern, or all non-star pattern).
+ * See {@code HaplotypeNameComparatorTest.testMixedNomenclature()} for an example.
+ * <p>
  * The rules for how this sorts:
  * <ol>
  *   <li>The terms <code>Any</code> and <code>All</code> always get sorted to the beginning</li>
