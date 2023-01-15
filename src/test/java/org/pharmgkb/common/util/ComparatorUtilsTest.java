@@ -1,5 +1,9 @@
 package org.pharmgkb.common.util;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -25,5 +29,40 @@ class ComparatorUtilsTest {
     assertEquals(1, ComparatorUtils.compareNumbers("2", "1.2"));
     assertEquals(1, ComparatorUtils.compareNumbers("2.3", "1.2"));
     assertEquals(1, ComparatorUtils.compareNumbers("2.0", "1.2"));
+  }
+
+
+  @Test
+  void compareMap() {
+
+    Map<String, List<String>> m1 = new HashMap<>();
+    Map<String, List<String>> m2 = new HashMap<>();
+    assertEquals(0, ComparatorUtils.compareMap(m1, m2));
+
+    m1.put("a", new ArrayList<>());
+    assertEquals(1, ComparatorUtils.compareMap(m1, m2));
+
+    m2.put("a", new ArrayList<>());
+    assertEquals(0, ComparatorUtils.compareMap(m1, m2));
+
+    m1.get("a").add("1");
+    assertEquals(1, ComparatorUtils.compareMap(m1, m2));
+
+    m2.get("a").add("1");
+    assertEquals(0, ComparatorUtils.compareMap(m1, m2));
+
+    m2.put("b", new ArrayList<>());
+    assertEquals(-1, ComparatorUtils.compareMap(m1, m2));
+
+    m1.put("b", new ArrayList<>());
+    m1.get("b").add("2");
+    assertEquals(1, ComparatorUtils.compareMap(m1, m2));
+
+    m2.get("b").add("1");
+    assertEquals(1, ComparatorUtils.compareMap(m1, m2));
+
+    m2.put("b", new ArrayList<>());
+    m2.get("b").add("3");
+    assertEquals(-1, ComparatorUtils.compareMap(m1, m2));
   }
 }

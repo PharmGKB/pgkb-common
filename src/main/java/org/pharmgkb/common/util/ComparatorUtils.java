@@ -1,6 +1,7 @@
 package org.pharmgkb.common.util;
 
 import java.util.Collection;
+import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.pharmgkb.common.comparator.CollectionComparator;
 
@@ -102,8 +103,59 @@ public class ComparatorUtils {
   }
 
 
+  /**
+   * Compare two collections.
+   *
+   * @param a the first collection to compare
+   * @param b the second collection to compare
+   * @return a negative integer, zero, or a positive integer if the first
+   * map is less than, equal to, or greater than the second collection
+   */
   public static int compareCollection(@Nullable Collection<? extends Comparable> a,
       @Nullable Collection<? extends Comparable> b) {
     return CollectionComparator.getComparator().compare(a, b);
+  }
+
+
+  /**
+   * Compare two maps.
+   *
+   * @param a the first map to compare
+   * @param b the second map to compare
+   * @return a negative integer, zero, or a positive integer if the first
+   * map is less than, equal to, or greater than the second map
+   */
+  public static int compareMap(@Nullable Map a, @Nullable Map b) {
+    if (a == b) {
+      return 0;
+    }
+    if (a == null) {
+      return -1;
+    } else if (b == null) {
+      return 1;
+    }
+
+    //noinspection unchecked
+    int rez = compareCollection(a.keySet(), b.keySet());
+    if (rez != 0) {
+      return rez;
+    }
+
+    for (Object ka : a.keySet()) {
+      Object va = a.get(ka);
+      Object vb = b.get(ka);
+      if (va instanceof Collection) {
+        //noinspection unchecked
+        rez = compareCollection((Collection)va, (Collection)vb);
+      } else if (va instanceof Comparable) {
+        rez = compare((Comparable)va, (Comparable)vb);
+      } else {
+        throw new UnsupportedOperationException("Don't know how to compare " + va.getClass());
+      }
+      if (rez != 0) {
+        return rez;
+      }
+    }
+    return 0;
   }
 }
