@@ -1,3 +1,10 @@
+## [0.5.5](https://github.com/PharmGKB/pgkb-common/compare/v0.5.4...v0.5.5) (2023-01-16)
+
+
+### Bug Fixes
+
+* add ComparatorUtils.compareCollectionOfMaps ([e62e2bc](https://github.com/PharmGKB/pgkb-common/commit/e62e2bc1f2f65c486db7da7944c08898235abc1e))
+
 ## [0.5.4](https://github.com/PharmGKB/pgkb-common/compare/v0.5.3...v0.5.4) (2023-01-15)
 
 

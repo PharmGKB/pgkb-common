@@ -16,7 +16,7 @@ This package contains common code shared among all PharmGKB projects.
   <dependency>
     <groupId>org.pharmgkb</groupId>
     <artifactId>pgkb-common</artifactId>
-    <version>0.5.4</version>
+    <version>0.5.5</version>
   </dependency>
   ...
 </dependencies>
