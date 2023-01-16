@@ -1,6 +1,7 @@
 package org.pharmgkb.common.util;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.pharmgkb.common.comparator.CollectionComparator;
@@ -118,7 +119,52 @@ public class ComparatorUtils {
 
 
   /**
+   * Compare two collections of maps.
+   * <p>
+   * First compare by collection size, then compare by map (using {@link #compareMap(Map, Map)}).
+   *
+   * @param a the first collection to compare
+   * @param b the second collection to compare
+   * @return a negative integer, zero, or a positive integer if the first
+   * map is less than, equal to, or greater than the second collection
+   */
+  public static int compareCollectionOfMaps(@Nullable Collection<Map> a, @Nullable Collection<Map> b) {
+    if (a == b) {
+      return 0;
+    }
+    int aSize = 0;
+    if (a != null) {
+      aSize = a.size();
+    }
+    int bSize = 0;
+    if (b != null) {
+      bSize = b.size();
+    }
+    int rez = Integer.compare(aSize, bSize);
+    if (rez != 0) {
+      return rez;
+    }
+    // sizes are the same, so make sure it's not empty
+    if (aSize == 0) {
+      return 0;
+    }
+    Iterator<Map> aIt = a.iterator();
+    @SuppressWarnings({ "ConstantConditions" })
+    Iterator<Map> bIt = b.iterator();
+    while (aIt.hasNext()) {
+      rez = compareMap(aIt.next(), bIt.next());
+      if (rez != 0) {
+        return rez;
+      }
+    }
+    return 0;
+  }
+
+
+  /**
    * Compare two maps.
+   * <p>
+   * First compare by keys, then compare by values.
    *
    * @param a the first map to compare
    * @param b the second map to compare

@@ -65,4 +65,56 @@ class ComparatorUtilsTest {
     m2.get("b").add("3");
     assertEquals(-1, ComparatorUtils.compareMap(m1, m2));
   }
+
+
+
+  @Test
+  void compareCollectionOfMaps() {
+
+    List<Map> a = new ArrayList<>();
+    List<Map> b = new ArrayList<>();
+
+    Map<String, List<String>> m1 = new HashMap<>();
+    Map<String, List<String>> m2 = new HashMap<>();
+    a.add(m1);
+    b.add(m2);
+    assertEquals(0, ComparatorUtils.compareCollectionOfMaps(a, b));
+
+    m1.put("a", new ArrayList<>());
+    assertEquals(1, ComparatorUtils.compareCollectionOfMaps(a, b));
+
+    m2.put("a", new ArrayList<>());
+    assertEquals(0, ComparatorUtils.compareCollectionOfMaps(a, b));
+
+    m1.get("a").add("1");
+    assertEquals(1, ComparatorUtils.compareCollectionOfMaps(a, b));
+
+    m2.get("a").add("1");
+    assertEquals(0, ComparatorUtils.compareCollectionOfMaps(a, b));
+
+    m2.put("b", new ArrayList<>());
+    assertEquals(-1, ComparatorUtils.compareCollectionOfMaps(a, b));
+
+    m1.put("b", new ArrayList<>());
+    m1.get("b").add("2");
+    assertEquals(1, ComparatorUtils.compareCollectionOfMaps(a, b));
+
+    m2.get("b").add("1");
+    assertEquals(1, ComparatorUtils.compareCollectionOfMaps(a, b));
+
+    m2.put("b", new ArrayList<>());
+    m2.get("b").add("3");
+    assertEquals(-1, ComparatorUtils.compareCollectionOfMaps(a, b));
+
+
+    m1 = new HashMap<>();
+    a.add(m1);
+    assertEquals(1, ComparatorUtils.compareCollectionOfMaps(a, b));
+
+
+    m2 = new HashMap<>();
+    b.add(m2);
+    assertEquals(-1, ComparatorUtils.compareCollectionOfMaps(a, b));
+  }
+
 }
