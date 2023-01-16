@@ -1,3 +1,10 @@
+## [0.5.7](https://github.com/PharmGKB/pgkb-common/compare/v0.5.6...v0.5.7) (2023-01-16)
+
+
+### Bug Fixes
+
+* add ComparisonChain ([ee25ad8](https://github.com/PharmGKB/pgkb-common/commit/ee25ad81f451f42ca081273e948b5527883662e6))
+
 ## [0.5.6](https://github.com/PharmGKB/pgkb-common/compare/v0.5.5...v0.5.6) (2023-01-16)
 
 
