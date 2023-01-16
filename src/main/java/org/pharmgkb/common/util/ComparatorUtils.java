@@ -127,8 +127,9 @@ public class ComparatorUtils {
    * @param b the second collection to compare
    * @return a negative integer, zero, or a positive integer if the first
    * map is less than, equal to, or greater than the second collection
+   * @throws ClassCastException if collections do not contain maps
    */
-  public static int compareCollectionOfMaps(@Nullable Collection<Map> a, @Nullable Collection<Map> b) {
+  public static int compareCollectionOfMaps(@Nullable Collection a, @Nullable Collection b) throws ClassCastException {
     if (a == b) {
       return 0;
     }
@@ -140,16 +141,16 @@ public class ComparatorUtils {
     if (b != null) {
       bSize = b.size();
     }
+    if (aSize == 0 && bSize == 0) {
+      return 0;
+    }
     int rez = Integer.compare(aSize, bSize);
     if (rez != 0) {
       return rez;
     }
-    // sizes are the same, so make sure it's not empty
-    if (aSize == 0) {
-      return 0;
-    }
+    @SuppressWarnings("unchecked")
     Iterator<Map> aIt = a.iterator();
-    @SuppressWarnings({ "ConstantConditions" })
+    @SuppressWarnings({ "unchecked" })
     Iterator<Map> bIt = b.iterator();
     while (aIt.hasNext()) {
       rez = compareMap(aIt.next(), bIt.next());

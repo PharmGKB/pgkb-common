@@ -71,7 +71,7 @@ class ComparatorUtilsTest {
   @Test
   void compareCollectionOfMaps() {
 
-    List<Map> a = new ArrayList<>();
+    List<Map<String, List<String>>> a = new ArrayList<>();
     List<Map> b = new ArrayList<>();
 
     Map<String, List<String>> m1 = new HashMap<>();
