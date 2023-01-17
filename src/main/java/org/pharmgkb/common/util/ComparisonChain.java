@@ -15,7 +15,7 @@ public class ComparisonChain {
 
 
   @SuppressWarnings("rawtypes")
-  public ComparisonChain compare(Comparable a, Comparable b) {
+  public ComparisonChain compare(@Nullable Comparable a, @Nullable Comparable b) {
     if (m_comparison != 0) {
       return this;
     }
