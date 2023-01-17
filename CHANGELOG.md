@@ -1,3 +1,10 @@
+## [0.5.8](https://github.com/PharmGKB/pgkb-common/compare/v0.5.7...v0.5.8) (2023-01-17)
+
+
+### Bug Fixes
+
+* add nullability constraints to ComparisonChain ([74d7e20](https://github.com/PharmGKB/pgkb-common/commit/74d7e2096d048528cfe98952abd1f995c313a5b8))
+
 ## [0.5.7](https://github.com/PharmGKB/pgkb-common/compare/v0.5.6...v0.5.7) (2023-01-16)
 
 
