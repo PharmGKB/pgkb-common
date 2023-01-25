@@ -1,3 +1,10 @@
+## [0.6.0](https://github.com/PharmGKB/pgkb-common/compare/v0.5.8...v0.6.0) (2023-01-25)
+
+
+### Features
+
+* add support for ANSI console codes ([6e21e16](https://github.com/PharmGKB/pgkb-common/commit/6e21e1663fca95a5cca7e6d85152aa802a9f68b9))
+
 ## [0.5.8](https://github.com/PharmGKB/pgkb-common/compare/v0.5.7...v0.5.8) (2023-01-17)
 
 
