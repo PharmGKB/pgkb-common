@@ -12,7 +12,9 @@ import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.util.Base64;
 import java.util.zip.GZIPInputStream;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -93,7 +95,7 @@ public class StreamUtils {
 
   /**
    * Copies contents of a {@code url} to a {@code file}.  If {@code file} already exists, it will be overwritten.
-   *
+   * <p>
    * Use this instead of {@link FileUtils#copyURLToFile(URL, File)} when you need to follow redirects.
    */
   public static void copyUrlToFile(String url, Path file) throws IOException {
@@ -120,5 +122,29 @@ public class StreamUtils {
         IOUtils.copy(in,out);
       }
     }
+  }
+
+
+  /**
+   * Calculates md5 hash for a file.
+   */
+  public static byte[] md5(Path file) throws IOException {
+    try (InputStream is = Files.newInputStream(file)) {
+      return DigestUtils.md5(is);
+    }
+  }
+
+  /**
+   * Calculates md5 hash for a file and return its Base64 representation.
+   */
+  public static String md5InBase64(Path file) throws IOException {
+    return Base64.getEncoder().encodeToString(md5(file));
+  }
+
+  /**
+   * Calculates md5 hash for the {@code data} and return its Base64 representation.
+   */
+  public static String md5InBase64(byte[] data) throws IOException {
+    return Base64.getEncoder().encodeToString(DigestUtils.md5(data));
   }
 }

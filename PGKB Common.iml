@@ -25,5 +25,6 @@
     <orderEntry type="library" exported="" name="HttpComponents Client" level="project" />
     <orderEntry type="library" exported="" name="SLF4J" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="JUnit" level="project" />
+    <orderEntry type="library" exported="" name="Commons-codec" level="project" />
   </component>
 </module>
