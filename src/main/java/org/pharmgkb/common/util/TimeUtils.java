@@ -62,14 +62,14 @@ public class TimeUtils {
 
 
   /**
-   * Formats {@code date} as "M/d/yy".
+   * Formats {@code date} as "M/d/yy HH:mm z".
    */
   public static String humanReadableDateTime(Date date) {
     return humanReadableDateTime(date.toInstant());
   }
 
   /**
-   * Formats {@code date} as "M/d/yy HH:mm z'.
+   * Formats {@code date} as "M/d/yy HH:mm z".
    */
   public static String humanReadableDateTime(TemporalAccessor time) {
     return sf_simpleDateTimeFormatter.format(time);
