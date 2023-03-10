@@ -46,7 +46,7 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
    * @throws IllegalArgumentException if the short name has a space in it
    */
   public void add(T theEnum, int id, String shortName, @Nullable String displayName,
-      @Nullable String... additionalNames) {
+      String @Nullable ... additionalNames) {
 
     Preconditions.checkArgument(!m_idMap.containsKey(id), "Duplicate ID '%s' for %s", id,
         theEnum.getClass().getSimpleName());
