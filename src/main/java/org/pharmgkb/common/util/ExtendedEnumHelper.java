@@ -55,10 +55,10 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
     String strippedShortName = StringUtils.stripToNull(shortName);
     Preconditions.checkArgument(strippedShortName != null, "Empty shortName for %s",
         theEnum.getClass().getSimpleName());
-    Preconditions.checkArgument(!strippedShortName.contains(" "), "Spaces in shortName for %s",
-        theEnum.getClass().getSimpleName());
-    Preconditions.checkArgument(!StringUtils.isNumeric(strippedShortName), "Numeric shortName for %s",
-        theEnum.getClass().getSimpleName());
+    Preconditions.checkArgument(!strippedShortName.contains(" "), "Spaces in shortName for %s (%s)",
+        theEnum.getClass().getSimpleName(), shortName);
+    Preconditions.checkArgument(!StringUtils.isNumeric(strippedShortName), "Numeric shortName for %s (%s)",
+        theEnum.getClass().getSimpleName(), shortName);
     Preconditions.checkArgument(!m_shortNameMap.containsKey(strippedShortName),
         "Duplicate shortName '%s' for %s", strippedShortName, theEnum.getClass().getSimpleName());
 
@@ -96,7 +96,7 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
 
 
   /**
-   * Looks for the enum with the given Id.
+   * Looks for the enum with the given ID.
    */
   public @Nullable T lookupById(int id) {
     return m_idMap.get(id);
