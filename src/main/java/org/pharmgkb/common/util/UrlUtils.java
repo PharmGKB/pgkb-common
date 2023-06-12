@@ -135,7 +135,7 @@ public class UrlUtils {
         connection.setReadTimeout(sf_timeout);
         // TODO(markwoon): this only checks to see if we can connect to the server
         connection.connect();
-        // TODO(markwoon): we're not actualy verifying if the file is available, or if it is even a file
+        // TODO(markwoon): we're not actually verifying if the file is available, or if it is even a file
         /* unreliable, fails for ftp://anonymous:foo%40bar.com@ftp.swfwmd.state.fl.us/pub/README.txt
         try (InputStream in = connection.getInputStream()) {
         }
