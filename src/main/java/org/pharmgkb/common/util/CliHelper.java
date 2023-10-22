@@ -295,6 +295,10 @@ public class CliHelper {
         throw new InvalidPathException("Not a file: '" + p);
       }
     }
+    // parent can be null if path has no dir info (e.g. "foo.txt" vs. "./foo.txt")
+    if (p.getParent() == null) {
+      p = p.toAbsolutePath();
+    }
     return p;
   }
 
