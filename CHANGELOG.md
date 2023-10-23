@@ -1,3 +1,17 @@
+## [0.7.0](https://github.com/PharmGKB/pgkb-common/compare/v0.6.0...v0.7.0) (2023-10-23)
+
+
+### Features
+
+* support md5 hashing ([7d7f662](https://github.com/PharmGKB/pgkb-common/commit/7d7f66229ec4a39f175d7ea077ebf3c205103f49))
+
+
+### Bug Fixes
+
+* fix generics ([4a6f483](https://github.com/PharmGKB/pgkb-common/commit/4a6f483ef16823fc9f411dc3873279378e1e96fe))
+* improve error message ([8477e63](https://github.com/PharmGKB/pgkb-common/commit/8477e63fbfb864ba53005cec0cf9229dd5cf1ae1))
+* return absolute path if provided path has no parent ([0e035fe](https://github.com/PharmGKB/pgkb-common/commit/0e035fe54e9547221d7ebd696fd7455381a8f5cc))
+
 ## [0.6.0](https://github.com/PharmGKB/pgkb-common/compare/v0.5.8...v0.6.0) (2023-01-25)
 
 
