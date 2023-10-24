@@ -3,7 +3,7 @@ buildscript {
     mavenCentral()
   }
   dependencies {
-    classpath 'biz.aQute.bnd:biz.aQute.bnd.gradle:5.3.0'
+    classpath 'biz.aQute.bnd:biz.aQute.bnd.gradle:7.0.0'
   }
 }
 
@@ -34,8 +34,6 @@ def getVersionName() {
   }
 }
 
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
 project.group = 'org.pharmgkb'
 project.version = getVersionName()
 
@@ -82,18 +80,24 @@ repositories {
 dependencies {
   implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
   implementation group: 'commons-cli', name: 'commons-cli', version: '1.5.0'
-  implementation group: 'commons-codec', name: 'commons-codec', version: '1.15'
+  implementation group: 'commons-codec', name: 'commons-codec', version: '1.16.0'
   implementation group: 'commons-collections', name: 'commons-collections', version: '3.2.2'
-  implementation group: 'commons-io', name: 'commons-io', version: '2.12.0'
-  implementation group: 'com.google.guava', name: 'guava', version: '31.1-jre'
-  implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
+  implementation group: 'commons-io', name: 'commons-io', version: '2.14.0'
+  implementation group: 'com.google.guava', name: 'guava', version: '32.1.3-jre'
+  implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.13.0'
   implementation group: 'org.apache.commons', name: 'commons-text', version: '1.10.0'
   implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.14'
-  implementation group: 'org.checkerframework', name: 'checker-qual', version: '3.17.0'
+  implementation group: 'org.checkerframework', name: 'checker-qual', version: '3.39.0'
   implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.36'
 
-  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.8.2'
+  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.10.0'
   testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '2.2'
+}
+
+
+java {
+  sourceCompatibility = JavaVersion.VERSION_1_8
+  targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 apply from: 'pgkb-build.gradle'
