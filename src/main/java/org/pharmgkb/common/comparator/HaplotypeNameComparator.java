@@ -20,7 +20,7 @@ import org.apache.commons.lang3.StringUtils;
  * <p>
  * The rules for how this sorts:
  * <ol>
- *   <li>The terms <code>Any</code> and <code>All</code> always get sorted to the beginning</li>
+ *   <li>The terms <code>Any</code>, <code>All</code>, and <code>Reference</code> always get sorted to the beginning</li>
  *   <li>The terms <code>Unknown</code> and <code>Other</code> always get sorted to the end</li>
  *   <li>if the term contains numbers (e.g. *2, H3, *3B) the terms will be String sorted by the initial character(s), 
  *   Integer sorted by the following numbers, then String sorted by any following characters</li>
@@ -33,7 +33,7 @@ public class HaplotypeNameComparator implements Comparator<String> {
   private static final Pattern sf_strictStarPattern = Pattern.compile("(.*)\\*(\\d+)(.*)");
   private static final Pattern sf_looseStarPattern = Pattern.compile("(\\D*)(\\d+)(.*)");
   private static final Comparator<String> sf_comparator = new HaplotypeNameComparator();
-  private static final List<String> sf_topTerms = ImmutableList.of("Any","All");
+  private static final List<String> sf_topTerms = ImmutableList.of("Any", "All", "Reference");
   private static final List<String> sf_bottomTerms = ImmutableList.of("Other","Unknown");
 
   /**
