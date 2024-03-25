@@ -114,8 +114,7 @@ public class UrlUtils {
 
   /**
    * For HTTP URLs, this will perform a HEAD request and checks for a non-error response.
-   * For FTP URLs, this will only verify that we can connect to the server, not whether the resource is actually
-   * available.
+   * For FTP URLs, this will only verify that we can connect to the server, not whether the resource is available.
    */
   public static boolean isReachable(URL url) {
     try {
