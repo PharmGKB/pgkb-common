@@ -96,7 +96,8 @@ public class StreamUtils {
   /**
    * Copies contents of a {@code url} to a {@code file}.  If {@code file} already exists, it will be overwritten.
    * <p>
-   * Use this instead of {@link FileUtils#copyURLToFile(URL, File)} when you need to follow redirects.
+   * Use this instead of {@link FileUtils#copyURLToFile(URL, File)} or {@link IOUtils#copy(URL, File)}
+   * when you need to follow redirects.
    */
   public static void copyUrlToFile(String url, Path file) throws IOException {
 
