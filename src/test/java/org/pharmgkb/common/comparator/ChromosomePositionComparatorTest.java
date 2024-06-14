@@ -17,11 +17,13 @@ class ChromosomePositionComparatorTest {
   @Test
   void testComparator() {
 
+    //noinspection EqualsWithItself
     assertEquals(0, ChromosomePositionComparator.getComparator().compare(null, null));
     assertEquals(-1, ChromosomePositionComparator.getComparator().compare(null, "chr1:1"));
     assertEquals(1, ChromosomePositionComparator.getComparator().compare("chr1:1", null));
 
     assertEquals(-1, ChromosomePositionComparator.getComparator().compare("chr1:4", "chr1:100"));
+    //noinspection EqualsWithItself
     assertEquals(0, ChromosomePositionComparator.getComparator().compare("chr1:4", "chr1:4"));
     assertEquals(1, ChromosomePositionComparator.getComparator().compare("chr3:4", "chr1:4"));
     assertEquals(1, ChromosomePositionComparator.getComparator().compare("chr4:100", "chr1:400"));
@@ -31,7 +33,6 @@ class ChromosomePositionComparatorTest {
   @Test
   void testBadArg1() throws IllegalArgumentException {
     Assertions.assertThrows(IllegalArgumentException.class, () -> {
-      //noinspection ResultOfMethodCallIgnored
       ChromosomePositionComparator.getComparator().compare("chr1", "chr1:100");
     });
   }
@@ -40,7 +41,6 @@ class ChromosomePositionComparatorTest {
   @Test
   void testBadArg2() throws IllegalArgumentException {
     Assertions.assertThrows(IllegalArgumentException.class, () -> {
-      //noinspection ResultOfMethodCallIgnored
       ChromosomePositionComparator.getComparator().compare("chr1:1", ":100");
     });
   }

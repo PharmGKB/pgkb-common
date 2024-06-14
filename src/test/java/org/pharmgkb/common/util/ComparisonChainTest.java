@@ -78,5 +78,21 @@ class ComparisonChainTest {
         .compare(listB, listB)
         .compareCollectionOfMaps(listMapA, listMapB)
         .result());
+
+
+    assertEquals(-1, new ComparisonChain()
+        .compareChromosomePositions("chr1:4", "chr1:100")
+        .result());
+    assertEquals(1, new ComparisonChain()
+        .compareChromosomePositions("chr4:100", "chr1:400")
+        .result());
+
+
+    assertEquals(-1, new ComparisonChain()
+        .compareChromosomeNames("chr2", "chr11")
+        .result());
+    assertEquals(1, new ComparisonChain()
+        .compareHaplotypeNames("chr11", "chr2")
+        .result());
   }
 }

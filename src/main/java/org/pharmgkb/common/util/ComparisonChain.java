@@ -3,6 +3,9 @@ package org.pharmgkb.common.util;
 import java.util.Collection;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.pharmgkb.common.comparator.ChromosomeNameComparator;
+import org.pharmgkb.common.comparator.ChromosomePositionComparator;
+import org.pharmgkb.common.comparator.HaplotypeNameComparator;
 
 
 /**
@@ -70,6 +73,43 @@ public class ComparisonChain {
     m_comparison = ComparatorUtils.compareCollectionOfMaps(a, b);
     return this;
   }
+
+
+  /**
+   * Compares chromosome names.
+   */
+  public ComparisonChain compareChromosomeNames(@Nullable String a, @Nullable String b) {
+    if (m_comparison != 0) {
+      return this;
+    }
+    m_comparison = ChromosomeNameComparator.getComparator().compare(a, b);
+    return this;
+  }
+
+
+  /**
+   * Compares chromosomal positions (in the format chrX:1234).
+   */
+  public ComparisonChain compareChromosomePositions(@Nullable String a, @Nullable String b) {
+    if (m_comparison != 0) {
+      return this;
+    }
+    m_comparison = ChromosomePositionComparator.getComparator().compare(a, b);
+    return this;
+  }
+
+
+  /**
+   * Compares haplotype names.
+   */
+  public ComparisonChain compareHaplotypeNames(@Nullable String a, @Nullable String b) {
+    if (m_comparison != 0) {
+      return this;
+    }
+    m_comparison = HaplotypeNameComparator.getComparator().compare(a, b);
+    return this;
+  }
+
 
   public int result() {
     return m_comparison;
