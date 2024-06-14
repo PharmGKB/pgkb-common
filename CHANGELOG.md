@@ -1,3 +1,10 @@
+## [0.7.1](https://github.com/PharmGKB/pgkb-common/compare/v0.7.0...v0.7.1) (2024-06-14)
+
+### Bug Fixes
+
+* add convenience methods to ComparisonChain for haplotypes and chromosomes ([f6ab4c9](https://github.com/PharmGKB/pgkb-common/commit/f6ab4c94e87293ddab55d39bc70176d537ce9a91))
+* **api:** sort allele list in GSI options response ([33fa0bf](https://github.com/PharmGKB/pgkb-common/commit/33fa0bfcbc79c993702f06cc1f53e7f1efac7c4e))
+
 ## [0.7.0](https://github.com/PharmGKB/pgkb-common/compare/v0.6.0...v0.7.0) (2023-10-23)
 
 
