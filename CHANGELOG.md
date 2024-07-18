@@ -1,3 +1,9 @@
+## [0.7.2](https://github.com/PharmGKB/pgkb-common/compare/v0.7.1...v0.7.2) (2024-07-18)
+
+### Bug Fixes
+
+* fix transitivity bug in HaplotypeNameComparator ([446f4c1](https://github.com/PharmGKB/pgkb-common/commit/446f4c126e038904a0355e072600d0a176485779))
+
 ## [0.7.1](https://github.com/PharmGKB/pgkb-common/compare/v0.7.0...v0.7.1) (2024-06-14)
 
 ### Bug Fixes
