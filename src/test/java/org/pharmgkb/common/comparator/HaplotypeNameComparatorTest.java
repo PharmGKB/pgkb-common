@@ -18,6 +18,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class HaplotypeNameComparatorTest {
 
+  @Test
+  void testReference() {
+    // cannot use 2 strings or compiler will optimize it away and use the same String object
+    String[] dip = "Reference/Reference".split("/");
+    assertEquals(0, HaplotypeNameComparator.getComparator().compare(dip[0], dip[1]));
+  }
 
   @Test
   void testComparator() {

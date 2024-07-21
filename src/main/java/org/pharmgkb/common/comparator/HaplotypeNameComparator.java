@@ -43,8 +43,12 @@ public class HaplotypeNameComparator implements Comparator<String> {
     }
     if (name1 == null) {
       return -1;
-    } else if (name2 == null) {
+    }
+    if (name2 == null) {
       return 1;
+    }
+    if (name1.equals(name2)) {
+      return 0;
     }
     
     if (sf_topTerms.contains(name1) || sf_bottomTerms.contains(name2)) {
