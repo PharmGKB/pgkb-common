@@ -1,3 +1,9 @@
+## [0.7.3](https://github.com/PharmGKB/pgkb-common/compare/v0.7.2...v0.7.3) (2024-07-21)
+
+### Bug Fixes
+
+* fix haplotype name comparator for "Reference" ([5359f23](https://github.com/PharmGKB/pgkb-common/commit/5359f23e71bcdabafce0419e6154c475bb4474c9))
+
 ## [0.7.2](https://github.com/PharmGKB/pgkb-common/compare/v0.7.1...v0.7.2) (2024-07-18)
 
 ### Bug Fixes
