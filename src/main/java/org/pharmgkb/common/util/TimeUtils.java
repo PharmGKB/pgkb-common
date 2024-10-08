@@ -82,6 +82,9 @@ public class TimeUtils {
    */
   public static String humanReadableDuration(Duration duration) {
 
+    if (duration.toMillis() < 1000) {
+      return duration.toMillis() + " ms";
+    }
     long days = duration.toDays();
     long hours = duration.toHours() - TimeUnit.DAYS.toHours(duration.toDays());
     long mins = duration.toMinutes() - TimeUnit.HOURS.toMinutes(duration.toHours());
@@ -89,30 +92,33 @@ public class TimeUtils {
 
     StringBuilder stringBuilder = new StringBuilder();
     boolean hasAnd = false;
-
     if (secs > 0) {
       prependDuration(stringBuilder, secs, "second", "seconds");
     }
+    handleDuration(stringBuilder, days, hours, mins, hasAnd);
+    return stringBuilder.toString();
+  }
 
+  private static void handleDuration(StringBuilder stringBuilder, long days, long hours, long mins, boolean hasAnd) {
     if (mins > 0) {
       hasAnd = addCommas(stringBuilder, false);
       prependDuration(stringBuilder, mins, "minute", "minutes");
     }
-
     if (hours > 0) {
       hasAnd = addCommas(stringBuilder, hasAnd);
       prependDuration(stringBuilder, hours, "hour", "hours");
     }
-
     if (days > 0) {
       addCommas(stringBuilder, hasAnd);
       prependDuration(stringBuilder, days, "day", "days");
     }
-
-    return stringBuilder.toString();
   }
 
   public static String humanReadablePreciseDuration(Duration duration) {
+
+    if (duration.toMillis() < 1000) {
+      return duration.toMillis() + " ms";
+    }
 
     long days = duration.toDays();
     long hours = duration.toHours() - TimeUnit.DAYS.toHours(duration.toDays());
@@ -126,27 +132,11 @@ public class TimeUtils {
     if (ms > 0 && mins == 0 && hours == 0 && days == 0) {
       prependDuration(stringBuilder, ms, "ms", "ms");
     }
-
     if (secs > 0) {
       hasAnd = addCommas(stringBuilder, false);
       prependDuration(stringBuilder, secs, "second", "seconds");
     }
-
-    if (mins > 0) {
-      hasAnd = addCommas(stringBuilder, false);
-      prependDuration(stringBuilder, mins, "minute", "minutes");
-    }
-
-    if (hours > 0) {
-      hasAnd = addCommas(stringBuilder, hasAnd);
-      prependDuration(stringBuilder, hours, "hour", "hours");
-    }
-
-    if (days > 0) {
-      addCommas(stringBuilder, hasAnd);
-      prependDuration(stringBuilder, days, "day", "days");
-    }
-
+    handleDuration(stringBuilder, days, hours, mins, hasAnd);
     return stringBuilder.toString();
   }
 

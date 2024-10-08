@@ -20,7 +20,7 @@ class TimeUtilsTest {
 
   @BeforeAll
   static void beforeClass() {
-    // make sure test timezone is consistent
+    // make sure the timezone is consistent in the test
     TimeZone.setDefault(TimeZone.getTimeZone("America/Los_Angeles"));
   }
 
@@ -75,7 +75,10 @@ class TimeUtilsTest {
   @Test
   void testDuration() {
 
-    Duration duration = Duration.ofSeconds(1);
+    Duration duration = Duration.ofMillis(39);
+    assertEquals("39 ms", TimeUtils.humanReadablePreciseDuration(duration));
+
+    duration = duration.plusSeconds(1);
     assertEquals("1 second", TimeUtils.humanReadableDuration(duration));
 
     duration = Duration.ofSeconds(39);
