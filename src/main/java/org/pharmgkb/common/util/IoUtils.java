@@ -1,7 +1,7 @@
 package org.pharmgkb.common.util;
 
 import java.lang.invoke.MethodHandles;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

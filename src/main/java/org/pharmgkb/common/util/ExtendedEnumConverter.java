@@ -2,7 +2,7 @@ package org.pharmgkb.common.util;
 
 import org.apache.commons.beanutils.ConversionException;
 import org.apache.commons.beanutils.Converter;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -20,7 +20,7 @@ public class ExtendedEnumConverter implements Converter {
 
 
   @Override
-  public @Nullable <T> T convert(Class<T> aClass, Object o) {
+  public @Nullable <T> T convert(Class<T> aClass, @Nullable Object o) {
 
     if (o == null) {
       return null;

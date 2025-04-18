@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.FileSystem;
 import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
@@ -11,7 +12,7 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -40,7 +41,7 @@ public final class PathUtils {
 
 
   /**
-   * Gets the file extension, if one exists.  Does not include ".".
+   * Gets the file extension if one exists.  Does not include ".".
    * Does not validate if {@code file} is a regular file.
    */
   public static @Nullable String getFileExtension(Path file) {
@@ -108,8 +109,8 @@ public final class PathUtils {
         try {
           FileSystems.getFileSystem(uri);
         } catch (FileSystemNotFoundException ex) {
-          try {
-            FileSystems.newFileSystem(uri, Collections.emptyMap());
+          //noinspection EmptyTryBlock
+          try (FileSystem ignored = FileSystems.newFileSystem(uri, Collections.emptyMap())) {
           } catch (IOException ex2) {
             throw new IllegalStateException("Unable to create zip/jar filesystem", ex2);
           }

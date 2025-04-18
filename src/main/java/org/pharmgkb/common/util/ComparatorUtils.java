@@ -3,7 +3,7 @@ package org.pharmgkb.common.util;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.pharmgkb.common.comparator.CollectionComparator;
 
 

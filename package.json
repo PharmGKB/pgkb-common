@@ -7,7 +7,7 @@
     "url": "https://github.com/PharmGKB/pgkb-common.git"
   },
   "license": "MPL-2.0",
-  "packageManager": "yarn@4.2.2",
+  "packageManager": "yarn@4.9.1",
   "devDependencies": {
     "@google/semantic-release-replace-plugin": "1.2.7",
     "@semantic-release/changelog": "6.0.3",

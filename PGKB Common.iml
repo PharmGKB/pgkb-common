@@ -15,7 +15,6 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" exported="" name="CheckerFramework Annotations" level="project" />
     <orderEntry type="library" exported="" name="Commons-beanutils" level="project" />
     <orderEntry type="library" exported="" name="Commons-cli" level="project" />
     <orderEntry type="library" exported="" name="Commons-io" level="project" />
@@ -26,5 +25,6 @@
     <orderEntry type="library" exported="" name="SLF4J" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="JUnit" level="project" />
     <orderEntry type="library" exported="" name="Commons-codec" level="project" />
+    <orderEntry type="library" exported="" name="JSpecify" level="project" />
   </component>
 </module>

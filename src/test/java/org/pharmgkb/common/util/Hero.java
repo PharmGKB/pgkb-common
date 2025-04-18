@@ -1,7 +1,7 @@
 package org.pharmgkb.common.util;
 
 import java.util.Collection;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -14,6 +14,7 @@ enum Hero implements ExtendedEnum {
   Superman(2, "Clark", "Clark Kent"),
   Batman(3, "Bruce", "Bruce Wayne");
 
+  @SuppressWarnings("NotNullFieldNotInitialized")
   private static ExtendedEnumHelper<Hero> s_extendedEnumHelper;
   private final int m_id;
   private final String m_shortName;
@@ -29,6 +30,7 @@ enum Hero implements ExtendedEnum {
 
   //-- BEGIN ExtendedEnum methods --//
   private synchronized void init() {
+    //noinspection ConstantValue
     if (s_extendedEnumHelper == null) {
       s_extendedEnumHelper = new ExtendedEnumHelper<>(getClass());
     }

@@ -18,18 +18,16 @@ apply plugin: 'biz.aQute.bnd.builder'
 
 
 def getVersionName() {
-  def errOut = new ByteArrayOutputStream()
   try {
-    def stdOut = new ByteArrayOutputStream()
-    exec {
-      commandLine 'git', 'describe', '--tags'
-      standardOutput = stdOut
-      errorOutput = errOut
-    }
-    // strip of leading 'v'
-    return stdOut.toString().trim().substring(1)
+    def output = providers.exec {
+      executable 'git'
+      args = ['describe', '--tags']
+    }.standardOutput.asText.get().trim()
+    // strip of leading "v"
+    return output.substring(1)
   } catch (ignore) {
-    logger.info('Error running git describe (' + errOut.toString().trim() + '), defaulting to 0.0.0')
+    println(ignore)
+    logger.info('Error running git describe (' + ignore + '), defaulting to 0.0.0')
     return '0.0.0'
   }
 }
@@ -78,20 +76,21 @@ repositories {
 }
 
 dependencies {
-  implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
-  implementation group: 'commons-cli', name: 'commons-cli', version: '1.7.0'
-  implementation group: 'commons-codec', name: 'commons-codec', version: '1.16.1'
+  implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.10.1'
+  implementation group: 'commons-cli', name: 'commons-cli', version: '1.9.0'
+  implementation group: 'commons-codec', name: 'commons-codec', version: '1.18.0'
   implementation group: 'commons-collections', name: 'commons-collections', version: '3.2.2'
-  implementation group: 'commons-io', name: 'commons-io', version: '2.16.1'
-  implementation group: 'com.google.guava', name: 'guava', version: '33.1.0-jre'
-  implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.14.0'
-  implementation group: 'org.apache.commons', name: 'commons-text', version: '1.12.0'
+  implementation group: 'commons-io', name: 'commons-io', version: '2.19.0'
+  implementation group: 'com.google.guava', name: 'guava', version: '33.4.8-jre'
+  implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.17.0'
+  implementation group: 'org.apache.commons', name: 'commons-text', version: '1.13.1'
   implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.14'
-  implementation group: 'org.checkerframework', name: 'checker-qual', version: '3.39.0'
-  implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.13'
+  implementation group: 'org.jspecify', name: 'jspecify', version: '1.0.0'
+  implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.17'
 
-  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.10.2'
-  testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '2.2'
+  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.12.2'
+  testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '3.0'
+  testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.12.2'
 }
 
 

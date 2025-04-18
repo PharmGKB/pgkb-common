@@ -1,10 +1,10 @@
 package org.pharmgkb.common.util;
 
 /**
- * This interface should be implemented by all enums.  Implementors should also make available
- * all accessor methods from {@link ExtendedEnumHelper} as static methods.
+ * All enums should implement this interface.
+ * Implementors should also make available all accessor methods from {@link ExtendedEnumHelper} as static methods.
  * <p />
- * The goal is to be able to specify an Id, short name and a display name for enums that do not change if the enum
+ * The goal is to be able to specify an ID, short name and a display name for enums that do not change if the enum
  * itself gets moved/renamed, and to allow reverse lookups.
  *
  * @author Mark Woon
@@ -13,7 +13,7 @@ public interface ExtendedEnum {
 
 
   /**
-   * Gets the Id of this enum.
+   * Gets the ID of this enum.
    */
   int getId();
 
@@ -25,7 +25,7 @@ public interface ExtendedEnum {
 
 
   /**
-   * Gets the display name of this enum.  Will return short name if no display name is defined.
+   * Gets the display name of this enum.  Will return the short name if no display name is defined.
    */
   String getDisplayName();
 }

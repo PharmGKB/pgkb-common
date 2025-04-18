@@ -1,9 +1,8 @@
 package org.pharmgkb.common.comparator;
 
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Iterator;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -13,13 +12,13 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * @author Mark Woon
  */
 public class CollectionComparator extends AbstractComparator<Collection<? extends Comparable>> {
-  private static final Comparator<Collection<? extends Comparable>> sf_comparator = new CollectionComparator();
+  private static final CollectionComparator sf_comparator = new CollectionComparator();
 
 
   /**
    * Gets an instance of this comparator.
    */
-  public static Comparator<Collection<? extends Comparable>> getComparator() {
+  public static CollectionComparator getComparator() {
     return sf_comparator;
   }
 

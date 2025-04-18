@@ -3,28 +3,29 @@ package org.pharmgkb.common.comparator;
 import java.util.Comparator;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 
 
 /**
- * Comparator for chromosome names.  This expects the chromosome name to either be numeric, or start with "chr".
+ * Comparator for chromosome names.  This expects the chromosome name to either be numeric or start with "chr".
  *
  * @author Mark Woon
  */
 public class ChromosomeNameComparator implements Comparator<String> {
-  private static final Comparator<String> sf_comparator = new ChromosomeNameComparator();
+  private static final ChromosomeNameComparator sf_comparator = new ChromosomeNameComparator();
 
   /**
    * Gets an instance of this comparator.
    *
    * @return an instance of this comparator
    */
-  public static Comparator<String> getComparator() {
+  public static ChromosomeNameComparator getComparator() {
     return sf_comparator;
   }
 
 
   @Override
-  public int compare(String name1, String name2) {
+  public int compare(@Nullable String name1, @Nullable String name2) {
 
     //noinspection StringEquality
     if (name1 == name2) {

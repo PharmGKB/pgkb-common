@@ -10,7 +10,7 @@ import com.google.common.base.Preconditions;
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.WordUtils;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -41,7 +41,7 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
   /**
    * Adds the given enum to the maps.
    *
-   * @throws IllegalStateException if the enum being added has a id, name or display name that's
+   * @throws IllegalStateException if the enum being added has an id, name or display name that's
    * already being used
    * @throws IllegalArgumentException if the short name has a space in it
    */
@@ -129,6 +129,7 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
    * @throws IllegalArgumentException if no enum for the given name exists
    */
   public T lookupByNameOrThrow(String name) {
+    @SuppressWarnings("DataFlowIssue")
     T rez = lookupByName(name);
     if (rez == null) {
       throw new IllegalArgumentException("No such " + m_enumClass.getSimpleName() + ": '" + name + "'");

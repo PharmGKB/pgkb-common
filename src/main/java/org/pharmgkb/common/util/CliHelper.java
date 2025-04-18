@@ -17,7 +17,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.lang3.StringUtils;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -30,15 +30,15 @@ public class CliHelper {
   private static final String sf_verboseFlag = "verbose";
   private static final String sf_versionFlag = "version";
   private final String m_name;
-  private String m_version;
+  private @Nullable String m_version;
   /**
    * Shadow collection of options with nothing required so that we can check if help was requested
    * without hitting a parsing exception.
    */
   private final Options m_helpOptions = new Options();
   private final Options m_options = new Options();
-  private CommandLine m_commandLine;
-  private String m_error;
+  private @Nullable CommandLine m_commandLine;
+  private @Nullable String m_error;
 
 
   /**
@@ -61,7 +61,7 @@ public class CliHelper {
 
 
   /**
-   * Add version option that prints specified {@code version}.
+   * Adds the version option that prints specified {@code version}.
    */
   public CliHelper addVersion(String version) {
     Preconditions.checkArgument(version != null);
@@ -203,6 +203,7 @@ public class CliHelper {
    * Checks whether the specified option exists.
    */
   public boolean hasOption(String opt) {
+    Preconditions.checkState(m_commandLine != null, "Command line has not been parsed");
     return m_commandLine.hasOption(opt);
   }
 
@@ -210,9 +211,10 @@ public class CliHelper {
    * Gets the first String value, if any, for the given option.
    *
    * @param opt the name of the option
-   * @return Value of the argument if option is set, and has an argument, otherwise null.
+   * @return Value of the argument if the option is set and has an argument, otherwise null.
    */
   public @Nullable String getValue(String opt) {
+    Preconditions.checkState(m_commandLine != null, "Command line has not been parsed");
     return StringUtils.stripToNull(m_commandLine.getOptionValue(opt));
   }
 
@@ -220,6 +222,7 @@ public class CliHelper {
    * Gets the String values for the given option.
    */
   public List<String> getValues(String opt) {
+    Preconditions.checkState(m_commandLine != null, "Command line has not been parsed");
     String[] vals = m_commandLine.getOptionValues(opt);
     if (vals == null) {
       return Collections.emptyList();
@@ -231,6 +234,7 @@ public class CliHelper {
    * Gets the int value for the given option.
    */
   public int getIntValue(String opt) {
+    Preconditions.checkState(m_commandLine != null, "Command line has not been parsed");
     return Integer.parseInt(m_commandLine.getOptionValue(opt));
   }
 
@@ -238,11 +242,11 @@ public class CliHelper {
   /**
    * Gets the value for the given option as a {@link File}.
    *
-   * @param createIfNotExist if true and directory doesn't exist, create the directory;
-   * otherwise, if false and directory doesn't exist, throw InvalidPathException
+   * @param createIfNotExist if true and the directory doesn't exist, create the directory;
+   * otherwise, if false and the directory doesn't exist, throw InvalidPathException
    * @return the directory
-   * @throws IllegalArgumentException if option was not specified
-   * @throws InvalidPathException if specified path is not a directory or {@code createIfNotExist} is false and
+   * @throws IllegalArgumentException if the option was not specified
+   * @throws InvalidPathException if the specified path is not a directory or {@code createIfNotExist} is false and
    * directory doesn't exist
    */
   public Path getValidDirectory(String opt, boolean createIfNotExist) throws IOException {
@@ -268,7 +272,7 @@ public class CliHelper {
   /**
    * Gets the value for the given option as a {@link Path}.
    *
-   * @throws IllegalArgumentException if option was not specified
+   * @throws IllegalArgumentException if the option was not specified
    */
   public Path getPath(String opt) {
 
@@ -282,7 +286,7 @@ public class CliHelper {
   /**
    * Gets the value for the given option as a {@link Path}, that must point to an existing file.
    *
-   * @throws InvalidPathException if file doesn't exist
+   * @throws InvalidPathException if the file doesn't exist
    */
   public Path getValidFile(String opt, boolean mustExist) throws InvalidPathException {
     Path p = getPath(opt);
@@ -295,7 +299,7 @@ public class CliHelper {
         throw new InvalidPathException("Not a file: '" + p);
       }
     }
-    // parent can be null if path has no dir info (e.g. "foo.txt" vs. "./foo.txt")
+    // parent can be null if the path has no dir info (e.g. "foo.txt" vs. "./foo.txt")
     if (p.getParent() == null) {
       p = p.toAbsolutePath();
     }
@@ -307,6 +311,7 @@ public class CliHelper {
    * Gets remaining parameters.
    */
   public List getArguments() {
+    Preconditions.checkState(m_commandLine != null, "Command line has not been parsed");
     return m_commandLine.getArgList();
   }
 
@@ -315,6 +320,7 @@ public class CliHelper {
    * Gets whether to operate in verbose mode.
    */
   public boolean isVerbose() {
+    Preconditions.checkState(m_commandLine != null, "Command line has not been parsed");
     return m_commandLine.hasOption(sf_verboseFlag);
   }
 

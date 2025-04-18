@@ -11,7 +11,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
 import com.google.common.io.Closeables;
 import org.apache.commons.lang3.StringUtils;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,12 +50,10 @@ public class StaxReader implements Closeable, AutoCloseable {
   @Override
   public void close() {
 
-    if (m_xmlReader != null) {
-      try {
-        m_xmlReader.close();
-      } catch (Exception ex) {
-        sf_logger.warn("Error closing XML reader", ex);
-      }
+    try {
+      m_xmlReader.close();
+    } catch (Exception ex) {
+      sf_logger.warn("Error closing XML reader", ex);
     }
     Closeables.closeQuietly(m_inputStream);
   }
