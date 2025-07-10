@@ -42,7 +42,7 @@ ext {
   url = 'https://github.com/PharmGKB/' + project.ext.baseName + '.git'
   scm = 'scm:git@github.com:PharmGKB/' + project.ext.baseName + '.git'
   orgName = 'PharmGKB'
-  orgUrl = 'https://www.pharmgkb.org'
+  orgUrl = 'https://www.clinpgx.org'
   // grab properties from environment for CI
   sonatypeUser = project.hasProperty('ossrhUsername') ? ossrhUsername : System.getenv('OSSRH_USERNAME')
   sonatypePwd  = project.hasProperty('ossrhPassword') ? ossrhPassword : System.getenv('OSSRH_PASSWORD')

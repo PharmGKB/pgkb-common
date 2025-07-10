@@ -17,22 +17,22 @@ class UrlUtilsTest {
 
   @Test
   void testWebUrls() {
-    assertTrue(UrlUtils.isValidWebUrl("http://www.pharmgkb.org"));
-    assertTrue(UrlUtils.isValidWebUrl("http://www.pharmgkb.org/bar.txt"));
-    assertTrue(UrlUtils.isValidWebUrl("http://www.pharmgkb.org:8080"));
-    assertTrue(UrlUtils.isValidWebUrl("http://www.pharmgkb.org:8080/bar.txt"));
-    assertTrue(UrlUtils.isValidWebUrl("http://hi:there@www.pharmgkb.org/"));
+    assertTrue(UrlUtils.isValidWebUrl("http://www.clinpgx.org"));
+    assertTrue(UrlUtils.isValidWebUrl("http://www.clinpgx.org/bar.txt"));
+    assertTrue(UrlUtils.isValidWebUrl("http://www.clinpgx.org:8080"));
+    assertTrue(UrlUtils.isValidWebUrl("http://www.clinpgx.org:8080/bar.txt"));
+    assertTrue(UrlUtils.isValidWebUrl("http://hi:there@www.clinpgx.org/"));
 
-    assertTrue(UrlUtils.isValidWebUrl("https://www.pharmgkb.org"));
-    assertTrue(UrlUtils.isValidWebUrl("https://www.pharmgkb.org/bar.txt"));
-    assertTrue(UrlUtils.isValidWebUrl("https://www.pharmgkb.org:8080"));
-    assertTrue(UrlUtils.isValidWebUrl("https://www.pharmgkb.org:8080/bar.txt"));
-    assertTrue(UrlUtils.isValidWebUrl("https://hi:there@www.pharmgkb.org/"));
+    assertTrue(UrlUtils.isValidWebUrl("https://www.clinpgx.org"));
+    assertTrue(UrlUtils.isValidWebUrl("https://www.clinpgx.org/bar.txt"));
+    assertTrue(UrlUtils.isValidWebUrl("https://www.clinpgx.org:8080"));
+    assertTrue(UrlUtils.isValidWebUrl("https://www.clinpgx.org:8080/bar.txt"));
+    assertTrue(UrlUtils.isValidWebUrl("https://hi:there@www.clinpgx.org/"));
 
-    assertFalse(UrlUtils.isValidWebUrl("ftp://www.pharmgkb.org"));
-    assertFalse(UrlUtils.isValidWebUrl("ftp://www.pharmgkb.org/bar.txt"));
-    assertFalse(UrlUtils.isValidWebUrl("ftp://hi:there@www.pharmgkb.org:8080"));
-    assertFalse(UrlUtils.isValidWebUrl("ftp://hi:there@www.pharmgkb.org:8080/bar.txt"));
+    assertFalse(UrlUtils.isValidWebUrl("ftp://www.clinpgx.org"));
+    assertFalse(UrlUtils.isValidWebUrl("ftp://www.clinpgx.org/bar.txt"));
+    assertFalse(UrlUtils.isValidWebUrl("ftp://hi:there@www.clinpgx.org:8080"));
+    assertFalse(UrlUtils.isValidWebUrl("ftp://hi:there@www.clinpgx.org:8080/bar.txt"));
 
     assertTrue(UrlUtils.isValidWebUrl("http://171.67.192.16"));
     assertTrue(UrlUtils.isValidWebUrl("http://171.67.192.16:8080"));
@@ -64,22 +64,22 @@ class UrlUtilsTest {
 
   @Test
   void testUrls() {
-    assertTrue(UrlUtils.isValid("http://www.pharmgkb.org"));
-    assertTrue(UrlUtils.isValid("http://www.pharmgkb.org/bar.txt"));
-    assertTrue(UrlUtils.isValid("http://www.pharmgkb.org:8080"));
-    assertTrue(UrlUtils.isValid("http://www.pharmgkb.org:8080/bar.txt"));
-    assertTrue(UrlUtils.isValid("http://hi:there@www.pharmgkb.org/"));
+    assertTrue(UrlUtils.isValid("http://www.clinpgx.org"));
+    assertTrue(UrlUtils.isValid("http://www.clinpgx.org/bar.txt"));
+    assertTrue(UrlUtils.isValid("http://www.clinpgx.org:8080"));
+    assertTrue(UrlUtils.isValid("http://www.clinpgx.org:8080/bar.txt"));
+    assertTrue(UrlUtils.isValid("http://hi:there@www.clinpgx.org/"));
 
-    assertTrue(UrlUtils.isValid("https://www.pharmgkb.org"));
-    assertTrue(UrlUtils.isValid("https://www.pharmgkb.org/bar.txt"));
-    assertTrue(UrlUtils.isValid("https://www.pharmgkb.org:8080"));
-    assertTrue(UrlUtils.isValid("https://www.pharmgkb.org:8080/bar.txt"));
-    assertTrue(UrlUtils.isValid("https://hi:there@www.pharmgkb.org/"));
+    assertTrue(UrlUtils.isValid("https://www.clinpgx.org"));
+    assertTrue(UrlUtils.isValid("https://www.clinpgx.org/bar.txt"));
+    assertTrue(UrlUtils.isValid("https://www.clinpgx.org:8080"));
+    assertTrue(UrlUtils.isValid("https://www.clinpgx.org:8080/bar.txt"));
+    assertTrue(UrlUtils.isValid("https://hi:there@www.clinpgx.org/"));
 
-    assertTrue(UrlUtils.isValid("ftp://www.pharmgkb.org"));
-    assertTrue(UrlUtils.isValid("ftp://www.pharmgkb.org/bar.txt"));
-    assertTrue(UrlUtils.isValid("ftp://hi:there@www.pharmgkb.org:8080"));
-    assertTrue(UrlUtils.isValid("ftp://hi:there@www.pharmgkb.org:8080/bar.txt"));
+    assertTrue(UrlUtils.isValid("ftp://www.clinpgx.org"));
+    assertTrue(UrlUtils.isValid("ftp://www.clinpgx.org/bar.txt"));
+    assertTrue(UrlUtils.isValid("ftp://hi:there@www.clinpgx.org:8080"));
+    assertTrue(UrlUtils.isValid("ftp://hi:there@www.clinpgx.org:8080/bar.txt"));
 
     assertTrue(UrlUtils.isValid("http://171.67.192.16"));
     assertTrue(UrlUtils.isValid("http://171.67.192.16:8080"));
@@ -127,8 +127,8 @@ class UrlUtilsTest {
   @Test
   void testIsReachableUrl() throws Exception {
 
-    assertTrue(UrlUtils.isReachable(new URL("http://www.pharmgkb.org")));
-    assertTrue(UrlUtils.isReachable(new URL("https://www.pharmgkb.org")));
+    assertTrue(UrlUtils.isReachable(new URL("http://www.clinpgx.org")));
+    assertTrue(UrlUtils.isReachable(new URL("https://www.clinpgx.org")));
     assertTrue(UrlUtils.isReachable(new URL("ftp://mirrors.sonic.net/cygwin/")));
     assertTrue(UrlUtils.isReachable(new URL("ftp://anonymous:foo%40bar.com@ftp.swfwmd.state.fl.us/pub/README.txt")));
   }
@@ -137,7 +137,7 @@ class UrlUtilsTest {
   @Test
   void testVerify() {
 
-    assertTrue(UrlUtils.isValid("http://www.pharmgkb.org", true, false, false, true));
-    assertFalse(UrlUtils.isValid("http://www.pharmgkboo.org", true, false, false, true));
+    assertTrue(UrlUtils.isValid("http://www.clinpgx.org", true, false, false, true));
+    assertFalse(UrlUtils.isValid("http://www.clinpgxoops.org", true, false, false, true));
   }
 }
