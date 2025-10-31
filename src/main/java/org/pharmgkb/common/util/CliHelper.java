@@ -153,8 +153,8 @@ public class CliHelper {
   /**
    * Parses arguments.
    *
-   * @return true if parse completed and processing should continue, false if there are missing arguments or help was
-   * requested
+   * @return true if parse completed and processing should continue, false if there are missing arguments or
+   * help or version was requested
    */
   public boolean parse(String[] args) {
 
