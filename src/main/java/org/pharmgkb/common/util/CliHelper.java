@@ -220,6 +220,7 @@ public class CliHelper {
 
   /**
    * Gets the String values for the given option.
+   * @return returns a List of the specified values, empty list if no options specified
    */
   public List<String> getValues(String opt) {
     Preconditions.checkState(m_commandLine != null, "Command line has not been parsed");
