@@ -3,6 +3,7 @@ package org.pharmgkb.common.comparator;
 import java.util.Comparator;
 import java.util.List;
 import com.google.common.collect.ImmutableList;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -35,7 +36,7 @@ public class HaplotypeNameComparator implements Comparator<String> {
 
 
   @Override
-  public int compare(String name1, String name2) {
+  public int compare(@Nullable String name1, @Nullable String name2) {
 
     //noinspection StringEquality
     if (name1 == name2) {
@@ -50,7 +51,7 @@ public class HaplotypeNameComparator implements Comparator<String> {
     if (name1.equals(name2)) {
       return 0;
     }
-    
+
     if (sf_topTerms.contains(name1) || sf_bottomTerms.contains(name2)) {
       return -1;
     }

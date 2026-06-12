@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.ObjectUtils;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -26,7 +27,7 @@ public class ChromosomePositionComparator implements Comparator<String> {
 
 
   @Override
-  public int compare(String o1, String o2) {
+  public int compare(@Nullable String o1, @Nullable String o2) {
 
     //noinspection StringEquality
     if (o1 == o2) {

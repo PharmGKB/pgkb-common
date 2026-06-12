@@ -3,6 +3,7 @@ package org.pharmgkb.common.comparator;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -19,7 +20,22 @@ public class NaturalStringComparator implements Comparator<String> {
   }
 
   @Override
-  public int compare(String o1, String o2) {
+  public int compare(@Nullable String o1, @Nullable String o2) {
+
+    //noinspection StringEquality
+    if (o1 == o2) {
+      return 0;
+    }
+    if (o1 == null) {
+      return -1;
+    }
+    if (o2 == null) {
+      return 1;
+    }
+    if (o1.equals(o2)) {
+      return 0;
+    }
+
     List<Object> parts1 = partsOf(o1);
     List<Object> parts2 = partsOf(o2);
     while (!parts1.isEmpty() && !parts2.isEmpty()) {
