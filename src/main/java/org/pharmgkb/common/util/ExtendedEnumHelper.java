@@ -129,7 +129,6 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
    * @throws IllegalArgumentException if no enum for the given name exists
    */
   public T lookupByNameOrThrow(String name) {
-    @SuppressWarnings("DataFlowIssue")
     T rez = lookupByName(name);
     if (rez == null) {
       throw new IllegalArgumentException("No such " + m_enumClass.getSimpleName() + ": '" + name + "'");

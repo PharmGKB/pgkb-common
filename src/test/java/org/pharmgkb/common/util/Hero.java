@@ -14,8 +14,13 @@ enum Hero implements ExtendedEnum {
   Superman(2, "Clark", "Clark Kent"),
   Batman(3, "Bruce", "Bruce Wayne");
 
-  @SuppressWarnings("NotNullFieldNotInitialized")
-  private static ExtendedEnumHelper<Hero> s_extendedEnumHelper;
+  private static final ExtendedEnumHelper<Hero> s_extendedEnumHelper = new ExtendedEnumHelper<>(Hero.class);
+  static {
+    for (Hero hero : values()) {
+      s_extendedEnumHelper.add(hero, hero.m_id, hero.m_shortName, hero.m_displayName);
+    }
+  }
+
   private final int m_id;
   private final String m_shortName;
   private final String m_displayName;
@@ -24,19 +29,10 @@ enum Hero implements ExtendedEnum {
     m_id = id;
     m_shortName = shortName;
     m_displayName = displayName;
-    init();
   }
 
 
   //-- BEGIN ExtendedEnum methods --//
-  private synchronized void init() {
-    //noinspection ConstantValue
-    if (s_extendedEnumHelper == null) {
-      s_extendedEnumHelper = new ExtendedEnumHelper<>(getClass());
-    }
-    s_extendedEnumHelper.add(this, m_id, m_shortName, m_displayName);
-  }
-
   @Override
   public int getId() {
     return m_id;

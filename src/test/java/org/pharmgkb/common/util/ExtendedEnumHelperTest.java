@@ -1,5 +1,6 @@
 package org.pharmgkb.common.util;
 
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -126,12 +127,12 @@ class ExtendedEnumHelperTest {
     }
 
     @Override
-    public String getShortName() {
+    public @NonNull String getShortName() {
       return "shortName";
     }
 
     @Override
-    public String getDisplayName() {
+    public @NonNull String getDisplayName() {
       return "displayName";
     }
   }
