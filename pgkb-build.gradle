@@ -55,7 +55,7 @@ jar {
 }
 
 tasks.withType(Javadoc) {
-  // disable the crazy super-strict doclint tool in Java 8
+  // disable the crazy super-strict doclint tool
   options.addStringOption('Xdoclint:none', '-quiet')
 }
 
