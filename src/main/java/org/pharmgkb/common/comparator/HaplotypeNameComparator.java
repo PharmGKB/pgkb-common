@@ -12,8 +12,9 @@ import org.jspecify.annotations.Nullable;
  * <p>
  * The rules for how this sorts:
  * <ol>
- *   <li>The terms <code>Any</code>, <code>All</code>, and <code>Reference</code> always get sorted to the beginning</li>
- *   <li>The terms <code>Unknown</code> and <code>Other</code> always get sorted to the end</li>
+ *   <li>The terms <code>Any</code>, <code>All</code>, and <code>Reference</code> (case-insensitive) always get
+ *   sorted to the beginning</li>
+ *   <li>The terms <code>Unknown</code> and <code>Other</code> (case-insensitive) always get sorted to the end</li>
  *   <li>The terms are compared using {@link NaturalStringComparator} which will tokenize and compare numerically when appropriate</li>
  *   <li>Otherwise just do regular String sorting</li>
  * </ol>
@@ -52,13 +53,26 @@ public class HaplotypeNameComparator implements Comparator<String> {
       return 0;
     }
 
-    if (sf_topTerms.contains(name1) || sf_bottomTerms.contains(name2)) {
-      return -1;
+    boolean top1 = containsIgnoreCase(sf_topTerms, name1);
+    boolean top2 = containsIgnoreCase(sf_topTerms, name2);
+    if (top1 != top2) {
+      return top1 ? -1 : 1;
     }
-    if (sf_topTerms.contains(name2) || sf_bottomTerms.contains(name1)) {
-      return 1;
+    boolean bottom1 = containsIgnoreCase(sf_bottomTerms, name1);
+    boolean bottom2 = containsIgnoreCase(sf_bottomTerms, name2);
+    if (bottom1 != bottom2) {
+      return bottom1 ? 1 : -1;
     }
 
     return NaturalStringComparator.getComparator().compare(name1, name2);
+  }
+
+  private static boolean containsIgnoreCase(List<String> terms, String name) {
+    for (String term : terms) {
+      if (term.equalsIgnoreCase(name)) {
+        return true;
+      }
+    }
+    return false;
   }
 }

@@ -7,7 +7,11 @@ import org.jspecify.annotations.Nullable;
 
 
 /**
- * Comparator for chromosome names.  This expects the chromosome name to either be numeric or start with "chr".
+ * Comparator for chromosome names.  This expects the chromosome name to either be numeric or start with "chr"
+ * (case-insensitive).
+ * <p>
+ * Numeric names sort first (numerically), followed by X and Y, followed by the mitochondrial chromosome
+ * ("MT" or "M", case-insensitive). Any other non-numeric name is sorted lexicographically alongside X/Y.
  *
  * @author Mark Woon
  */
@@ -37,19 +41,26 @@ public class ChromosomeNameComparator implements Comparator<String> {
       return 1;
     }
 
-    if (name1.startsWith("chr")) {
+    String origName1 = name1;
+    String origName2 = name2;
+    if (name1.regionMatches(true, 0, "chr", 0, 3)) {
       name1 = name1.substring(3);
     }
     boolean isName1Numeric = StringUtils.isNumeric(name1);
-    if (name2.startsWith("chr")) {
+    if (name2.regionMatches(true, 0, "chr", 0, 3)) {
       name2 = name2.substring(3);
     }
     boolean isName2Numeric = StringUtils.isNumeric(name2);
 
-    // assume non-numeric is either X or Y
+    // assume non-numeric is X, Y or the mitochondrial chromosome (MT/M), which sorts after X/Y
     if (isName1Numeric) {
       if (isName2Numeric) {
-        return ObjectUtils.compare(Integer.parseInt(name1), Integer.parseInt(name2));
+        int cmp = ObjectUtils.compare(parseChromosomeNumber(origName1, name1), parseChromosomeNumber(origName2, name2));
+        if (cmp == 0) {
+          // tie-break on raw digits so e.g. "01" doesn't compare equal to "1"
+          cmp = name1.compareTo(name2);
+        }
+        return cmp;
       } else {
         return -1;
       }
@@ -57,8 +68,41 @@ public class ChromosomeNameComparator implements Comparator<String> {
       if (isName2Numeric) {
         return 1;
       } else {
-        return ObjectUtils.compare(name1, name2);
+        boolean isName1Mito = isMitochondrial(name1);
+        boolean isName2Mito = isMitochondrial(name2);
+        if (isName1Mito != isName2Mito) {
+          return isName1Mito ? 1 : -1;
+        }
+        int cmp = name1.compareToIgnoreCase(name2);
+        if (cmp == 0 && !isName1Mito && !isCanonicalSingleLetter(name1)) {
+          // case-insensitively equal but not equals()-equal, and not one of the canonical X/Y/M/MT names
+          // (which are meant to compare as literally the same chromosome regardless of case, per
+          // testCasePrefixInsensitive) - tie-break on raw case-sensitive comparison so distinct-case
+          // scaffold/contig names (e.g. "chrUn_GL000195v1" vs "chrUn_gl000195v1") don't collapse into the
+          // same slot, e.g. in a TreeSet (same footgun the numeric leading-zero tie-break above guards
+          // against). A tie under compareToIgnoreCase implies identical letters up to case, so if either
+          // name is canonical (X/Y/mito), so is the other - no need to check both.
+          cmp = name1.compareTo(name2);
+        }
+        return cmp;
       }
+    }
+  }
+
+  private static boolean isMitochondrial(String name) {
+    return name.equalsIgnoreCase("MT") || name.equalsIgnoreCase("M");
+  }
+
+  private static boolean isCanonicalSingleLetter(String name) {
+    return name.equalsIgnoreCase("X") || name.equalsIgnoreCase("Y");
+  }
+
+  private static long parseChromosomeNumber(String original, String number) {
+    try {
+      return Long.parseLong(number);
+    } catch (NumberFormatException ex) {
+      throw new IllegalArgumentException(
+          "Chromosome number in '" + original + "' is too large to compare (max " + Long.MAX_VALUE + ")", ex);
     }
   }
 }

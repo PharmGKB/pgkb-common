@@ -10,7 +10,25 @@ import com.google.common.base.Preconditions;
  * @author Mark Woon
  */
 public abstract class AbstractComparator<T> implements Comparator<T>{
-  private SortOrder m_order = SortOrder.NATURAL;
+  private final SortOrder m_order;
+
+
+  /**
+   * Default constructor, sorts in natural order.
+   */
+  protected AbstractComparator() {
+    this(SortOrder.NATURAL);
+  }
+
+  /**
+   * Instantiates a comparator that sorts with the specified order.
+   *
+   * @param order the order in which results should be returned
+   */
+  protected AbstractComparator(SortOrder order) {
+    Preconditions.checkNotNull(order);
+    m_order = order;
+  }
 
 
   /**
@@ -20,16 +38,6 @@ public abstract class AbstractComparator<T> implements Comparator<T>{
    */
   public final SortOrder getOrder() {
     return m_order;
-  }
-
-  /**
-   * Sets the order in which results should be returned.
-
-   * @param order the order in which results should be returned
-   */
-  protected final void setOrder(SortOrder order) {
-    Preconditions.checkNotNull(order);
-    m_order = order;
   }
 
 

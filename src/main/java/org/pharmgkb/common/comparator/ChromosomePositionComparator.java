@@ -13,8 +13,8 @@ import org.jspecify.annotations.Nullable;
  * @author Mark Woon
  */
 public class ChromosomePositionComparator implements Comparator<String> {
-  public static final Comparator<String> sf_comparator = new ChromosomePositionComparator();
-  private static final Pattern sf_pattern = Pattern.compile("(?:chr)?(\\w{1,2}):(\\d+)");
+  private static final Comparator<String> sf_comparator = new ChromosomePositionComparator();
+  private static final Pattern sf_pattern = Pattern.compile("(?:chr)?(\\w+):(\\d+)", Pattern.CASE_INSENSITIVE);
 
   /**
    * Gets an instance of this comparator.
@@ -48,12 +48,34 @@ public class ChromosomePositionComparator implements Comparator<String> {
       throw new IllegalArgumentException("'" + o2 + "' is not in the expected chromosomal position format");
     }
 
-    int rez = ChromosomeNameComparator.getComparator().compare(m1.group(1), m2.group(1));
+    int rez;
+    try {
+      rez = ChromosomeNameComparator.getComparator().compare(m1.group(1), m2.group(1));
+    } catch (IllegalArgumentException ex) {
+      // ChromosomeNameComparator only sees the chr-stripped number, not the full "chr:position" string, so
+      // its own message can't name which input caused the failure - rethrow with both full positions attached
+      throw new IllegalArgumentException(
+          "Error comparing chromosome positions '" + o1 + "' and '" + o2 + "': " + ex.getMessage(), ex);
+    }
     if (rez != 0) {
       return rez;
     }
-    Integer n1 = Integer.parseInt(m1.group(2));
-    Integer n2 = Integer.valueOf(m2.group(2));
-    return ObjectUtils.compare(n1, n2);
+    Long n1 = parsePosition(o1, m1.group(2));
+    Long n2 = parsePosition(o2, m2.group(2));
+    rez = ObjectUtils.compare(n1, n2);
+    if (rez == 0) {
+      // tie-break on raw digits so e.g. "01" doesn't compare equal to "1"
+      rez = m1.group(2).compareTo(m2.group(2));
+    }
+    return rez;
+  }
+
+  private static long parsePosition(String original, String position) {
+    try {
+      return Long.parseLong(position);
+    } catch (NumberFormatException ex) {
+      throw new IllegalArgumentException(
+          "Position in '" + original + "' is too large to compare (max " + Long.MAX_VALUE + ")", ex);
+    }
   }
 }

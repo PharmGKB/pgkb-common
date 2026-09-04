@@ -42,8 +42,14 @@ public class NaturalStringComparator implements Comparator<String> {
       Object part1 = parts1.remove(0);
       Object part2 = parts2.remove(0);
       int cmp;
-      if (part1 instanceof Integer && part2 instanceof Integer) {
-        cmp = Integer.compare((Integer)part1, (Integer)part2);
+      if (part1 instanceof NumericPart && part2 instanceof NumericPart) {
+        NumericPart num1 = (NumericPart)part1;
+        NumericPart num2 = (NumericPart)part2;
+        cmp = Long.compare(num1.value(), num2.value());
+        if (cmp == 0) {
+          // tie-break on raw digits so e.g. "*01" doesn't compare equal to "*1"
+          cmp = num1.raw().compareTo(num2.raw());
+        }
       } else if (part1 instanceof String && part2 instanceof String) {
         cmp = ((String) part1).compareTo((String) part2);
       } else {
@@ -69,7 +75,16 @@ public class NaturalStringComparator implements Comparator<String> {
           || Character.isDigit(s.charAt(pos)) != wasDigit) {
         if (pos > pos0) {
           String part = s.substring(pos0, pos);
-          parts.add(wasDigit? Integer.valueOf(part) : part);
+          if (wasDigit) {
+            try {
+              parts.add(new NumericPart(Long.parseLong(part), part));
+            } catch (NumberFormatException ex) {
+              throw new IllegalArgumentException(
+                  "Numeric portion of '" + s + "' is too large to compare (max " + Long.MAX_VALUE + ")", ex);
+            }
+          } else {
+            parts.add(part);
+          }
           pos0 = pos;
         }
         if (pos >= s.length()) {
@@ -80,5 +95,12 @@ public class NaturalStringComparator implements Comparator<String> {
       ++pos;
     }
     return parts;
+  }
+
+  /**
+   * Holder for a parsed numeric substring, retaining both the parsed value (for numeric ordering) and the raw
+   * digit substring (as a tie-break when the parsed values are equal, e.g. "01" vs. "1").
+   */
+  private record NumericPart(long value, String raw) {
   }
 };
