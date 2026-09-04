@@ -14,12 +14,7 @@ enum Hero implements ExtendedEnum {
   Superman(2, "Clark", "Clark Kent"),
   Batman(3, "Bruce", "Bruce Wayne");
 
-  private static final ExtendedEnumHelper<Hero> s_extendedEnumHelper = new ExtendedEnumHelper<>(Hero.class);
-  static {
-    for (Hero hero : values()) {
-      s_extendedEnumHelper.add(hero, hero.m_id, hero.m_shortName, hero.m_displayName);
-    }
-  }
+  private static final ExtendedEnumHelper<Hero> s_extendedEnumHelper = ExtendedEnumHelper.register(Hero.class);
 
   private final int m_id;
   private final String m_shortName;
