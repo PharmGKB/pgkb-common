@@ -3,7 +3,7 @@ name: Build & Tests
 on:
   push:
     branches:
-      - "*"
+      - "**"
     paths-ignore:
       - "**.md"
   pull_request:
@@ -23,11 +23,15 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: 17
+          java-version: 21
           cache: gradle
 
       - name: Build and test
-        run: ./gradlew test
+        # javadoc (not just test) so a doclint break is caught here, not mid-publish in release.yml - not
+        # `./gradlew build`, which also pulls in the sign* tasks; those fall back to reading a local
+        # ~/.gnupg/secring.gpg when no signing key is configured (which it isn't in this workflow), so they'd
+        # fail this job on every push
+        run: ./gradlew test javadoc
 
       - name: Codecov
         uses: codecov/codecov-action@v5

@@ -26,11 +26,14 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: 17
+          java-version: 21
           cache: gradle
 
       - name: Build and test
-        run: ./gradlew test
+        # javadoc (not just test) so a doclint break fails here, before the publish step below - not
+        # `./gradlew build`, which also pulls in the sign* tasks; SIGNING_KEY/SIGNING_PASSWORD aren't set for
+        # this step (only for "Publish to Maven Central" below), so they'd fail this job before publishing
+        run: ./gradlew test javadoc
 
       - name: Publish to Maven Central
         run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
