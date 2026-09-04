@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -19,8 +20,8 @@ public class ZippedFileInputStream extends InputStream {
 
 
   public ZippedFileInputStream(Path zipFile) throws IOException {
-    String zipFilename = zipFile.getName(zipFile.getNameCount() - 1).toString();
-    if (!zipFilename.toLowerCase().endsWith(".zip")) {
+    String zipFilename = PathUtils.getFilename(zipFile);
+    if (!zipFilename.toLowerCase(Locale.ROOT).endsWith(".zip")) {
       throw new IllegalArgumentException("File does not end with .zip");
     }
 
@@ -30,8 +31,8 @@ public class ZippedFileInputStream extends InputStream {
 
 
   public ZippedFileInputStream(Path zipFile, String filename) throws IOException {
-    String zipFilename = zipFile.getName(zipFile.getNameCount() - 1).toString();
-    if (!zipFilename.toLowerCase().endsWith(".zip")) {
+    String zipFilename = PathUtils.getFilename(zipFile);
+    if (!zipFilename.toLowerCase(Locale.ROOT).endsWith(".zip")) {
       throw new IllegalArgumentException("File does not end with .zip");
     }
 
@@ -53,16 +54,35 @@ public class ZippedFileInputStream extends InputStream {
     } else {
       m_zipInputStream = new ZipInputStream(in);
     }
-    boolean foundFile = false;
-    ZipEntry entry;
-    while((entry = m_zipInputStream.getNextEntry()) != null) {
-      if (entry.getName().equals(filename)) {
-        foundFile = true;
-        break;
+    try {
+      boolean foundFile = false;
+      ZipEntry entry;
+      while ((entry = m_zipInputStream.getNextEntry()) != null) {
+        if (entry.getName().equals(filename)) {
+          foundFile = true;
+          break;
+        }
       }
-    }
-    if (!foundFile) {
-      throw new FileNotFoundException("Cannot find " + filename + " in zipped file");
+      if (!foundFile) {
+        throw new FileNotFoundException("Cannot find " + filename + " in zipped file");
+      }
+    } catch (Exception ex) {
+      // ZipInputStream.getNextEntry() can throw an unchecked IllegalArgumentException (not just the checked
+      // IOException/FileNotFoundException above) for an entry name that's invalid UTF-8 with the UTF-8 (EFS)
+      // flag set - that must still close the underlying stream, or it leaks
+      try {
+        m_zipInputStream.close();
+      } catch (IOException closeEx) {
+        ex.addSuppressed(closeEx);
+      }
+      if (ex instanceof IOException ioEx) {
+        throw ioEx;
+      }
+      if (ex instanceof RuntimeException runtimeEx) {
+        throw runtimeEx;
+      }
+      // unreachable: the try block above only throws IOException (and subtypes) or RuntimeException
+      throw new IllegalStateException(ex);
     }
   }
 

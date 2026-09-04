@@ -22,6 +22,12 @@ class StringsTest {
     assertEquals(3, Strings.stripToEmpty(text).length());
   }
 
+  @Test
+  void testStripToEmptyPreservesInternalNbspAsSpace() {
+    // an nbsp between words is a word separator, not something to delete outright
+    assertEquals("New York", Strings.stripToEmpty("New York"));
+  }
+
 
   @Test
   void testStripToNull() {

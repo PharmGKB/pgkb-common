@@ -88,7 +88,6 @@ dependencies {
   implementation group: 'com.google.guava', name: 'guava', version: '33.7.1-jre'
   implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.20.0'
   implementation group: 'org.apache.commons', name: 'commons-text', version: '1.15.0'
-  implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.14'
   implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.18'
 
   // JUnit 6 unifies Platform/Jupiter/Vintage under one version number - junit-platform-launcher must match
