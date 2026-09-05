@@ -66,6 +66,34 @@ class TimeUtilsTest {
 
 
   @Test
+  void testParseDateWithExplicitZone() {
+    // explicitly passing the system default zone must match the no-zone overload exactly
+    assertEquals(new Date(1558249200000L), TimeUtils.parseToDate("5/19/19", ZoneId.systemDefault()));
+    // America/New_York is 3 hours ahead of America/Los_Angeles (both observe US DST on the same dates, so
+    // the offset is constant year-round) - midnight in New York is therefore 3 hours earlier, in UTC terms,
+    // than midnight in Los Angeles on the same calendar date
+    assertEquals(new Date(1558238400000L), TimeUtils.parseToDate("5/19/19", ZoneId.of("America/New_York")));
+  }
+
+  @Test
+  void testParseDateWithExplicitZoneCoversLongFormat() {
+    // sf_shortDateParser isn't the only formatter built with its own attached .withZone(...) -
+    // sf_longDateFormatter is too, and testParseDateWithExplicitZone() above only exercises the short format,
+    // so cover the long format's zone handling here too
+    assertEquals(new Date(1558238400000L), TimeUtils.parseToDate("May 19, 2019", ZoneId.of("America/New_York")));
+  }
+
+  @Test
+  void testParseDateWithExplicitZoneRejectsNullZone() {
+    // must throw NullPointerException regardless of whether "time" itself is parseable - without an
+    // upfront null check, a valid date string reaches the null zone (NPE from atStartOfDay) but an invalid
+    // one never gets that far, throwing DateTimeParseException instead - an inconsistent contract depending
+    // on an unrelated argument
+    assertThrows(NullPointerException.class, () -> TimeUtils.parseToDate("not a date", null));
+  }
+
+
+  @Test
   void testParseToDateAttachesEarlierFormatFailuresAsSuppressed() {
     // the short/medium format parse attempts' failures must not be silently discarded before the long
     // format's own failure escapes alone - they're attached as suppressed exceptions on the one that's
@@ -169,6 +197,9 @@ class TimeUtilsTest {
 
     Duration duration = Duration.ofMillis(39);
     assertEquals("39 ms", TimeUtils.humanReadablePreciseDuration(duration));
+    // humanReadableDuration's own sub-second early return (not just humanReadablePreciseDuration's) - the two
+    // are documented to produce identical output below a minute, but weren't both exercised at this length
+    assertEquals("39 ms", TimeUtils.humanReadableDuration(duration));
 
     duration = duration.plusSeconds(1);
     assertEquals("1 second", TimeUtils.humanReadableDuration(duration));

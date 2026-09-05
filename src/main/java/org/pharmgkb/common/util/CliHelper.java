@@ -103,7 +103,9 @@ public class CliHelper {
     // so -h/-version can always be detected even if another, incomplete option is present. But if the real
     // option accepts an argument, the clone must accept the same shape of argument too (as optional), or
     // Commons CLI's lenient first pass rejects "--opt=value"/"-o=value"/"-Dkey=value" syntax as an
-    // unrecognized option entirely (numberOfArgs and valueSeparator both matter here, not just hasArg).
+    // unrecognized option entirely (numberOfArgs is what's load-bearing here, not just hasArg - mirroring
+    // valueSeparator too is harmless but not actually required, since this clone's parsed values are never
+    // read, only whether parsing succeeds).
     Option.Builder helpOptBuilder = Option.builder(option.getOpt())
         .longOpt(option.getLongOpt())
         .desc(option.getDescription());

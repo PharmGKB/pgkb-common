@@ -84,6 +84,20 @@ public class TimeUtils {
    * no real caller of this class works with a date before 1000 AD.
    */
   public static Date parseToDate(String time) throws DateTimeParseException {
+    return parseToDate(time, ZoneId.systemDefault());
+  }
+
+  /**
+   * Parses "M/d/yy", "M/d/yyyy" or "MMMM d, yyyy" formatted strings into a {@link Date}, treating the parsed
+   * date as midnight in {@code zone} (rather than the JVM's default zone) when converting it to an instant.
+   * <p>
+   * See {@link #parseToDate(String)} for the pre-1000-AD round-trip caveat, which applies here too.
+   */
+  public static Date parseToDate(String time, ZoneId zone) throws DateTimeParseException {
+    // validate up front so this always throws NullPointerException for a null zone, regardless of whether
+    // "time" itself happens to be parseable - otherwise an invalid "time" would throw DateTimeParseException
+    // instead, before ever reaching the zone
+    Preconditions.checkNotNull(zone, "zone cannot be null");
     TemporalAccessor temporalAccessor;
     try {
       temporalAccessor = sf_shortDateParser.parse(time);
@@ -102,7 +116,7 @@ public class TimeUtils {
       }
     }
     LocalDate ld = LocalDate.from(temporalAccessor);
-    return Date.from(ld.atStartOfDay(ZoneId.systemDefault()).toInstant());
+    return Date.from(ld.atStartOfDay(zone).toInstant());
   }
 
 
