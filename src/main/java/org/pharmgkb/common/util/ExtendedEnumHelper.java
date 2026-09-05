@@ -180,9 +180,16 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
    * {@link Class#getEnumConstants()} above triggering {@code clz}'s own static initialization on this call's
    * first touch of it - if {@code clz} follows this method's own intended usage (its static field initializer
    * calling {@code register(clz)} itself), that reentrant inner call can win {@code sf_enumMap}'s slot in the
-   * middle of THIS call's own loop. This is still a plain check-then-act, not atomic, so it does NOT protect
-   * against two separate THREADS calling {@code register(clz)} for the same class concurrently from outside
-   * the intended single-static-field-initializer pattern.
+   * middle of THIS call's own loop. The trailing check is atomic (a single {@code ConcurrentHashMap.putIfAbsent}),
+   * so even two separate THREADS calling {@code register(clz)} for the same class concurrently can still only
+   * ever have one of them win and return normally - but WHICH one wins isn't controlled, and that matters: if
+   * an external caller's {@code register(clz)} wins the race against {@code clz}'s own static-initializer
+   * {@code register(clz)} call (the intended, single-static-field-initializer usage), that static initializer
+   * itself throws this exception, which the JLS wraps in {@link ExceptionInInitializerError} and then
+   * permanently marks {@code clz} as erroneous ({@link NoClassDefFoundError} on every future reference) - a
+   * much worse outcome than the reverse ordering, where only the external caller's own call fails and
+   * {@code clz} remains fully usable. Callers going through anything other than the intended usage should not
+   * assume they'll be the "safe" side of that race.
    */
   public static <T extends Enum<T> & ExtendedEnum> ExtendedEnumHelper<T> register(Class<T> clz) {
     Preconditions.checkNotNull(clz, "clz is null");

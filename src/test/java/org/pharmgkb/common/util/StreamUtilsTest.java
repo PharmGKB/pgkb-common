@@ -2,12 +2,17 @@ package org.pharmgkb.common.util;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
 import java.io.UncheckedIOException;
 import java.net.InetSocketAddress;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.net.ServerSocket;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -2904,19 +2909,122 @@ class StreamUtilsTest {
   }
 
   @Test
-  void testUnrelatedCallDoesNotMutateHttpClientGlobalState() {
-    // buildHttpClient()'s two JVM-global side effects (the redirect-retrylimit system property, the
-    // CookieManager JUL logger's level) must only apply when something actually builds an HttpClient
-    // (copyUrlToFile()), not merely from loading this class - calling an unrelated pure function like
-    // md5InBase64() must not touch either. Asserted as "unchanged before vs. after" (not an absolute value)
-    // so this doesn't depend on whether some OTHER test in this suite already triggered copyUrlToFile()
-    // first, sharing this JVM.
-    String propertyBefore = System.getProperty("jdk.httpclient.redirects.retrylimit");
+  void testUnrelatedCallDoesNotMutateLoggerLevel() {
+    // the CookieManager JUL logger's suppression is applied lazily, only inside buildHttpClient() (the
+    // redirect-retrylimit property, unlike this, is now set eagerly as soon as this class loads at all -
+    // see testRedirectRetryLimitIsSetAsSoonAsClassLoadsInAFreshJvm below, which is why that property isn't
+    // asserted here too) - calling an unrelated pure function like md5InBase64() must not touch the logger.
+    // Asserted as "unchanged before vs. after" so this doesn't depend on whether some OTHER test in this
+    // suite already triggered copyUrlToFile() first, sharing this JVM.
     Level levelBefore = Logger.getLogger("java.net.CookieManager").getLevel();
 
     StreamUtils.md5InBase64(new byte[]{1, 2, 3});
 
-    assertEquals(propertyBefore, System.getProperty("jdk.httpclient.redirects.retrylimit"));
     assertEquals(levelBefore, Logger.getLogger("java.net.CookieManager").getLevel());
+  }
+
+  @Test
+  void testRedirectRetryLimitIsSetAsSoonAsClassLoadsInAFreshJvm() throws IOException, InterruptedException {
+    // jdk.httpclient.redirects.retrylimit is JVM-global and read once, by the FIRST HttpClient anywhere in
+    // the JVM to follow a redirect - so raising it only helps if it's set before that happens, regardless of
+    // whether it's this library's own HttpClient or some unrelated one elsewhere in the same JVM. This can
+    // only be proven in a genuinely fresh JVM that has never built an HttpClient at all: every other test in
+    // THIS suite has already called copyUrlToFile()/buildHttpClient() by the time any later test runs,
+    // making the property already "50" regardless of whether it's set eagerly (at class load) or lazily (at
+    // first buildHttpClient() call) - that distinction is exactly what a forked subprocess can isolate.
+    String javaBin = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
+    Process process = new ProcessBuilder(javaBin, "-cp", System.getProperty("java.class.path"),
+        RetryLimitProbe.class.getName())
+        .start();
+    // stdout/stderr are read separately (NOT redirectErrorStream(true) merged into one stream) - a JVM
+    // env var like JAVA_TOOL_OPTIONS/JDK_JAVA_OPTIONS/_JAVA_OPTIONS set on the Gradle/test JVM is inherited
+    // by this forked child too, and the JDK prints a "Picked up ..." banner for those to STDERR; merging
+    // that into stdout would corrupt this test's exact-match assertion below on any machine/CI that happens
+    // to have one of those set, even though it has nothing to do with what this test actually checks
+    String stdout = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8).trim();
+    String stderr = new String(process.getErrorStream().readAllBytes(), StandardCharsets.UTF_8).trim();
+    int exitCode = process.waitFor();
+    assertEquals(0, exitCode, "stdout=[" + stdout + "] stderr=[" + stderr + "]");
+    assertEquals("50", stdout);
+  }
+
+  /**
+   * Loads {@link StreamUtils} via {@link Class#forName} only - deliberately never calls
+   * {@code copyUrlToFile()}/{@code buildHttpClient()} - then prints the property
+   * {@code testRedirectRetryLimitIsSetAsSoonAsClassLoadsInAFreshJvm} above checks in a fresh JVM.
+   */
+  public static class RetryLimitProbe {
+    public static void main(String[] args) throws ClassNotFoundException {
+      Class.forName("org.pharmgkb.common.util.StreamUtils");
+      System.out.println(System.getProperty("jdk.httpclient.redirects.retrylimit"));
+    }
+  }
+
+  @Test
+  void testEagerFixCannotRetroactivelyHelpAgainstAnEarlierUnrelatedRedirect() throws IOException, InterruptedException {
+    // the eager static initializer above only narrows the race against other HttpClient usage in the same
+    // JVM - it does NOT close it. This locks in that documented limitation as an actual assertion, not just
+    // prose: if a host application's own, completely unrelated HttpClient follows a redirect before ever
+    // touching StreamUtils at all, the JDK's one-time internal read of the retrylimit property already
+    // happened with the un-raised default by the time StreamUtils later loads and sets it - and that's
+    // permanently too late for the rest of the JVM, even for a brand-new HttpClient built afterward. Needs a
+    // genuinely fresh JVM to prove, same reason as the test above.
+    String javaBin = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
+    Process process = new ProcessBuilder(javaBin, "-cp", System.getProperty("java.class.path"),
+        RetroactiveFixProbe.class.getName())
+        .start();
+    String stdout = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8).trim();
+    String stderr = new String(process.getErrorStream().readAllBytes(), StandardCharsets.UTF_8).trim();
+    int exitCode = process.waitFor();
+    assertEquals(0, exitCode, "stdout=[" + stdout + "] stderr=[" + stderr + "]");
+    assertEquals("still-capped", stdout);
+  }
+
+  /**
+   * Starts a local {@link HttpServer} with a 10-hop redirect chain, follows it with a plain
+   * {@link HttpClient} BEFORE ever referencing {@link StreamUtils} (simulating a host application's own,
+   * unrelated HTTP usage), then loads {@link StreamUtils} (too late for the JDK's already-consumed internal
+   * read) and follows the same chain again with a brand-new {@link HttpClient}, reporting whether that
+   * second attempt is still capped at the JDK's un-raised default.
+   */
+  public static class RetroactiveFixProbe {
+    public static void main(String[] args) throws Exception {
+      HttpServer server = HttpServer.create(new InetSocketAddress(0), 0);
+      int hopCount = 10;
+      for (int i = 0; i < hopCount; i++) {
+        int next = i;
+        server.createContext("/hop" + i, ex -> {
+          ex.getResponseHeaders().add("Location", "/hop" + (next + 1));
+          ex.sendResponseHeaders(302, -1);
+          ex.close();
+        });
+      }
+      server.createContext("/hop" + hopCount, ex -> {
+        byte[] body = "done".getBytes(StandardCharsets.UTF_8);
+        ex.sendResponseHeaders(200, body.length);
+        ex.getResponseBody().write(body);
+        ex.close();
+      });
+      server.start();
+      try {
+        URI uri = URI.create("http://localhost:" + server.getAddress().getPort() + "/hop0");
+        HttpRequest request = HttpRequest.newBuilder(uri).timeout(Duration.ofSeconds(5)).build();
+
+        // app's own HttpClient usage, before StreamUtils is ever referenced - property is unset
+        HttpClient appClient = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.ALWAYS).build();
+        appClient.send(request, HttpResponse.BodyHandlers.discarding());
+
+        // too late: StreamUtils's static initializer runs now, but the JDK already consumed its one-time
+        // read above
+        Class.forName("org.pharmgkb.common.util.StreamUtils");
+
+        // a brand-new client, built after StreamUtils loaded and (attempted to) raise the property
+        HttpClient newClient = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.ALWAYS).build();
+        HttpResponse<Void> response = newClient.send(request, HttpResponse.BodyHandlers.discarding());
+        System.out.println(response.statusCode() == 200 ? "not-capped" : "still-capped");
+      } finally {
+        server.stop(0);
+      }
+    }
   }
 }

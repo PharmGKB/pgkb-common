@@ -52,6 +52,20 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * This class contains useful stream convenience functions.
+ * <p>
+ * Merely referencing this class at all (any static method, not just {@link #copyUrlToFile(String, Path)})
+ * attempts one permanent, JVM-wide side effect: it raises {@code jdk.httpclient.redirects.retrylimit} to 50
+ * for every {@link java.net.http.HttpClient} in the whole process - including ones this library has nothing
+ * to do with - unless that property was already set via {@code -D}/{@link System#setProperty}. This is a
+ * best-effort mitigation, not a guarantee: the JDK reads this property exactly once, on the first redirect
+ * ANY {@code HttpClient} anywhere in the JVM follows, and setting it afterward - even from a brand-new
+ * client built after this class has loaded - is a no-op for the rest of the JVM's life. If a host
+ * application follows its own redirect (via its own, unrelated {@code HttpClient} usage) before ever
+ * referencing this library at all, this side effect cannot retroactively fix that. (A JDK "net property"
+ * like this one can also be defaulted via {@code $JAVA_HOME/conf/net.properties}, but that channel is
+ * invisible to this check and gets overridden regardless - see the class's own static initializer for why
+ * that gap can't be closed.) See that same static initializer for the full rationale for why this can't be
+ * scoped any narrower than class-load time.
  *
  * @author Mark Woon
  */
@@ -67,6 +81,44 @@ public class StreamUtils {
   // reverts under enough GC pressure (reproduced by running the full test suite, where it's flaky, vs. a
   // single class in isolation, where the Logger survives long enough to look reliable)
   private static final Logger sf_cookieManagerLogger = Logger.getLogger("java.net.CookieManager");
+
+  // java.net.http.HttpClient has no per-client (let alone per-request) knob for its redirect-hop limit -
+  // it's read once, JVM-wide, from this system property, by the FIRST HttpClient anywhere in the JVM (not
+  // just this library's own) to follow a redirect. That makes "set it right before building OUR client"
+  // (the previous, lazy placement, inside buildHttpClient()) unreliable: it only works if THIS library's own
+  // HttpClient happens to be the first one to follow a redirect anywhere in the process - any unrelated
+  // earlier HttpClient usage elsewhere in the same JVM (an application's own auth client, for instance) reads
+  // the JDK's un-raised default first and permanently locks it in for the rest of the JVM's life, with no way
+  // for this library to detect or recover from that after the fact. So this is set here instead - eagerly,
+  // as soon as this class loads at all, not lazily inside buildHttpClient() - which narrows that race window
+  // (this class tends to load well before copyUrlToFile() is actually invoked) but does NOT close it: the
+  // property is read exactly once, by the first redirect ANY HttpClient anywhere follows, and setting it
+  // AFTER that read - even from a brand-new HttpClient instance built after this static initializer runs -
+  // is a proven no-op for the rest of the JVM's life (verified directly: build a client, have it follow a
+  // redirect with the property unset, THEN set the property, THEN build and use a second, brand-new client -
+  // the second client is still capped at the JDK's original default). So if a host application makes its own
+  // unrelated HttpClient call that follows a redirect before ever referencing this library at all, this
+  // static initializer running afterward cannot retroactively fix that - deliberately accepting this as the
+  // best available mitigation, not a guarantee, given a library has no way to run before arbitrary
+  // unrelated code in the same JVM. The JDK's own default (jdk.httpclient.redirects.retrylimit=5) is
+  // effectively 4 FOLLOWED hops (one of the 5 attempts is the initial, non-redirect request) - far short of
+  // main's Apache HttpClient RequestConfig default of 50, and exceeding it doesn't throw a clear "too many
+  // redirects" error like main did: HttpClient just returns the last (redirect) response as-is, which
+  // copyUrlToFile() below reports as a plain "Error downloading <url>: 302" - indistinguishable from a
+  // genuinely terminal redirect. Only set if not already configured via the -D/System.setProperty channel -
+  // a deployer who explicitly set THAT must not have their choice silently overwritten. This does NOT cover
+  // every channel, though: jdk.httpclient.* is a JDK "net property" (sun.net.NetProperties), which ALSO reads
+  // $JAVA_HOME/conf/net.properties as a fallback default BELOW the -D system property in precedence but is
+  // otherwise invisible to System.getProperty(...) - a deployer using that file instead is still silently
+  // overwritten by the setProperty(...) call below, since setting a System property always outranks the
+  // properties-file default regardless of which one "got there first". No accessible fix exists
+  // (sun.net.NetProperties isn't exported, and hand-parsing conf/net.properties would be fragile and
+  // layout-dependent) - documented as a known, narrow limitation rather than fixed.
+  static {
+    if (System.getProperty("jdk.httpclient.redirects.retrylimit") == null) {
+      System.setProperty("jdk.httpclient.redirects.retrylimit", "50");
+    }
+  }
 
 
   /**
@@ -412,47 +464,25 @@ public class StreamUtils {
    * downside - no connection-pool reuse across separate {@code copyUrlToFile} calls - is immaterial for
    * this library's real usage (infrequent, one-off large-file downloads, not high-volume repeated calls).
    * <p>
-   * Also applies two JVM-global side effects (a system property, a JDK logger level) needed by the
-   * {@link HttpClient} this builds - done here, not in a static initializer, so calling an unrelated method
-   * elsewhere in this class (e.g. {@link #md5InBase64(byte[])}) can't silently trigger them just by loading
-   * this class. Both guards are idempotent, so repeating them on every call (rather than only the first) is
-   * harmless - see each one's own comment below for what it does and why.
+   * Also applies a JVM-global side effect (a JDK logger level) needed by the {@link HttpClient} this builds -
+   * done here, not in a static initializer, so calling an unrelated method elsewhere in this class (e.g.
+   * {@link #md5InBase64(byte[])}) can't silently trigger it just by loading this class. (The redirect-
+   * retrylimit system property is a separate, class-load-time side effect - see the static initializer near
+   * the top of this class for why THAT one can't wait until here.) This guard is idempotent, so repeating it
+   * on every call (rather than only the first) is harmless - see its own comment below for what it does and
+   * why.
    */
   private static HttpClient buildHttpClient(Duration idleTimeout) {
-    // java.net.http.HttpClient has no per-client (let alone per-request) knob for its redirect-hop limit -
-    // it's read once, JVM-wide, from this system property, so it has to be set before any HttpClient in the
-    // JVM follows its first redirect (if something else in the same JVM already triggered that internal
-    // one-time read first, this no-ops too late to help - an inherent limitation of a JVM-global, read-once
-    // property, not something this method can fully close). The JDK's own default
-    // (jdk.httpclient.redirects.retrylimit=5) is effectively 4 FOLLOWED hops (one of the 5 attempts is the
-    // initial, non-redirect request) - far short of main's Apache HttpClient RequestConfig default of 50,
-    // and exceeding it doesn't throw a clear "too many redirects" error like main did: HttpClient just
-    // returns the last (redirect) response as-is, which copyUrlToFile() below reports as a plain "Error
-    // downloading <url>: 302" - indistinguishable from a genuinely terminal redirect. Only set if not
-    // already configured via the -D/System.setProperty channel - a deployer who explicitly set THAT must
-    // not have their choice silently overwritten. This does NOT cover every channel, though: jdk.httpclient.*
-    // is a JDK "net property" (sun.net.NetProperties), which ALSO reads $JAVA_HOME/conf/net.properties as a
-    // fallback default BELOW the -D system property in precedence but is otherwise invisible to
-    // System.getProperty(...) - a deployer using that file instead is still silently overwritten by the
-    // setProperty(...) call below, since setting a System property always outranks the properties-file
-    // default regardless of which one "got there first". No accessible fix exists (sun.net.NetProperties
-    // isn't exported, and hand-parsing conf/net.properties would be fragile and layout-dependent) -
-    // documented as a known, narrow limitation rather than fixed. Raising the JDK's own default only changes
-    // behavior for a chain of 5+ hops, and only when nothing else in the JVM cares
-    if (System.getProperty("jdk.httpclient.redirects.retrylimit") == null) {
-      System.setProperty("jdk.httpclient.redirects.retrylimit", "50");
-    }
     // java.net.CookieManager.put() logs "SEVERE: Invalid cookie for <url>: <full Set-Cookie value>" via its
     // own JUL logger whenever HttpCookie.parse() rejects a Set-Cookie header (e.g. an unquoted comma inside a
     // Max-Age-tagged cookie value's RFC-2965 comma-splitting - see round 23 in review.log) - by default (the
     // JVM's built-in root-logger ConsoleHandler, which every JVM has unless a deployer replaced it) this
     // reaches stderr with zero logging configuration of the caller's own, printing a potential session-cookie
     // VALUE into logs main's Apache HttpClient never touched at all (it never used java.util.logging for
-    // this). Suppressed here, the same way as the retrylimit property above. Only suppressed if this
-    // specific logger doesn't already have an explicit level set (getLevel() == null means "inheriting from
-    // its parent/root logger", not "explicitly configured") - a deployer who specifically configured this
-    // logger (e.g. to actually see this diagnostic while debugging) must not have that choice silently
-    // overwritten, same principle as the retrylimit guard above
+    // this). Only suppressed if this specific logger doesn't already have an explicit level set
+    // (getLevel() == null means "inheriting from its parent/root logger", not "explicitly configured") - a
+    // deployer who specifically configured this logger (e.g. to actually see this diagnostic while debugging)
+    // must not have that choice silently overwritten
     if (sf_cookieManagerLogger.getLevel() == null) {
       sf_cookieManagerLogger.setLevel(Level.OFF);
     }
