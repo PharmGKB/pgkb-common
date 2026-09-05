@@ -56,8 +56,9 @@ public class NullSafeComparisonChain {
   /**
    * See {@link ComparatorUtils#compareNumbers(String, String)}.
    *
-   * @throws NumberFormatException if {@code a} or {@code b} is a non-{@code null} value that isn't a valid
-   * decimal number
+   * @throws NumberFormatException only if {@code a} and {@code b} are both non-{@code null} and not the same
+   * reference, and either isn't a valid decimal number - a {@code null} operand (or the same reference
+   * passed for both) short-circuits before the other operand is ever parsed
    */
   public NullSafeComparisonChain compareNumbers(@Nullable String a, @Nullable String b) {
     if (m_comparison != 0) {
@@ -145,8 +146,9 @@ public class NullSafeComparisonChain {
    * Compares chromosomal positions (in the format chrX:1234).
    *
    * @throws IllegalArgumentException if {@code a} or {@code b} is a non-{@code null} value that isn't in the
-   * expected {@code chrX:1234} format; or, only if the chromosome-name components tie, if either's chromosome
-   * number or position number exceeds {@link Long#MAX_VALUE}
+   * expected {@code chrX:1234} format; if either's chromosome number exceeds {@link Long#MAX_VALUE} (checked
+   * unconditionally, before the chromosome names are even compared); or, only if the chromosome-name
+   * components tie, if either's position number exceeds {@link Long#MAX_VALUE}
    */
   public NullSafeComparisonChain compareChromosomePositions(@Nullable String a, @Nullable String b) {
     if (m_comparison != 0) {

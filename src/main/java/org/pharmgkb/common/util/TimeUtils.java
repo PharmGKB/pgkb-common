@@ -56,7 +56,7 @@ public class TimeUtils {
 
 
   /**
-   * Formats {@code date} as "M/d/yy" for a year within the rolling 100-year window centered on "now" (80
+   * Formats {@code date} as "M/d/yy" for a year within the rolling 100-year window anchored to "now" (80
    * years back, 20 years forward), or "M/d/yyyy" for a year outside it - except a year well before 1000 AD,
    * which can still format to a bare 2-digit year that doesn't correspond to that window; see
    * {@link #parseToDate(String)} for the resulting round-trip caveat.
@@ -68,7 +68,7 @@ public class TimeUtils {
   }
 
   /**
-   * Formats {@code date} as "M/d/yy" for a year within the rolling 100-year window centered on "now" (80
+   * Formats {@code date} as "M/d/yy" for a year within the rolling 100-year window anchored to "now" (80
    * years back, 20 years forward), or "M/d/yyyy" for a year outside it - except a year well before 1000 AD,
    * which can still format to a bare 2-digit year that doesn't correspond to that window; see
    * {@link #parseToDate(String)} for the resulting round-trip caveat.

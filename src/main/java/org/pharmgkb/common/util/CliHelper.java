@@ -359,7 +359,8 @@ public class CliHelper {
   }
 
   /**
-   * Gets the first String value, if any, for the given option.
+   * Gets the first String value, if any, for the given option. A whitespace-only value is stripped to
+   * {@code null}, same as a truly missing one.
    *
    * @param opt the name of the option
    * @return Value of the argument if the option is set and has an argument, otherwise null.
@@ -481,6 +482,8 @@ public class CliHelper {
   /**
    * Gets the value for the given option as a {@link Path}, that must point to an existing file.
    *
+   * @throws IllegalArgumentException if the option wasn't supplied, was supplied with no value at all, or its
+   * value stripped to blank (propagated from {@link #getPath})
    * @throws InvalidCliPathException if {@code mustExist} is true and the file doesn't exist, or if the path exists but
    * is not a regular file
    */

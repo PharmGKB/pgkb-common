@@ -58,16 +58,22 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
    * should ensure all {@code add()} calls for a given enum type complete on a single thread before any other
    * thread looks up that type.
    *
-   * @param shortName must be non-blank (after stripping whitespace), not purely numeric, contain no whitespace,
-   * and be unique (case-insensitively, across the combined shortName/displayName/additionalNames namespace)
-   * @param displayName must be non-blank (after stripping whitespace), not purely numeric, and unique the same
-   * way {@code shortName} is
-   * @param additionalNames each non-null entry must be non-numeric and unique the same way {@code shortName} is
-   * @throws NullPointerException if {@code shortName} or {@code displayName} is {@code null}
+   * @param shortName leading/trailing whitespace is stripped first; once stripped, must be non-blank, not
+   * purely numeric, contain no (remaining, internal) whitespace, and not collide (case-insensitively) with
+   * any name already registered for a DIFFERENT enum constant - this method does not cross-check
+   * {@code shortName}/{@code displayName}/{@code additionalNames} against each other within this same call,
+   * so e.g. passing the same string for both {@code shortName} and {@code displayName} is accepted
+   * @param displayName stripped and validated the same way {@code shortName} is, except whitespace is only
+   * stripped, never rejected
+   * @param additionalNames each non-null entry is stripped and validated the same way {@code shortName} is
+   * @throws NullPointerException if {@code theEnum}, {@code shortName}, or {@code displayName} is
+   * {@code null} - for {@code theEnum}, this comes from evaluating its class name for an error message
+   * before this method's own {@code isInstance} check ever runs, not from an explicit null check
    * @throws IllegalArgumentException if {@code theEnum} isn't an instance of this helper's enum class; if
    * {@code id} is already registered; if {@code shortName} or {@code displayName} is blank or purely numeric
-   * once stripped; if {@code shortName} contains whitespace; or if {@code shortName}, {@code displayName}, or
-   * any non-null {@code additionalNames} entry collides (case-insensitively) with an already-registered name
+   * once stripped; if {@code shortName} contains internal whitespace once stripped; or if {@code shortName},
+   * {@code displayName}, or any non-null {@code additionalNames} entry collides (case-insensitively) with a
+   * name already registered for a different enum constant
    */
   public synchronized void add(T theEnum, int id, String shortName, String displayName,
       String @Nullable ... additionalNames) {
@@ -75,41 +81,41 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
     Preconditions.checkArgument(m_enumClass.isInstance(theEnum), "%s is not an instance of %s",
         theEnum.getClass().getSimpleName(), m_enumClass.getSimpleName());
     Preconditions.checkArgument(!m_idMap.containsKey(id), "Duplicate ID '%s' for %s", id,
-        theEnum.getClass().getSimpleName());
+        m_enumClass.getSimpleName());
 
     Preconditions.checkNotNull(shortName, "shortName is null");
     String strippedShortName = StringUtils.stripToNull(shortName);
     Preconditions.checkArgument(strippedShortName != null, "Empty shortName for %s",
-        theEnum.getClass().getSimpleName());
+        m_enumClass.getSimpleName());
     // .contains(" ") only rejects literal U+0020 - check every whitespace category (tab, newline, NBSP, etc.)
     // Character.isWhitespace() alone excludes non-breaking space by design, so isSpaceChar() is also needed
     Preconditions.checkArgument(
         strippedShortName.chars().noneMatch(c -> Character.isWhitespace(c) || Character.isSpaceChar(c)),
-        "Spaces in shortName for %s (%s)", theEnum.getClass().getSimpleName(), shortName);
+        "Spaces in shortName for %s (%s)", m_enumClass.getSimpleName(), shortName);
     Preconditions.checkArgument(!StringUtils.isNumeric(strippedShortName), "Numeric shortName for %s (%s)",
-        theEnum.getClass().getSimpleName(), shortName);
+        m_enumClass.getSimpleName(), shortName);
     Preconditions.checkArgument(!m_shortNameMap.containsKey(strippedShortName),
-        "Duplicate shortName '%s' for %s", strippedShortName, theEnum.getClass().getSimpleName());
+        "Duplicate shortName '%s' for %s", strippedShortName, m_enumClass.getSimpleName());
     String lcShortName = strippedShortName.toLowerCase(Locale.ROOT);
     ExtendedEnum shortNameCollision = m_lcNameMap.get(lcShortName);
     if (shortNameCollision != null && shortNameCollision != theEnum) {
       throw new IllegalArgumentException(String.format("shortName '%s' for %s mapped to %s and %s",
-          strippedShortName, theEnum.getClass().getSimpleName(), shortNameCollision, theEnum));
+          strippedShortName, m_enumClass.getSimpleName(), shortNameCollision, theEnum));
     }
 
     Preconditions.checkNotNull(displayName, "displayName is null");
     String strippedDisplayName = StringUtils.stripToNull(displayName);
     Preconditions.checkArgument(strippedDisplayName != null, "Empty displayName for %s",
-        theEnum.getClass().getSimpleName());
+        m_enumClass.getSimpleName());
     Preconditions.checkArgument(!StringUtils.isNumeric(strippedDisplayName), "Numeric displayName for %s (%s)",
-        theEnum.getClass().getSimpleName(), displayName);
+        m_enumClass.getSimpleName(), displayName);
     Preconditions.checkArgument(!m_displayNameMap.containsKey(strippedDisplayName),
-        "Duplicate displayName '%s' for %s", strippedDisplayName, theEnum.getClass().getSimpleName());
+        "Duplicate displayName '%s' for %s", strippedDisplayName, m_enumClass.getSimpleName());
     String lcDisplayName = strippedDisplayName.toLowerCase(Locale.ROOT);
     ExtendedEnum displayNameCollision = m_lcNameMap.get(lcDisplayName);
     if (displayNameCollision != null && displayNameCollision != theEnum) {
       throw new IllegalArgumentException(String.format("displayName '%s' for %s mapped to %s and %s",
-          strippedDisplayName, theEnum.getClass().getSimpleName(), displayNameCollision, theEnum));
+          strippedDisplayName, m_enumClass.getSimpleName(), displayNameCollision, theEnum));
     }
 
     if (additionalNames != null) {
@@ -120,11 +126,11 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
         String strippedAdditionalName = StringUtils.stripToNull(additionalName);
         if (strippedAdditionalName != null) {
           Preconditions.checkArgument(!StringUtils.isNumeric(strippedAdditionalName),
-              "Numeric additional name for %s (%s)", theEnum.getClass().getSimpleName(), additionalName);
+              "Numeric additional name for %s (%s)", m_enumClass.getSimpleName(), additionalName);
           ExtendedEnum additionalNameCollision = m_lcNameMap.get(strippedAdditionalName.toLowerCase(Locale.ROOT));
           if (additionalNameCollision != null && additionalNameCollision != theEnum) {
             throw new IllegalArgumentException(String.format("Additional name '%s' for %s mapped to %s and %s",
-                strippedAdditionalName, theEnum.getClass().getSimpleName(), additionalNameCollision, theEnum));
+                strippedAdditionalName, m_enumClass.getSimpleName(), additionalNameCollision, theEnum));
           }
         }
       }
@@ -166,14 +172,17 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
    *
    * @throws IllegalArgumentException if any constant's id, name or display name collides with another - same as
    * {@link #add}, since this delegates to it
-   * @throws IllegalStateException if {@code clz} is already registered - a second call would silently build a
-   * fully-populated but orphaned helper: {@code sf_enumMap}'s {@code putIfAbsent} (see {@link #add}) means the
-   * FIRST helper registered for a class always wins that slot, so the second call's own return value would
-   * disagree with (and never be reachable via) {@link #getExtendedEnumHelper}, {@link ExtendedEnumConverter} or
-   * any other caller that looks a helper up by class rather than using the reference this method returns. This
-   * check is a plain check-then-act, not atomic - it only protects the intended usage (a single static field
-   * initializer per class, which the JLS already serializes via that class's own initialization lock), not two
-   * threads calling {@code register(clz)} for the SAME class concurrently from outside that pattern.
+   * @throws IllegalStateException if {@code clz} is already registered, either before this call starts or by
+   * the time it finishes - a second registration would otherwise silently build a fully-populated but orphaned
+   * helper whose own return value disagrees with (and is never reachable via) {@link #getExtendedEnumHelper},
+   * {@link ExtendedEnumConverter} or any other caller that looks a helper up by class rather than using the
+   * reference this method returns. The "by the time it finishes" half specifically catches
+   * {@link Class#getEnumConstants()} above triggering {@code clz}'s own static initialization on this call's
+   * first touch of it - if {@code clz} follows this method's own intended usage (its static field initializer
+   * calling {@code register(clz)} itself), that reentrant inner call can win {@code sf_enumMap}'s slot in the
+   * middle of THIS call's own loop. This is still a plain check-then-act, not atomic, so it does NOT protect
+   * against two separate THREADS calling {@code register(clz)} for the same class concurrently from outside
+   * the intended single-static-field-initializer pattern.
    */
   public static <T extends Enum<T> & ExtendedEnum> ExtendedEnumHelper<T> register(Class<T> clz) {
     Preconditions.checkNotNull(clz, "clz is null");
@@ -185,8 +194,21 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
     }
     // a zero-constant enum never calls add() above, which is otherwise the only place sf_enumMap gets
     // populated - register this class here too, so a second register(clz) call for it is still rejected
-    // by the checkState above instead of silently building and discarding an orphaned second helper
-    sf_enumMap.putIfAbsent(clz, helper);
+    // by the checkState above instead of silently building and discarding an orphaned second helper. For a
+    // non-empty enum, add() above already did this same putIfAbsent as its own side effect (with this exact
+    // helper), so the common case is a no-op here - existing == helper, not an error.
+    //
+    // Checking the return value (not just calling putIfAbsent) also closes a narrower race the checkState
+    // above can't catch on its own: getEnumConstants() above is what triggers clz's static initialization
+    // on this call's first touch of clz, and if clz follows the documented usage (its own static field
+    // initializer calling register(clz)), that reentrant inner call can claim this same slot - with a
+    // DIFFERENT helper instance - in the middle of THIS call's own loop, after the checkState above already
+    // passed. Without this check, that leaves this (outer) call silently returning a second, fully-
+    // populated, but now-orphaned helper instead of throwing.
+    ExtendedEnumHelper<?> existing = sf_enumMap.putIfAbsent(clz, helper);
+    if (existing != null && existing != helper) {
+      throw new IllegalStateException(clz + " is already registered");
+    }
     return helper;
   }
 
@@ -318,6 +340,12 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
   private static final Pattern sf_punctuationPattern = Pattern.compile("\\p{Punct}");
   /**
    * Converts the given name into camel case format.
+   * <p>
+   * {@code stripToNull}/{@code deleteWhitespace} below are both {@code Character.isWhitespace()}-based,
+   * which excludes U+00A0 (non-breaking space) by design - unlike this project's own {@link Strings}, an
+   * embedded NBSP survives into the result unchanged rather than being treated as a separator.
+   *
+   * @throws IllegalArgumentException if {@code name} strips down to nothing (e.g. it's entirely punctuation)
    */
   public static String camelCaseFormat(String name) {
     Preconditions.checkNotNull(name, "name is null");

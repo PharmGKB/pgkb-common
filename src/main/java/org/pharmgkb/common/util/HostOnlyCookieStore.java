@@ -87,7 +87,8 @@ class HostOnlyCookieStore implements CookieStore {
    * Calling this eagerly at every other mutation site that touches {@link #m_hostOnly} (rather than only
    * from {@code get()}, matching the JDK's own laziness) is a deliberate, stricter choice - {@link
    * #getCookies()} achieves the same effect inline instead of calling this method, since it's already
-   * iterating {@link #m_hostOnly} directly. It costs nothing extra
+   * iterating {@link #m_hostOnly} directly, and {@link #removeAll()} has no need for it at all, since it
+   * clears {@link #m_hostOnly} wholesale rather than per-host. It costs nothing extra
    * ({@code cookies.isEmpty()} is O(1)) and {@link #getURIs()} isn't reachable from any real caller of this
    * package-private class anyway (only ever wrapped in a per-call {@code CookieManager} that calls just
    * {@code add()}/{@code get()}), so being more correct than the JDK here has no downside. Must be called

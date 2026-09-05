@@ -434,6 +434,23 @@ class ExtendedEnumHelperTest {
     assertThrows(IllegalArgumentException.class, () -> rawHelper.add(Op.ADD, 1, "add", "Add"));
   }
 
+  @Test
+  void testAddErrorMessagesNameTheEnumClassForConstantSpecificBodies() {
+    // ConstantBody's constants each have a constant-specific class body (an anonymous subclass overriding
+    // toString()), so theEnum.getClass().getSimpleName() is empty for them ("" is not a useful class name
+    // in an error message) - the messages must name m_enumClass (ConstantBody itself) instead. A dedicated
+    // enum, not the already-shared Op above: Op's registration is exclusively claimed by
+    // testAddWithConstantSpecificClassBody, and sf_enumMap is a single static map shared across the whole
+    // test class with no reset between tests - registering Op a second time here would collide with that
+    // other test depending on run order.
+    //noinspection rawtypes
+    ExtendedEnumHelper rawHelper = new ExtendedEnumHelper(ConstantBody.class);
+    rawHelper.add(ConstantBody.ONE, 1, "one", "One");
+    IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+        () -> rawHelper.add(ConstantBody.TWO, 1, "two", "Two"));
+    assertTrue(ex.getMessage().contains("ConstantBody"), ex.getMessage());
+  }
+
 
   @Test
   void testRegisterAutoDiscoversConstantsWithDisplayNamesAndAdditionalNames() {
@@ -490,6 +507,25 @@ class ExtendedEnumHelperTest {
     // testRegisterRejectsSecondCallForSameClass above but for the one case add() never runs at all.
     ExtendedEnumHelper.register(EmptyEnum.class);
     assertThrows(IllegalStateException.class, () -> ExtendedEnumHelper.register(EmptyEnum.class));
+  }
+
+  @Test
+  void testRegisterRejectsReentrantRegistrationRace() {
+    // register(clz)'s early checkState() runs BEFORE clz.getEnumConstants() below - but that call is
+    // exactly what triggers clz's OWN static initialization if this is the first real touch of clz. If
+    // clz's static field initializer follows this method's own documented usage pattern (calling
+    // register(clz) itself, as ReentrantRegister does below), an external register(clz) call that's the
+    // very first reference to clz reenters this method from inside getEnumConstants() - and that inner call
+    // wins sf_enumMap's slot before the outer call ever finishes its own loop, so the outer call must throw
+    // instead of silently returning a second, fully-populated, permanently-unreachable helper.
+    // ReentrantRegister.class is a bare class literal - it does NOT trigger static initialization on its
+    // own, so this register() call genuinely is the first touch, same as it would be for a caller who
+    // (incorrectly) invokes register() directly instead of only via the enum's own static field.
+    assertThrows(IllegalStateException.class, () -> ExtendedEnumHelper.register(ReentrantRegister.class));
+    // the reentrant registration triggered by ReentrantRegister's own static initializer must still be
+    // intact and reachable - not replaced, corrupted, or left orphaned by the rejected outer attempt
+    assertEquals(ReentrantRegister.ONE,
+        ExtendedEnumHelper.getExtendedEnumHelper(ReentrantRegister.class).lookupByName("one"));
   }
 
 
@@ -703,6 +739,66 @@ class ExtendedEnumHelperTest {
     @Override
     public @NonNull String getShortName() {
       throw new AssertionError("unreachable - no constants");
+    }
+  }
+
+
+  private enum ReentrantRegister implements ExtendedEnum {
+    ONE(1, "one");
+
+    private static final ExtendedEnumHelper<ReentrantRegister> s_helper =
+        ExtendedEnumHelper.register(ReentrantRegister.class);
+
+    private final int m_id;
+    private final String m_shortName;
+
+    ReentrantRegister(int id, String shortName) {
+      m_id = id;
+      m_shortName = shortName;
+    }
+
+    @Override
+    public int getId() {
+      return m_id;
+    }
+
+    @Override
+    public @NonNull String getShortName() {
+      return m_shortName;
+    }
+  }
+
+
+  private enum ConstantBody implements ExtendedEnum {
+    ONE(1, "one") {
+      @Override
+      public String toString() {
+        return "one-body";
+      }
+    },
+    TWO(2, "two") {
+      @Override
+      public String toString() {
+        return "two-body";
+      }
+    };
+
+    private final int m_id;
+    private final String m_shortName;
+
+    ConstantBody(int id, String shortName) {
+      m_id = id;
+      m_shortName = shortName;
+    }
+
+    @Override
+    public int getId() {
+      return m_id;
+    }
+
+    @Override
+    public @NonNull String getShortName() {
+      return m_shortName;
     }
   }
 }

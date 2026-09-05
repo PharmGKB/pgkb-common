@@ -107,8 +107,9 @@ public class ComparatorUtils {
    * @param b the second number to compare
    * @return a negative integer, zero, or a positive integer if the first
    * object is less than, equal to, or greater than the second object
-   * @throws NumberFormatException if {@code a} or {@code b} is a non-{@code null} value that isn't a valid
-   * decimal number
+   * @throws NumberFormatException only if {@code a} and {@code b} are both non-{@code null} and not the same
+   * reference, and either isn't a valid decimal number - a {@code null} operand (or the same reference
+   * passed for both) short-circuits before the other operand is ever parsed
    */
   public static int compareNumbers(@Nullable String a, @Nullable String b) {
 
