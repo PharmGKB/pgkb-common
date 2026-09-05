@@ -15,8 +15,8 @@ import org.jspecify.annotations.Nullable;
  *   <li>The terms <code>Any</code>, <code>All</code>, and <code>Reference</code> (case-insensitive) always get
  *   sorted to the beginning</li>
  *   <li>The terms <code>Unknown</code> and <code>Other</code> (case-insensitive) always get sorted to the end</li>
- *   <li>The terms are compared using {@link NaturalStringComparator} which will tokenize and compare numerically when appropriate</li>
- *   <li>Otherwise just do regular String sorting</li>
+ *   <li>Anything else is compared using {@link NaturalStringComparator}, which tokenizes and compares
+ *   numerically when appropriate (and falls back to regular String comparison otherwise)</li>
  * </ol>
  *
  * @author Ryan Whaley

@@ -84,8 +84,10 @@ class HostOnlyCookieStore implements CookieStore {
    * own expiry sweep all drop the cookie from {@code cookieJar} but leave the dangling index entry in place,
    * so the JDK's own {@code getURIs()} keeps reporting a host with zero live cookies until the next {@code
    * get()} call happens to visit it - only "never successfully added at all" is pruned immediately by both.
-   * Calling this eagerly at every one of THIS class's own mutation sites (rather than only from {@code
-   * get()}, matching the JDK's own laziness) is a deliberate, stricter choice - it costs nothing extra
+   * Calling this eagerly at every other mutation site that touches {@link #m_hostOnly} (rather than only
+   * from {@code get()}, matching the JDK's own laziness) is a deliberate, stricter choice - {@link
+   * #getCookies()} achieves the same effect inline instead of calling this method, since it's already
+   * iterating {@link #m_hostOnly} directly. It costs nothing extra
    * ({@code cookies.isEmpty()} is O(1)) and {@link #getURIs()} isn't reachable from any real caller of this
    * package-private class anyway (only ever wrapped in a per-call {@code CookieManager} that calls just
    * {@code add()}/{@code get()}), so being more correct than the JDK here has no downside. Must be called

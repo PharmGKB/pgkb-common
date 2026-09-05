@@ -58,8 +58,16 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
    * should ensure all {@code add()} calls for a given enum type complete on a single thread before any other
    * thread looks up that type.
    *
-   * @throws IllegalArgumentException if the enum being added has an id, name or display name that's already
-   * being used, or if the short name has a space in it
+   * @param shortName must be non-blank (after stripping whitespace), not purely numeric, contain no whitespace,
+   * and be unique (case-insensitively, across the combined shortName/displayName/additionalNames namespace)
+   * @param displayName must be non-blank (after stripping whitespace), not purely numeric, and unique the same
+   * way {@code shortName} is
+   * @param additionalNames each non-null entry must be non-numeric and unique the same way {@code shortName} is
+   * @throws NullPointerException if {@code shortName} or {@code displayName} is {@code null}
+   * @throws IllegalArgumentException if {@code theEnum} isn't an instance of this helper's enum class; if
+   * {@code id} is already registered; if {@code shortName} or {@code displayName} is blank or purely numeric
+   * once stripped; if {@code shortName} contains whitespace; or if {@code shortName}, {@code displayName}, or
+   * any non-null {@code additionalNames} entry collides (case-insensitively) with an already-registered name
    */
   public synchronized void add(T theEnum, int id, String shortName, String displayName,
       String @Nullable ... additionalNames) {
@@ -257,14 +265,16 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
 
 
   /**
-   * Gets all the enums sorted by Id.
+   * Gets all the enums sorted by Id. The returned collection is unmodifiable and reflects any enum
+   * registered after this call.
    */
   public Collection<T> getAllSortedById() {
     return m_idMapValues;
   }
 
   /**
-   * Gets all the enums sorted by name.
+   * Gets all the enums sorted by name. The returned collection is unmodifiable and reflects any enum
+   * registered after this call.
    */
   public Collection<T> getAllSortedByName() {
     return m_displayNameMapValues;

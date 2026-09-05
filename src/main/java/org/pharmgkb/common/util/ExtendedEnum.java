@@ -28,9 +28,12 @@ public interface ExtendedEnum {
 
 
   /**
-   * Gets the display name of this enum. Never {@code null} - see
-   * {@link ExtendedEnumHelper#add(ExtendedEnum, int, String, String, String...)}'s {@code displayName} parameter,
-   * which enforces this at registration time.
+   * Gets the display name of this enum. Never {@code null} for an implementor registered via
+   * {@link ExtendedEnumHelper#register(Class)} - that path passes this method's own return value as
+   * {@code add(ExtendedEnum, int, String, String, String...)}'s {@code displayName} argument, which enforces
+   * non-null (and non-blank) at registration time. An implementor using {@code add()} directly (the original,
+   * manually-called API) isn't held to this, since that path validates its own {@code displayName} argument,
+   * not this method's return value.
    * <p>
    * The default implementation falls back to {@link #getShortName()} - implementors with no distinct display
    * name can rely on this default instead of overriding {@code getDisplayName()} themselves. Implementors that

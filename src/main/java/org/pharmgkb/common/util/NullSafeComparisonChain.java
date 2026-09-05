@@ -129,8 +129,8 @@ public class NullSafeComparisonChain {
   /**
    * Compares chromosome names.
    *
-   * @throws IllegalArgumentException if a numeric component of {@code a} or {@code b} exceeds
-   * {@link Long#MAX_VALUE}
+   * @throws IllegalArgumentException only if {@code a} and {@code b} are both non-{@code null} and both
+   * numeric (after stripping any {@code chr} prefix), and either exceeds {@link Long#MAX_VALUE}
    */
   public NullSafeComparisonChain compareChromosomeNames(@Nullable String a, @Nullable String b) {
     if (m_comparison != 0) {
@@ -145,7 +145,8 @@ public class NullSafeComparisonChain {
    * Compares chromosomal positions (in the format chrX:1234).
    *
    * @throws IllegalArgumentException if {@code a} or {@code b} is a non-{@code null} value that isn't in the
-   * expected {@code chrX:1234} format, or if the position component exceeds {@link Long#MAX_VALUE}
+   * expected {@code chrX:1234} format; or, only if the chromosome-name components tie, if either's chromosome
+   * number or position number exceeds {@link Long#MAX_VALUE}
    */
   public NullSafeComparisonChain compareChromosomePositions(@Nullable String a, @Nullable String b) {
     if (m_comparison != 0) {
@@ -159,8 +160,9 @@ public class NullSafeComparisonChain {
   /**
    * Compares haplotype names.
    *
-   * @throws IllegalArgumentException if a numeric component of {@code a} or {@code b} exceeds
-   * {@link Long#MAX_VALUE}
+   * @throws IllegalArgumentException only if neither {@code a} nor {@code b} is {@code null}, equal, or one of
+   * the special-cased top/bottom terms (see {@link HaplotypeNameComparator}), and a numeric component of
+   * either exceeds {@link Long#MAX_VALUE}
    */
   public NullSafeComparisonChain compareHaplotypeNames(@Nullable String a, @Nullable String b) {
     if (m_comparison != 0) {

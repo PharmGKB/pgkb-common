@@ -32,6 +32,8 @@ public final class PathUtils {
   /**
    * Gets the name of the file.
    * Does not validate if {@code file} is a regular file.
+   *
+   * @throws IllegalArgumentException if {@code file} has no name element (e.g. the root path)
    */
   public static String getFilename(Path file) {
     Preconditions.checkNotNull(file);
@@ -44,6 +46,13 @@ public final class PathUtils {
   /**
    * Gets the file extension if one exists.  Does not include ".".
    * Does not validate if {@code file} is a regular file.
+   * <p>
+   * A dotfile (e.g. {@code ".gitignore"}) has no extension by this method's definition - its leading "."
+   * is not treated as an extension separator, so this returns {@code null} for it, same as for a filename
+   * with no "." at all.
+   *
+   * @throws IllegalArgumentException if {@code file} has no name element (e.g. the root path) - see
+   * {@link #getFilename}
    */
   public static @Nullable String getFileExtension(Path file) {
     String filename = getFilename(file);
@@ -58,6 +67,12 @@ public final class PathUtils {
   /**
    * Gets the base name of the file (i.e. file name without the extension).
    * Does not validate if {@code file} is a regular file.
+   * <p>
+   * A dotfile (e.g. {@code ".gitignore"}) has no extension by {@link #getFileExtension}'s definition, so
+   * this returns the filename unchanged (including its leading ".") rather than stripping anything.
+   *
+   * @throws IllegalArgumentException if {@code file} has no name element (e.g. the root path) - see
+   * {@link #getFilename}
    */
   public static String getBaseFilename(Path file) {
     Preconditions.checkNotNull(file);

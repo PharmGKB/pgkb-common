@@ -1,6 +1,5 @@
 package org.pharmgkb.common.util;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
@@ -282,6 +281,11 @@ public class CliHelper {
 
   /**
    * Parses arguments.
+   * <p>
+   * On failure (a {@code false} return, other than for a help/version request), the command line is left
+   * unset - every accessor below that requires a successful parse ({@link #hasOption}, {@link #getValue},
+   * {@link #getValues}, {@link #getArguments}, {@link #isVerbose}) then throws {@link IllegalStateException}
+   * rather than returning stale or partial data.
    *
    * @return true if parse completed and processing should continue, false if there are missing arguments or
    * help or version was requested
@@ -346,6 +350,8 @@ public class CliHelper {
 
   /**
    * Checks whether the specified option exists.
+   *
+   * @throws IllegalStateException if called before {@link #parse} or after a failed parse
    */
   public boolean hasOption(String opt) {
     Preconditions.checkState(m_commandLine != null, "Command line has not been parsed");
@@ -357,6 +363,7 @@ public class CliHelper {
    *
    * @param opt the name of the option
    * @return Value of the argument if the option is set and has an argument, otherwise null.
+   * @throws IllegalStateException if called before {@link #parse} or after a failed parse
    */
   public @Nullable String getValue(String opt) {
     Preconditions.checkState(m_commandLine != null, "Command line has not been parsed");
@@ -366,6 +373,7 @@ public class CliHelper {
   /**
    * Gets the String values for the given option.
    * @return returns a List of the specified values, empty list if no options specified
+   * @throws IllegalStateException if called before {@link #parse} or after a failed parse
    */
   public List<String> getValues(String opt) {
     Preconditions.checkState(m_commandLine != null, "Command line has not been parsed");
@@ -396,7 +404,8 @@ public class CliHelper {
   /**
    * Gets the first String value for the given option, which must be present.
    *
-   * @throws IllegalArgumentException if the option was not specified
+   * @throws IllegalArgumentException if the option wasn't supplied, was supplied with no value at all, or its
+   * value stripped to blank (see {@link #getValue})
    */
   public String getRequiredValue(String opt) {
     String val = getValue(opt);
@@ -410,7 +419,9 @@ public class CliHelper {
   /**
    * Gets the int value for the given option.
    *
-   * @throws IllegalArgumentException if the option was not specified
+   * @throws IllegalArgumentException if the option wasn't supplied, was supplied with no value at all, or its
+   * value stripped to blank (see {@link #getValue})
+   * @throws NumberFormatException if the value is not a parseable int
    */
   public int getIntValue(String opt) {
     String val = getValue(opt);
@@ -422,12 +433,13 @@ public class CliHelper {
 
 
   /**
-   * Gets the value for the given option as a {@link File}.
+   * Gets the value for the given option as a {@link Path}.
    *
    * @param createIfNotExist if true and the directory doesn't exist, create the directory;
    * otherwise, if false and the directory doesn't exist, throw InvalidCliPathException
    * @return the directory
-   * @throws IllegalArgumentException if the option was not specified
+   * @throws IllegalArgumentException if the option wasn't supplied, was supplied with no value at all, or its
+   * value stripped to blank (see {@link #getValue})
    * @throws InvalidCliPathException if the specified path is not a directory or {@code createIfNotExist} is false and
    * directory doesn't exist
    */
@@ -454,7 +466,8 @@ public class CliHelper {
   /**
    * Gets the value for the given option as a {@link Path}.
    *
-   * @throws IllegalArgumentException if the option was not specified
+   * @throws IllegalArgumentException if the option wasn't supplied, was supplied with no value at all, or its
+   * value stripped to blank (see {@link #getValue})
    */
   public Path getPath(String opt) {
 
@@ -491,7 +504,9 @@ public class CliHelper {
 
 
   /**
-   * Gets remaining parameters.
+   * Gets remaining parameters. The returned list is unmodifiable.
+   *
+   * @throws IllegalStateException if called before {@link #parse} or after a failed parse
    */
   public List getArguments() {
     Preconditions.checkState(m_commandLine != null, "Command line has not been parsed");
@@ -501,6 +516,8 @@ public class CliHelper {
 
   /**
    * Gets whether to operate in verbose mode.
+   *
+   * @throws IllegalStateException if called before {@link #parse} or after a failed parse
    */
   public boolean isVerbose() {
     Preconditions.checkState(m_commandLine != null, "Command line has not been parsed");
@@ -537,6 +554,8 @@ public class CliHelper {
 
   /**
    * Prints the help message.
+   *
+   * @throws UncheckedIOException if writing the help output fails
    */
   public void printHelp() {
 

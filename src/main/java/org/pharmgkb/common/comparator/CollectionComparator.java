@@ -41,9 +41,8 @@ import org.jspecify.annotations.Nullable;
  * are pairwise "equal" in two of three comparisons and incompatible in the third. This is unreachable via
  * {@link #compare} alone unless a caller actually mixes {@code null}/{@code List}/{@code Set} operands of the
  * same logical collection in one sorted context (e.g. a single {@link java.util.TreeSet} or {@code sort()}
- * call) - verified no real caller does today (see {@code review.log}'s known-non-issue entry for the
- * List-vs-Set rejection this stems from) - but a caller relying on strict transitivity across a mix of these
- * three shapes should not.
+ * call) - verified no real caller does today - but a caller relying on strict transitivity across a mix of
+ * these three shapes should not.
  *
  * @author Mark Woon
  */

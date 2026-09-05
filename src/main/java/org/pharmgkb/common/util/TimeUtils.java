@@ -56,8 +56,10 @@ public class TimeUtils {
 
 
   /**
-   * Formats {@code date} as "M/d/yy" - or "M/d/yyyy" if the year falls outside the rolling 100-year window
-   * {@code sf_shortDateFormatter} round-trips against (see that field's own comment).
+   * Formats {@code date} as "M/d/yy" for a year within the rolling 100-year window centered on "now" (80
+   * years back, 20 years forward), or "M/d/yyyy" for a year outside it - except a year well before 1000 AD,
+   * which can still format to a bare 2-digit year that doesn't correspond to that window; see
+   * {@link #parseToDate(String)} for the resulting round-trip caveat.
    */
   public static String humanReadableDate(Date date) {
     // Date.toInstant() is unconditionally overridden to throw UnsupportedOperationException by
@@ -66,8 +68,10 @@ public class TimeUtils {
   }
 
   /**
-   * Formats {@code date} as "M/d/yy" - or "M/d/yyyy" if the year falls outside the rolling 100-year window
-   * {@code sf_shortDateFormatter} round-trips against (see that field's own comment).
+   * Formats {@code date} as "M/d/yy" for a year within the rolling 100-year window centered on "now" (80
+   * years back, 20 years forward), or "M/d/yyyy" for a year outside it - except a year well before 1000 AD,
+   * which can still format to a bare 2-digit year that doesn't correspond to that window; see
+   * {@link #parseToDate(String)} for the resulting round-trip caveat.
    */
   public static String humanReadableDate(TemporalAccessor time) {
     return sf_shortDateFormatter.format(time);

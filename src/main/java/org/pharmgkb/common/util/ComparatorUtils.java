@@ -42,8 +42,8 @@ public class ComparatorUtils {
    * @return a negative integer, zero, or a positive integer if the first
    * object is less than, equal to, or greater than the second object
    * @throws ClassCastException if {@code a} and {@code b} are not mutually {@link Comparable} - this method's
-   * siblings ({@link #compareCollection}, {@link #compareMap}, {@link #compareCollectionOfMaps}) already
-   * document this same unchecked propagation
+   * siblings ({@link #compareCollection}, {@link #compareMap}) already document this same unchecked
+   * propagation for their own elements/keys
    */
   public static int compare(@Nullable Comparable a, @Nullable Comparable b) {
 
@@ -107,7 +107,8 @@ public class ComparatorUtils {
    * @param b the second number to compare
    * @return a negative integer, zero, or a positive integer if the first
    * object is less than, equal to, or greater than the second object
-   * @throws NumberFormatException if a or b is not a valid decimal number
+   * @throws NumberFormatException if {@code a} or {@code b} is a non-{@code null} value that isn't a valid
+   * decimal number
    */
   public static int compareNumbers(@Nullable String a, @Nullable String b) {
 
