@@ -482,6 +482,16 @@ class ExtendedEnumHelperTest {
         ExtendedEnumHelper.getExtendedEnumHelper(AutoWithoutDisplay.class).lookupByName("alpha"));
   }
 
+  @Test
+  void testRegisterRejectsSecondCallForZeroConstantEnum() {
+    // a zero-constant enum's getEnumConstants() is empty, so register()'s loop never calls add() - which is
+    // the only place sf_enumMap used to get populated. Without register() registering the class itself, a
+    // second call here would silently build and discard an orphaned second helper, same bug as
+    // testRegisterRejectsSecondCallForSameClass above but for the one case add() never runs at all.
+    ExtendedEnumHelper.register(EmptyEnum.class);
+    assertThrows(IllegalStateException.class, () -> ExtendedEnumHelper.register(EmptyEnum.class));
+  }
+
 
   private enum AutoWithDisplay implements ExtendedEnum {
     ONE(1, "one", "One", "uno"),
@@ -678,6 +688,21 @@ class ExtendedEnumHelperTest {
     @Override
     public @NonNull String getDisplayName() {
       return m_shortName;
+    }
+  }
+
+
+  private enum EmptyEnum implements ExtendedEnum {
+    ;
+
+    @Override
+    public int getId() {
+      throw new AssertionError("unreachable - no constants");
+    }
+
+    @Override
+    public @NonNull String getShortName() {
+      throw new AssertionError("unreachable - no constants");
     }
   }
 }

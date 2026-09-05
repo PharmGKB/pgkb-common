@@ -183,6 +183,10 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
       helper.add(constant, constant.getId(), constant.getShortName(), constant.getDisplayName(),
           constant.getAdditionalNames());
     }
+    // a zero-constant enum never calls add() above, which is otherwise the only place sf_enumMap gets
+    // populated - register this class here too, so a second register(clz) call for it is still rejected
+    // by the checkState above instead of silently building and discarding an orphaned second helper
+    sf_enumMap.putIfAbsent(clz, helper);
     return helper;
   }
 

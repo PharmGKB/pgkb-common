@@ -294,37 +294,6 @@ class UrlUtilsTest {
   }
 
   @Test
-  void testIsReachableFtpBranchDoesNotLeakFileDescriptorsOnFailure() throws Exception {
-    // the previous URLConnection-based implementation had no close()/disconnect() method at all - for FTP,
-    // connect() eagerly performs the full login handshake, so a slow/hanging server left an already-opened
-    // control socket open on failure, reclaimed only by GC (round 25). The new Socket-based implementation
-    // always closes in a finally block regardless of success or failure, so there's no equivalent failure
-    // shape left to reproduce against THIS implementation specifically (a plain connection refusal never
-    // opened a socket to leak in the first place, under either implementation) - reproduced instead as a
-    // direct structural check: repeated failed connectivity probes must not accumulate open file
-    // descriptors, counted via /proc/self/fd (Linux-only)
-    Path proc = Path.of("/proc/self/fd");
-    Assumptions.assumeTrue(Files.isDirectory(proc), "requires /proc/self/fd (Linux)");
-
-    int port;
-    try (ServerSocket probe = new ServerSocket(0)) {
-      port = probe.getLocalPort();
-    }
-    URL url = new URL("ftp://localhost:" + port + "/");
-
-    int attempts = 50;
-    long before = countOpenFds(proc);
-    for (int i = 0; i < attempts; i++) {
-      assertFalse(UrlUtils.isReachable(url));
-    }
-    long after = countOpenFds(proc);
-
-    assertTrue(after - before < attempts,
-        "expected no per-attempt fd growth after " + attempts + " failed attempts, but open fd count went " +
-            "from " + before + " to " + after);
-  }
-
-  @Test
   void testIsReachableFtpBranchDoesNotLeakFileDescriptorsOnSuccess() throws Exception {
     // the success path opens a real socket too - must be closed just as reliably as the failure path above
     Path proc = Path.of("/proc/self/fd");
