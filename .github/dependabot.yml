@@ -1,0 +1,10 @@
+# npm here is only the semantic-release tooling, which never ships in the Maven artifact, so no npm
+# PRs: `ignore` covers security updates as well as version updates. Gradle is left on the defaults.
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    ignore:
+      - dependency-name: "*"
