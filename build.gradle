@@ -43,9 +43,8 @@ ext {
   orgName = 'PharmGKB'
   orgUrl = 'https://www.clinpgx.org'
   // grab properties from environment for CI
-  sonatypeUser = project.hasProperty('ossrhUsername') ? ossrhUsername : System.getenv('OSSRH_USERNAME')
-  sonatypePwd  = project.hasProperty('ossrhPassword') ? ossrhPassword : System.getenv('OSSRH_PASSWORD')
-  sonatypeStagingProfileId = project.hasProperty('ossrhStagingProfileId') ? ossrhStagingProfileId : System.getenv('OSSRH_STAGING_PROFILE_ID')
+  sonatypeUser = project.hasProperty('sonatypeUsername') ? sonatypeUsername : System.getenv('SONATYPE_USERNAME')
+  sonatypePwd  = project.hasProperty('sonatypePassword') ? sonatypePassword : System.getenv('SONATYPE_PASSWORD')
 }
 
 // cannot modify signing directly, have to do it like this
