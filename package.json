@@ -7,22 +7,21 @@
     "url": "https://github.com/PharmGKB/pgkb-common.git"
   },
   "license": "MPL-2.0",
-  "packageManager": "yarn@4.14.1",
+  "packageManager": "pnpm@12.11.2",
   "devDependencies": {
-    "@google/semantic-release-replace-plugin": "1.2.7",
-    "@semantic-release/changelog": "7.0.0",
     "@semantic-release/git": "11.0.1",
     "conventional-changelog-conventionalcommits": "9.3.1",
-    "semantic-release": "25.0.9"
+    "semantic-release": "25.0.9",
+    "semantic-release-replace-plugin": "1.2.7"
   },
   "release": {
     "branches": [
-      "main"
+      "development"
     ],
     "plugins": [
       "@semantic-release/commit-analyzer",
       [
-        "@google/semantic-release-replace-plugin",
+        "semantic-release-replace-plugin",
         {
           "replacements": [
             {
@@ -58,14 +57,12 @@
           }
         }
       ],
-      "@semantic-release/changelog",
       "@semantic-release/github",
       "@semantic-release/npm",
       [
         "@semantic-release/git",
         {
           "assets": [
-            "CHANGELOG.md",
             "package.json",
             "README.md"
           ]

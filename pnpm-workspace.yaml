@@ -1,0 +1,6 @@
+saveExact: true
+trustPolicy: no-downgrade
+# Held back:
+# - conventional-changelog-conventionalcommits at 9: 10 needs conventional-changelog-writer 9, and
+#   @semantic-release/release-notes-generator 14.1.1 still uses writer 8, so generating the notes fails.
+#   Recheck: a stable release-notes-generator that depends on writer 9 (so far only 15.0.0-beta does).

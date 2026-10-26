@@ -30,6 +30,16 @@ jobs:
           java-version: 21
           cache: gradle
 
+      - name: Check version
+        # build.gradle takes the version from `git describe --tags` and falls back to 0.0.0 if that fails;
+        # a release published under the wrong version can't be removed from Maven Central
+        run: |
+          gradleVersion=$(./gradlew -q printVersion | tail -n 1)
+          if [[ "$gradleVersion" != "${{ steps.appVersion.outputs.substring }}" ]]; then
+            echo "::error::Gradle version '$gradleVersion' doesn't match release tag '${{ steps.appVersion.outputs.substring }}'"
+            exit 1
+          fi
+
       - name: Build and test
         # javadoc (not just test) so a doclint break fails here, before the publish step below - not
         # `./gradlew build`, which also pulls in the sign* tasks; SIGNING_KEY/SIGNING_PASSWORD aren't set for
