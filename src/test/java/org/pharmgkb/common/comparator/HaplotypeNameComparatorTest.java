@@ -59,6 +59,37 @@ class HaplotypeNameComparatorTest {
     assertTrue(HaplotypeNameComparator.getComparator().compare("TPMT", "BRCA") > 0);
 
     assertEquals(1, HaplotypeNameComparator.getComparator().compare("Unknown", "Unknown function"));
+
+    // distinct top/bottom terms must still compare antisymmetrically against each other
+    int otherVsUnknown = HaplotypeNameComparator.getComparator().compare("Other", "Unknown");
+    int unknownVsOther = HaplotypeNameComparator.getComparator().compare("Unknown", "Other");
+    assertTrue(Integer.signum(otherVsUnknown) == -Integer.signum(unknownVsOther));
+
+    int anyVsAll = HaplotypeNameComparator.getComparator().compare("Any", "All");
+    int allVsAny = HaplotypeNameComparator.getComparator().compare("All", "Any");
+    assertTrue(Integer.signum(anyVsAll) == -Integer.signum(allVsAny));
+  }
+
+  @Test
+  void testAllAndReferenceSortToTheBeginning() {
+    // sf_topTerms is {"Any", "All", "Reference"} - testComparator() above only ever compares "Any" against
+    // a non-top-term value ("*1"), so "All" and "Reference" have zero coverage of their OWN top-term
+    // sorting (the "Any" vs "All" antisymmetry check further down doesn't exercise this either, since both
+    // operands there are already top terms)
+    assertEquals(-1, HaplotypeNameComparator.getComparator().compare("All", "*1"));
+    assertEquals(1, HaplotypeNameComparator.getComparator().compare("*1", "All"));
+    assertEquals(-1, HaplotypeNameComparator.getComparator().compare("Reference", "*1"));
+    assertEquals(1, HaplotypeNameComparator.getComparator().compare("*1", "Reference"));
+  }
+
+  @Test
+  void testTopBottomTermsCaseInsensitive() {
+
+    // top/bottom term detection must be case-insensitive, consistent with the rest of the package
+    assertEquals(-1, HaplotypeNameComparator.getComparator().compare("ANY", "*1"));
+    assertEquals(1, HaplotypeNameComparator.getComparator().compare("*1", "any"));
+    assertEquals(-1, HaplotypeNameComparator.getComparator().compare("*1", "OTHER"));
+    assertEquals(1, HaplotypeNameComparator.getComparator().compare("unknown", "*1"));
   }
 
   @Test
