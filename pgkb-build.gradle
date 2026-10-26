@@ -71,11 +71,7 @@ task sourcesJar(type: Jar) {
   from sourceSets.main.allSource
 }
 
-artifacts {
-  archives jar
-  archives javadocJar
-  archives sourcesJar
-}
+assemble.dependsOn javadocJar, sourcesJar
 
 signing {
   if (project.ext.has('signing.key')) {
