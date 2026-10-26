@@ -1693,13 +1693,15 @@ class StreamUtilsTest {
 
   @Test
   void testOpenInputStreamMalformedZipEntryNameNamesThePath(@TempDir Path tempDir) throws IOException {
-    // ZipInputStream.getNextEntry() throws an unchecked IllegalArgumentException for an entry name that's
-    // invalid UTF-8 with the UTF-8 (EFS) flag set - it must surface as the declared IOException, naming the path
+    // ZipInputStream.getNextEntry() throws an unchecked IllegalArgumentException on JDK 21 (a ZipException on
+    // JDK 25) for an entry name that's invalid UTF-8 with the UTF-8 (EFS) flag set - it must surface as the
+    // declared IOException, naming the path
     Path file = tempDir.resolve("malformed.txt.zip");
     Files.write(file, buildLocalFileHeaderWithMalformedUtf8EntryName());
     IOException ex = assertThrows(IOException.class, () -> StreamUtils.openInputStream(file));
     assertTrue(ex.getMessage() != null && ex.getMessage().contains(file.toString()), String.valueOf(ex.getMessage()));
-    assertInstanceOf(IllegalArgumentException.class, ex.getCause());
+    assertTrue(ex.getCause() instanceof IllegalArgumentException || ex.getCause() instanceof ZipException,
+        String.valueOf(ex.getCause()));
   }
 
   @Test
@@ -1709,13 +1711,14 @@ class StreamUtilsTest {
     Files.write(file, buildLocalFileHeaderWithMalformedUtf8EntryName());
     IOException ex = assertThrows(IOException.class, () -> StreamUtils.openReader(file));
     assertTrue(ex.getMessage() != null && ex.getMessage().contains(file.toString()), String.valueOf(ex.getMessage()));
-    assertInstanceOf(IllegalArgumentException.class, ex.getCause());
+    assertTrue(ex.getCause() instanceof IllegalArgumentException || ex.getCause() instanceof ZipException,
+        String.valueOf(ex.getCause()));
   }
 
   /**
    * Hand-builds the bytes of a single zip local file header whose general-purpose flag declares UTF-8 (EFS,
    * bit 11) encoding, but whose entry name is not valid UTF-8 - triggering an {@link IllegalArgumentException}
-   * from the JDK's zip entry-name decoder. Same layout as
+   * from the JDK 21 zip entry-name decoder (a {@link ZipException} on JDK 25). Same layout as
    * {@code ZippedFileInputStreamTest.buildLocalFileHeaderWithMalformedUtf8Name()} - not shared between the two
    * test classes since it's a small, self-contained fixture rather than real production/test-utility code.
    */

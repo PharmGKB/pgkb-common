@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Locale;
+import java.util.zip.ZipException;
 import java.util.zip.ZipInputStream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -137,9 +138,9 @@ class ZippedFileInputStreamTest {
 
   @Test
   void closesUnderlyingStreamWhenEntryNameIsMalformed() throws Exception {
-    // ZipInputStream.getNextEntry() throws an unchecked IllegalArgumentException (not IOException) for an
-    // entry name that's invalid UTF-8 with the UTF-8 (EFS) flag set - that must still close the underlying
-    // stream, not just the checked-IOException case
+    // ZipInputStream.getNextEntry() throws an unchecked IllegalArgumentException (not IOException) on JDK 21 for
+    // an entry name that's invalid UTF-8 with the UTF-8 (EFS) flag set - that must still close the underlying
+    // stream, not just the checked-IOException case (JDK 25 throws a ZipException instead)
     byte[] malformedZip = buildLocalFileHeaderWithMalformedUtf8Name();
     boolean[] closed = { false };
     InputStream tracked = new FilterInputStream(new java.io.ByteArrayInputStream(malformedZip)) {
@@ -149,14 +150,15 @@ class ZippedFileInputStreamTest {
         super.close();
       }
     };
-    assertThrows(IllegalArgumentException.class, () -> new ZippedFileInputStream(tracked, "irrelevant.txt"));
+    Exception ex = assertThrows(Exception.class, () -> new ZippedFileInputStream(tracked, "irrelevant.txt"));
+    assertTrue(ex instanceof IllegalArgumentException || ex instanceof ZipException, ex.toString());
     assertTrue(closed[0]);
   }
 
   /**
    * Hand-builds the bytes of a single zip local file header whose general-purpose flag declares UTF-8 (EFS,
    * bit 11) encoding, but whose entry name is not valid UTF-8 - triggering an {@link IllegalArgumentException}
-   * from the JDK's zip entry-name decoder.
+   * from the JDK 21 zip entry-name decoder (a {@link ZipException} on JDK 25).
    */
   private static byte[] buildLocalFileHeaderWithMalformedUtf8Name() throws IOException {
     byte[] nameBytes = { (byte)0xC3, (byte)0x28 }; // invalid UTF-8 sequence

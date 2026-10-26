@@ -12,8 +12,14 @@ on:
 
 jobs:
   build:
-    name: Build and Test
+    name: Build and Test (JDK ${{ matrix.java }})
     runs-on: ubuntu-latest
+    strategy:
+      # one JDK failing shouldn't cancel the other: knowing whether a failure is JDK-specific is the point
+      fail-fast: false
+      matrix:
+        # 21 is what release.yml builds and publishes with; 25 catches JDK behavior changes before consumers do
+        java: [21, 25]
 
     steps:
       - name: Checkout code
@@ -23,7 +29,7 @@ jobs:
         uses: actions/setup-java@v6
         with:
           distribution: temurin
-          java-version: 21
+          java-version: ${{ matrix.java }}
           cache: gradle
 
       - name: Build and test
@@ -34,6 +40,7 @@ jobs:
         run: ./gradlew test javadoc
 
       - name: Codecov
+        if: matrix.java == 21
         uses: codecov/codecov-action@v7
         with:
           files: ./build/reports/jacoco/test/jacocoTestReport.xml
@@ -65,7 +72,7 @@ jobs:
                     "type": "section",
                     "text": {
                       "type": "mrkdwn",
-                      "text": ":stop: <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|FAILED ${{ github.workflow }}!>"
+                      "text": ":stop: <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|FAILED ${{ github.workflow }} (JDK ${{ matrix.java }})!>"
                     }
                   },
                   {
