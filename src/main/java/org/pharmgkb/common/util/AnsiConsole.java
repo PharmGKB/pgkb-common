@@ -54,8 +54,10 @@ public class AnsiConsole {
 
 
   private static boolean isIntelliJ() {
+    // "java.class.path" is absent for some non-standard JVM launch contexts (e.g. embedded via JNI) - an NPE
+    // here would happen during this class's static initializer, permanently breaking the whole class
     String classPath = System.getProperty("java.class.path");
-    if (classPath.contains("idea_rt.jar")) {
+    if (classPath != null && classPath.contains("idea_rt.jar")) {
       return true;
     }
     try {

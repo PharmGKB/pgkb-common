@@ -5,8 +5,9 @@ import java.util.function.BinaryOperator;
 
 
 /**
- * This is a merge function that rejects duplicate keys.
- * Used to collect a stream into a {@link SortedMap}.
+ * This is a {@link BinaryOperator} to use as the merge function for {@link java.util.stream.Collectors#toMap},
+ * which rejects merging (i.e. throws) when two different inputs map to the same key. Used to collect a stream
+ * into a {@link SortedMap}.
  * <p>
  * Example:
  * {@code
@@ -20,6 +21,7 @@ public class NoDuplicateMergeFunction<T> implements BinaryOperator<T> {
 
   @Override
   public T apply(T o, T o2) {
-    throw new RuntimeException(String.format("Duplicate key %s", o));
+    // a merge function only gets the two colliding values, never the key
+    throw new IllegalStateException(String.format("Duplicate value %s (colliding with %s)", o, o2));
   }
 }

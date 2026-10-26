@@ -35,11 +35,32 @@ class NoDuplicateMergeFunctionTest {
   @Test
   void testMergeDup() {
 
-    Assertions.assertThrows(RuntimeException.class, () -> {
+    Assertions.assertThrows(IllegalStateException.class, () -> {
       List<String> list = Lists.newArrayList("C", "C", "A");
       Map rez = list.stream()
           .collect(Collectors.toMap(s -> "key:" + s, Function.identity(), new NoDuplicateMergeFunction<>(), TreeMap::new));
       System.out.println(rez.size());
     });
+  }
+
+  @Test
+  void testMergeDupMessageDoesNotClaimToShowKey() {
+    // apply() only ever receives the colliding VALUES (per Collectors.toMap()'s merge-function contract), not
+    // the key - the message must not mislabel a value as "the duplicate key", which differs from the actual
+    // map key whenever the key-mapper isn't the identity function (as in this class's own javadoc example)
+    List<String> list = Lists.newArrayList("C", "C", "A");
+    IllegalStateException ex = Assertions.assertThrows(IllegalStateException.class, () ->
+        list.stream().collect(Collectors.toMap(s -> "key:" + s, Function.identity(), new NoDuplicateMergeFunction<>(), TreeMap::new)));
+    assertThat(ex.getMessage(), equalTo("Duplicate value C (colliding with C)"));
+  }
+
+  @Test
+  void testMergeDupMessageIncludesBothCollidingValues() {
+    // Collectors.toMap()'s own default merge function reports both colliding values in its message; dropping
+    // the second makes a collision much harder to diagnose whenever the two colliding values actually differ
+    List<Integer> list = Lists.newArrayList(1, 11);
+    IllegalStateException ex = Assertions.assertThrows(IllegalStateException.class, () ->
+        list.stream().collect(Collectors.toMap(i -> i % 10, Function.identity(), new NoDuplicateMergeFunction<>(), TreeMap::new)));
+    assertThat(ex.getMessage(), equalTo("Duplicate value 1 (colliding with 11)"));
   }
 }

@@ -1,7 +1,9 @@
 package org.pharmgkb.common.util;
 
-import java.io.StringReader;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 /**
@@ -12,19 +14,25 @@ import org.junit.jupiter.api.Test;
 class IoUtilsTest {
 
   @Test
-  void closeQuietly() {
+  void closeQuietlyClosesCleanly() {
+    boolean[] closed = { false };
+    IoUtils.closeQuietly(() -> closed[0] = true);
+    assertTrue(closed[0]);
+  }
 
-    // close cleanly
-    IoUtils.closeQuietly(new StringReader("all ok"));
-
-
-    // close with exception
-    StringReader reader = new StringReader("not ok") {
-      @Override
-      public void close() {
-        throw new RuntimeException("expected");
-      }
+  @Test
+  void closeQuietlySuppressesExceptionFromClose() {
+    boolean[] attempted = { false };
+    AutoCloseable throwing = () -> {
+      attempted[0] = true;
+      throw new RuntimeException("expected");
     };
-    IoUtils.closeQuietly(reader);
+    assertDoesNotThrow(() -> IoUtils.closeQuietly(throwing));
+    assertTrue(attempted[0]);
+  }
+
+  @Test
+  void closeQuietlyAcceptsNull() {
+    assertDoesNotThrow(() -> IoUtils.closeQuietly(null));
   }
 }
