@@ -1,7 +1,7 @@
 package org.pharmgkb.common.util;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -13,9 +13,9 @@ import com.google.common.collect.Lists;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
+import org.apache.commons.cli.help.HelpFormatter;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 
@@ -65,38 +65,119 @@ public class CliHelper {
    */
   public CliHelper addVersion(String version) {
     Preconditions.checkArgument(version != null);
+    if (m_version != null) {
+      // distinct from the "another option" collision below - addVersion() itself already registered
+      // "version", so blaming "another option" would misattribute the collision to something that doesn't
+      // exist
+      throw new IllegalArgumentException("addVersion() has already been called");
+    }
+    if (m_options.getOption(sf_versionFlag) != null) {
+      throw new IllegalArgumentException("Cannot add version option: '-version'/'--version' is already in use " +
+          "by another option");
+    }
     m_version = version;
-    return addOption(new Option(sf_versionFlag, sf_versionFlag, false, "print version and exit"));
+    // bypasses the reserved-argument check since this is the sole legitimate registrar of "version"
+    return addOptionInternal(new Option(sf_versionFlag, sf_versionFlag, false, "print version and exit"), false);
   }
 
 
   public CliHelper addOption(Option option) {
+    return addOptionInternal(option, true);
+  }
 
-    if (option.getOpt().equals("h") || option.getOpt().equals("v")) {
-      throw new IllegalArgumentException("-h and -v are reserved arguments");
+  private CliHelper addOptionInternal(Option option, boolean checkReserved) {
+
+    if (checkReserved && isReserved(option.getOpt(), option.getLongOpt())) {
+      throw new IllegalArgumentException(reservedArgsMessage());
     }
-    if (option.isRequired()) {
-      m_helpOptions.addOption(new Option(option.getOpt(), option.getLongOpt(), option.hasArg(), option.getDescription()));
-    } else {
-      m_helpOptions.addOption(option);
+    checkNotAlreadyRegistered(option.getOpt(), option.getLongOpt());
+    // the other addOption(...) overload's negative-numArgs guard doesn't cover this one, since this one
+    // takes an ALREADY-BUILT Option - Commons CLI itself accepts Option.Builder.numberOfArgs(-3), silently
+    // degrading hasArg() to false (same "silent degradation to a flag" failure mode that guard exists to
+    // prevent). Option.UNINITIALIZED (-1, "no args") and Option.UNLIMITED_VALUES (-2) are Commons CLI's own
+    // legitimate negative values and must stay accepted - only anything more negative is a real bug.
+    Preconditions.checkArgument(option.getArgs() >= Option.UNLIMITED_VALUES,
+        "numArgs must be >= %s (Option.UNLIMITED_VALUES)", Option.UNLIMITED_VALUES);
+    // the help-options clone must never require an argument (regardless of the real option's requirements),
+    // so -h/-version can always be detected even if another, incomplete option is present. But if the real
+    // option accepts an argument, the clone must accept the same shape of argument too (as optional), or
+    // Commons CLI's lenient first pass rejects "--opt=value"/"-o=value"/"-Dkey=value" syntax as an
+    // unrecognized option entirely (numberOfArgs is what's load-bearing here, not just hasArg - mirroring
+    // valueSeparator too is harmless but not actually required, since this clone's parsed values are never
+    // read, only whether parsing succeeds).
+    Option.Builder helpOptBuilder = Option.builder(option.getOpt())
+        .longOpt(option.getLongOpt())
+        .desc(option.getDescription());
+    if (option.hasArg()) {
+      helpOptBuilder.numberOfArgs(option.getArgs()).optionalArg(true);
+      if (option.getValueSeparator() != 0) {
+        helpOptBuilder.valueSeparator(option.getValueSeparator());
+      }
     }
+    m_helpOptions.addOption(helpOptBuilder.get());
     m_options.addOption(option);
     return this;
   }
+
+  /**
+   * Checks if {@code shortName} or {@code longName} collides with a reserved argument (-h/--help, -v/--verbose, or
+   * -version/--version if {@link #addVersion(String)} has been called).
+   */
+  private boolean isReserved(@Nullable String shortName, @Nullable String longName) {
+    // Commons CLI doesn't require short opts to be 1 character (or long opts to be more than 1), so each
+    // reserved form ("h"/"v" and "help"/"verbose") must be checked against BOTH shortName and longName -
+    // otherwise a user's own option collides with hasOption()/isHelpRequested()/isVerbose() (which match by
+    // either short or long opt) without ever being rejected here
+    if ("h".equals(shortName) || "h".equals(longName) || "v".equals(shortName) || "v".equals(longName) ||
+        sf_helpFlag.equals(shortName) || sf_helpFlag.equals(longName) ||
+        sf_verboseFlag.equals(shortName) || sf_verboseFlag.equals(longName)) {
+      return true;
+    }
+    return m_version != null && (sf_versionFlag.equals(shortName) || sf_versionFlag.equals(longName));
+  }
+
+  /**
+   * Builds an error message describing the arguments that are currently reserved.
+   */
+  private String reservedArgsMessage() {
+    return m_version == null
+        ? "-h, -v, --help and --verbose are reserved arguments"
+        : "-h, -v, --help, --verbose, -version and --version are reserved arguments";
+  }
+
+  /**
+   * Checks that neither {@code shortName} nor {@code longName} is already in use by another option, as either a
+   * short or a long name.
+   * <p>
+   * Both roles are checked because Commons CLI keys options by {@code Option.getKey()} (the short name if set,
+   * otherwise the long name), and resolves {@code --name} against short names before long ones: a name used as one
+   * option's short name and another's long name would make one of them unreachable.
+   */
+  private void checkNotAlreadyRegistered(@Nullable String shortName, @Nullable String longName) {
+    if (shortName != null && (m_options.hasShortOption(shortName) || m_options.hasLongOption(shortName))) {
+      throw new IllegalArgumentException("Cannot add option: '-" + shortName + "' is already in use by another option");
+    }
+    if (longName != null && (m_options.hasLongOption(longName) || m_options.hasShortOption(longName))) {
+      throw new IllegalArgumentException("Cannot add option: '--" + longName +
+          "' is already in use by another option");
+    }
+  }
+
 
   /**
    * Add a boolean option (aka a flag).
    */
   public CliHelper addOption(String shortName, String longName, String description) {
 
-    if (shortName.equals("h") || shortName.equals("v") || shortName.equals(sf_verboseFlag)) {
-      throw new IllegalArgumentException("-h, -v and -version are reserved arguments");
+    if (isReserved(shortName, longName)) {
+      throw new IllegalArgumentException(reservedArgsMessage());
     }
+    checkNotAlreadyRegistered(shortName, longName);
     Option opt = Option.builder(shortName)
         .longOpt(longName)
         .desc(description)
         .hasArg(false)
-        .build();
+        .get();
     m_helpOptions.addOption(opt);
     m_options.addOption(opt);
     return this;
@@ -112,17 +193,40 @@ public class CliHelper {
 
   /**
    * Adds an option that takes arguments.
+   * <p>
+   * For {@code numArgs > 1}, Commons CLI only guarantees that at least one value was supplied, not exactly
+   * {@code numArgs}: depending on {@code argsAreRequired}, supplying fewer values either succeeds or fails
+   * {@link #parse} (and not monotonically), and positional arguments that follow can be consumed as the option's
+   * values. Callers that need an exact count should check {@code getValues(opt).size()} after a successful
+   * {@link #parse}.
    *
    * @param numArgs 0 if argument(s) are optional, otherwise the number of expected arguments
    */
   public CliHelper addOption(String shortName, String longName, String description,
       boolean isOptionRequired, String argName, int numArgs, boolean argsAreRequired) {
 
-    if (shortName.equals("h") || shortName.equals("v")) {
-      throw new IllegalArgumentException("-h and -v are reserved arguments");
+    if (isReserved(shortName, longName)) {
+      throw new IllegalArgumentException(reservedArgsMessage());
     }
+    checkNotAlreadyRegistered(shortName, longName);
+    // numArgs is documented as "0 if optional, otherwise the number of expected arguments" - a negative
+    // value fits neither case. Left unrejected, Commons CLI either silently resets a small negative value
+    // back to 1 (Option.Builder.optionalArg()) or passes a more negative one through as a real negative arg
+    // count, which DefaultParser NPEs on for "--opt=value" syntax instead of parse()'s documented
+    // false-return contract
+    Preconditions.checkArgument(numArgs >= 0, "numArgs must be >= 0");
+    // numArgs=0 is documented as meaning "argument(s) are optional" - pairing it with argsAreRequired=true
+    // is self-contradictory (0 required args) and would otherwise silently produce a zero-argument option
+    Preconditions.checkArgument(numArgs > 0 || !argsAreRequired,
+        "numArgs must be > 0 when argsAreRequired is true");
 
-    m_helpOptions.addOption(buildOption(shortName, longName, description, false, argName, numArgs, argsAreRequired));
+    // the help-options clone must never require an argument (regardless of numArgs/argsAreRequired), so
+    // -h/-version can always be detected even if another, incomplete option is present. But it must still
+    // accept the same number of optional arguments (this overload is always for an arg-taking option), or
+    // Commons CLI's lenient first pass rejects "--opt=value"/"-o=value" syntax - or a numArgs>1 option's
+    // multi-value syntax - as an unrecognized option entirely.
+    m_helpOptions.addOption(Option.builder(shortName).longOpt(longName).desc(description)
+        .numberOfArgs(numArgs == 0 ? 1 : numArgs).optionalArg(true).get());
     m_options.addOption(buildOption(shortName, longName, description, isOptionRequired, argName, numArgs, argsAreRequired));
     return this;
   }
@@ -134,30 +238,38 @@ public class CliHelper {
     Option.Builder optBuilder = Option.builder(shortName)
         .longOpt(longName)
         .desc(description)
-        .argName(argName)
-        .numberOfArgs(numArgs);
+        .argName(argName);
 
     if (argsAreRequired) {
-      optBuilder.hasArg();
+      optBuilder.numberOfArgs(numArgs);
     } else {
-      optBuilder.optionalArg(true);
+      // numArgs=0 is documented as "optional"; Commons CLI needs an explicit positive arg count for
+      // optionalArg(true) to actually take effect, otherwise the option never captures its value
+      optBuilder.numberOfArgs(numArgs == 0 ? 1 : numArgs).optionalArg(true);
     }
     // add non-require variant to help options
     if (isOptionRequired) {
       optBuilder.required();
     }
-    return optBuilder.build();
+    return optBuilder.get();
   }
 
 
   /**
    * Parses arguments.
+   * <p>
+   * On failure (a {@code false} return, other than for a help/version request), the command line is left
+   * unset - every accessor below that requires a successful parse ({@link #hasOption}, {@link #getValue},
+   * {@link #getValues}, {@link #getArguments}, {@link #isVerbose}) then throws {@link IllegalStateException}
+   * rather than returning stale or partial data.
    *
    * @return true if parse completed and processing should continue, false if there are missing arguments or
    * help or version was requested
    */
   public boolean parse(String[] args) {
 
+    m_error = null;
+    m_commandLine = null;
     try {
       CommandLineParser parser = new DefaultParser();
       // check for -h
@@ -175,6 +287,8 @@ public class CliHelper {
       return true;
 
     } catch (org.apache.commons.cli.ParseException ex) {
+      // don't leave m_commandLine pointing at an earlier, successful pass's stale/lenient result
+      m_commandLine = null;
       m_error = ex.getMessage();
       System.err.println(m_error);
       System.err.println();
@@ -188,19 +302,32 @@ public class CliHelper {
    * This helps enforce proper exit codes.
    */
   public void execute(String[] args, Function<CliHelper, Integer> function) {
+    System.exit(computeExitCode(args, function));
+  }
+
+  /**
+   * Computes the exit code for {@link #execute(String[], Function)} without actually exiting the JVM, so that
+   * this logic can be tested.
+   *
+   * @param function the function to run; if it returns null, this is treated as a successful exit code of 0
+   */
+  int computeExitCode(String[] args, Function<CliHelper, Integer> function) {
 
     if (!parse(args)) {
-      if (isHelpRequested()) {
-        System.exit(0);
+      if (isHelpRequested() || isVersionRequested()) {
+        return 0;
       }
-      System.exit(1);
+      return 1;
     }
-    System.exit(function.apply(this));
+    Integer exitCode = function.apply(this);
+    return exitCode == null ? 0 : exitCode;
   }
 
 
   /**
    * Checks whether the specified option exists.
+   *
+   * @throws IllegalStateException if called before {@link #parse} or after a failed parse
    */
   public boolean hasOption(String opt) {
     Preconditions.checkState(m_commandLine != null, "Command line has not been parsed");
@@ -208,10 +335,12 @@ public class CliHelper {
   }
 
   /**
-   * Gets the first String value, if any, for the given option.
+   * Gets the first String value, if any, for the given option. A whitespace-only value is stripped to
+   * {@code null}, same as a truly missing one.
    *
    * @param opt the name of the option
    * @return Value of the argument if the option is set and has an argument, otherwise null.
+   * @throws IllegalStateException if called before {@link #parse} or after a failed parse
    */
   public @Nullable String getValue(String opt) {
     Preconditions.checkState(m_commandLine != null, "Command line has not been parsed");
@@ -221,6 +350,7 @@ public class CliHelper {
   /**
    * Gets the String values for the given option.
    * @return returns a List of the specified values, empty list if no options specified
+   * @throws IllegalStateException if called before {@link #parse} or after a failed parse
    */
   public List<String> getValues(String opt) {
     Preconditions.checkState(m_commandLine != null, "Command line has not been parsed");
@@ -232,54 +362,95 @@ public class CliHelper {
   }
 
   /**
-   * Gets the int value for the given option.
+   * Builds the exception for a required value that {@link #getValue} returned null for - distinguishing 3
+   * different situations that all collapse to that same null: "option not supplied at all", "option supplied
+   * with no value at all" (e.g. an optional-arg option given bare, like {@code -d} alone), and "option
+   * supplied, but its value stripped to blank" ({@link #getValue} strips a whitespace-only value to null the
+   * same as either of the above) - only the first is accurately described as "missing."
    */
-  public int getIntValue(String opt) {
-    Preconditions.checkState(m_commandLine != null, "Command line has not been parsed");
-    return Integer.parseInt(m_commandLine.getOptionValue(opt));
+  private IllegalArgumentException missingValueException(String opt) {
+    if (hasOption(opt)) {
+      if (m_commandLine.getOptionValue(opt) == null) {
+        return new IllegalArgumentException("Option '" + opt + "' was supplied with no value");
+      }
+      return new IllegalArgumentException("Option '" + opt + "' has a blank value");
+    }
+    return new IllegalArgumentException("Missing option '" + opt + "'");
+  }
+
+  /**
+   * Gets the first String value for the given option, which must be present.
+   *
+   * @throws IllegalArgumentException if the option wasn't supplied, was supplied with no value at all, or its
+   * value stripped to blank (see {@link #getValue})
+   */
+  public String getRequiredValue(String opt) {
+    String val = getValue(opt);
+    if (val == null) {
+      throw missingValueException(opt);
+    }
+    return val;
   }
 
 
   /**
-   * Gets the value for the given option as a {@link File}.
+   * Gets the int value for the given option.
    *
-   * @param createIfNotExist if true and the directory doesn't exist, create the directory;
-   * otherwise, if false and the directory doesn't exist, throw InvalidPathException
-   * @return the directory
-   * @throws IllegalArgumentException if the option was not specified
-   * @throws InvalidPathException if the specified path is not a directory or {@code createIfNotExist} is false and
-   * directory doesn't exist
+   * @throws IllegalArgumentException if the option wasn't supplied, was supplied with no value at all, or its
+   * value stripped to blank (see {@link #getValue})
+   * @throws NumberFormatException if the value is not a parseable int
    */
-  public Path getValidDirectory(String opt, boolean createIfNotExist) throws IOException {
-
+  public int getIntValue(String opt) {
     String val = getValue(opt);
     if (val == null) {
-      throw new IllegalArgumentException("Missing option '" + opt + "'");
+      throw missingValueException(opt);
     }
-    Path dir = Paths.get(val);
-    if (Files.exists(dir)) {
-      if (Files.isDirectory(dir)) {
-        return dir;
-      }
-      throw new InvalidPathException("Not a valid directory: " + dir);
-    } else if (createIfNotExist) {
-      Files.createDirectories(dir);
-      return dir;
-    }
-    throw new InvalidPathException("No such directory: " + dir);
+    return Integer.parseInt(val);
   }
 
 
   /**
    * Gets the value for the given option as a {@link Path}.
    *
-   * @throws IllegalArgumentException if the option was not specified
+   * @param createIfNotExist if true and the directory doesn't exist, create the directory;
+   * otherwise, if false and the directory doesn't exist, throw InvalidCliPathException
+   * @return the directory
+   * @throws IllegalArgumentException if the option wasn't supplied, was supplied with no value at all, or its
+   * value stripped to blank (see {@link #getValue})
+   * @throws InvalidCliPathException if the specified path is not a directory or {@code createIfNotExist} is false and
+   * directory doesn't exist
+   */
+  public Path getValidDirectory(String opt, boolean createIfNotExist) throws IOException {
+
+    String val = getValue(opt);
+    if (val == null) {
+      throw missingValueException(opt);
+    }
+    Path dir = Paths.get(val);
+    if (Files.exists(dir)) {
+      if (Files.isDirectory(dir)) {
+        return dir;
+      }
+      throw new InvalidCliPathException("Not a valid directory: " + dir);
+    } else if (createIfNotExist) {
+      Files.createDirectories(dir);
+      return dir;
+    }
+    throw new InvalidCliPathException("No such directory: " + dir);
+  }
+
+
+  /**
+   * Gets the value for the given option as a {@link Path}.
+   *
+   * @throws IllegalArgumentException if the option wasn't supplied, was supplied with no value at all, or its
+   * value stripped to blank (see {@link #getValue})
    */
   public Path getPath(String opt) {
 
     String val = getValue(opt);
     if (val == null) {
-      throw new IllegalArgumentException("Missing option '" + opt + "'");
+      throw missingValueException(opt);
     }
     return Paths.get(val);
   }
@@ -287,17 +458,20 @@ public class CliHelper {
   /**
    * Gets the value for the given option as a {@link Path}, that must point to an existing file.
    *
-   * @throws InvalidPathException if the file doesn't exist
+   * @throws IllegalArgumentException if the option wasn't supplied, was supplied with no value at all, or its
+   * value stripped to blank (propagated from {@link #getPath})
+   * @throws InvalidCliPathException if {@code mustExist} is true and the file doesn't exist, or if the path exists but
+   * is not a regular file
    */
-  public Path getValidFile(String opt, boolean mustExist) throws InvalidPathException {
+  public Path getValidFile(String opt, boolean mustExist) throws InvalidCliPathException {
     Path p = getPath(opt);
     if (!Files.exists(p)) {
       if (mustExist) {
-        throw new InvalidPathException("File '" + p + "' does not exist");
+        throw new InvalidCliPathException("File '" + p + "' does not exist");
       }
     } else {
       if (!Files.isRegularFile(p)) {
-        throw new InvalidPathException("Not a file: '" + p);
+        throw new InvalidCliPathException("Not a file: '" + p + "'");
       }
     }
     // parent can be null if the path has no dir info (e.g. "foo.txt" vs. "./foo.txt")
@@ -309,16 +483,20 @@ public class CliHelper {
 
 
   /**
-   * Gets remaining parameters.
+   * Gets remaining parameters. The returned list is unmodifiable.
+   *
+   * @throws IllegalStateException if called before {@link #parse} or after a failed parse
    */
   public List getArguments() {
     Preconditions.checkState(m_commandLine != null, "Command line has not been parsed");
-    return m_commandLine.getArgList();
+    return Collections.unmodifiableList(m_commandLine.getArgList());
   }
 
 
   /**
    * Gets whether to operate in verbose mode.
+   *
+   * @throws IllegalStateException if called before {@link #parse} or after a failed parse
    */
   public boolean isVerbose() {
     Preconditions.checkState(m_commandLine != null, "Command line has not been parsed");
@@ -355,16 +533,31 @@ public class CliHelper {
 
   /**
    * Prints the help message.
+   *
+   * @throws UncheckedIOException if writing the help output fails
    */
   public void printHelp() {
 
-    HelpFormatter formatter = new HelpFormatter();
-    formatter.printHelp(m_name, m_options);
+    // showSince defaults to true, adding a "Since" column populated from Option.getSince() - nothing in
+    // this codebase ever sets that, so every row would show a meaningless "--" filler with no way to ever
+    // populate it. main's old HelpFormatter never had such a column at all.
+    HelpFormatter formatter = HelpFormatter.builder().setShowSince(false).get();
+    try {
+      formatter.printHelp(m_name, null, m_options, null, true);
+    } catch (IOException ex) {
+      // the new commons-cli help API models output as a checked-exception-producing HelpAppendable, but
+      // this formatter's default HelpAppendable just writes to System.out - not expected to fail in practice
+      throw new UncheckedIOException(ex);
+    }
   }
 
 
-  public static class InvalidPathException extends IllegalArgumentException {
-    InvalidPathException(String msg) {
+  /**
+   * Thrown for an invalid path option. Not named {@code InvalidPathException}, so it can't be confused with
+   * {@link java.nio.file.InvalidPathException} in a {@code catch}.
+   */
+  public static class InvalidCliPathException extends IllegalArgumentException {
+    InvalidCliPathException(String msg) {
       super(msg);
     }
   }
