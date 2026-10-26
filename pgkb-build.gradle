@@ -55,8 +55,10 @@ jar {
 }
 
 tasks.withType(Javadoc) {
-  // disable the crazy super-strict doclint tool
-  options.addStringOption('Xdoclint:none', '-quiet')
+  // "none" hid real defects (e.g. a malformed self-closing <p/> tag) along with the noisy "missing
+  // comment" warnings for undocumented members - "all,-missing" still catches broken HTML/@link targets/etc.
+  // without requiring every member to have a javadoc comment
+  options.addStringOption('Xdoclint:all,-missing', '-quiet')
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
