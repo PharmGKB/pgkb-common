@@ -54,13 +54,23 @@ jobs:
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
 
+      - name: Get commit header
+        id: commit-msg
+        if: failure()
+        # only the subject line: a full commit body can run past Slack's 3000-character limit on a text field,
+        # and Slack then rejects the whole message
+        run: echo "header=$(git log -1 --format=%s)" >> "$GITHUB_OUTPUT"
+
       - name: Send Slack notification on failure
         if: failure()
-        uses: slackapi/slack-github-action@v1
+        uses: slackapi/slack-github-action@v4
         with:
-          channel-id: 'C0C9UT8MZLM'  # #ops-ci
+          method: chat.postMessage
+          token: ${{ secrets.SLACK_NOTIFICATIONS_BOT_TOKEN }}
+          # C0C9UT8MZLM is #ops-ci
           payload: |
             {
+              "channel": "C0C9UT8MZLM",
               "attachments": [{
                 "color": "#ff0000",
                 "blocks": [
@@ -75,7 +85,7 @@ jobs:
                     "type": "section",
                     "text": {
                       "type": "mrkdwn",
-                      "text": "Triggered by ${{ github.event_name }} on <${{ github.event.pull_request.html_url || github.event.head_commit.url }}|${{ github.ref_name }}> by ${{ github.actor }}."
+                      "text": "Triggered by ${{ github.event_name }} on <${{ github.event.release.html_url }}|${{ github.ref_name }}> by ${{ github.actor }}."
                     }
                   },
                   {
@@ -83,16 +93,10 @@ jobs:
                     "elements": [
                       {
                         "type": "mrkdwn",
-                        "text": "Last commit:"
-                      },
-                      {
-                        "type": "mrkdwn",
-                        "text": ${{ toJSON(github.event.head_commit.message || '(none)') }}
+                        "text": ${{ toJSON(format('Last commit: {0}', steps.commit-msg.outputs.header)) }}
                       }
                     ]
                   }
                 ]
             }]
             }
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_NOTIFICATIONS_BOT_TOKEN }}
