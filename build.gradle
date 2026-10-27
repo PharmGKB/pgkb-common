@@ -75,9 +75,8 @@ repositories {
 
 dependencies {
   // api, not implementation: these types appear in this library's own public API (CliHelper.addOption(Option),
-  // ExtendedEnumConverter implements Converter, @Nullable on nearly every public signature) - implementation
-  // scope wouldn't put them on downstream consumers' compile classpath
-  api 'commons-beanutils:commons-beanutils:1.11.0'
+  // @Nullable on nearly every public signature) - implementation scope wouldn't put them on downstream consumers'
+  // compile classpath
   api 'commons-cli:commons-cli:1.11.0'
   api 'org.jspecify:jspecify:1.0.1'
 

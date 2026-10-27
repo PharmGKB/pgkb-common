@@ -215,7 +215,7 @@ class ExtendedEnumHelperTest {
   @Test
   void testConcurrentReadDuringAddDoesNotThrow() throws InterruptedException {
     // lookups must never throw/corrupt while a concurrent add() is in progress (e.g. via
-    // ExtendedEnumConverter.convert(), reachable from another thread with just a bare Class reference, while
+    // BeanProperties.convert(), reachable from another thread with just a bare Class reference, while
     // an enum's own static initializer is still registering later constants on a different thread) - a plain
     // TreeMap would risk ConcurrentModificationException/undefined behavior here
     ExtendedEnumHelper<Foo> enumHelper = new ExtendedEnumHelper<>(Foo.class);

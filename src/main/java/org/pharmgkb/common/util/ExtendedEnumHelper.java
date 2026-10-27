@@ -8,7 +8,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.regex.Pattern;
 import com.google.common.base.Preconditions;
-import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.WordUtils;
 import org.jspecify.annotations.Nullable;
@@ -34,13 +33,9 @@ public class ExtendedEnumHelper<T extends ExtendedEnum> {
   private final Collection<T> m_displayNameMapValues = Collections.unmodifiableCollection(m_displayNameMap.values());
 
 
-  /**
-   * This constructor registers the {@link ExtendedEnum} for conversion by BeanUtils.
-   */
   public ExtendedEnumHelper(Class clz) {
     Preconditions.checkNotNull(clz, "clz is null");
     m_enumClass = clz;
-    ConvertUtils.register(ExtendedEnumConverter.getConverter(), clz);
   }
 
 
